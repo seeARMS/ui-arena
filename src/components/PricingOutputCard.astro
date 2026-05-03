@@ -1,0 +1,138 @@
+---
+const { output } = Astro.props;
+const style = `--accent: ${output.accent}; --accent-soft: ${output.accentSoft};`;
+const hasPreview = output.previewUrl && output.previewUrl !== "#";
+const hasScreenshot = output.screenshotUrl && output.screenshotUrl !== "#";
+const hasSource = output.sourceUrl && output.sourceUrl !== "#";
+const hasEvaluationReport = output.evaluationReportUrl && output.evaluationReportUrl !== "#";
+---
+
+<article class="output-card" style={style}>
+  <div class="output-thumbnail">
+    {
+      hasScreenshot ? (
+        <img src={output.screenshotUrl} alt={`${output.model} generated interface screenshot`} loading="lazy" />
+      ) : (
+        <div class="mock-screenshot mock-screenshot-compact" aria-label={`Placeholder screenshot for ${output.model}`}>
+          <div class="mock-browser">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="mock-hero">
+            <div>
+              <span></span>
+              <strong></strong>
+              <small></small>
+            </div>
+          </div>
+          <div class="mock-plans">
+            <div></div>
+            <div class="is-featured"></div>
+            <div></div>
+          </div>
+        </div>
+      )
+    }
+  </div>
+
+  <div class="output-main">
+    <div class="output-meta">
+      <div>
+        <p class="eyebrow">{output.family}</p>
+        <h2>{output.model}</h2>
+      </div>
+      <span>{output.stateLabel}</span>
+    </div>
+
+    {output.stats.length > 0 && (
+      <div class="run-stats" aria-label={`${output.model} run statistics`}>
+        {output.stats.map((stat) => (
+          <div>
+            <span>{stat.label}</span>
+            <strong>{stat.value}</strong>
+          </div>
+        ))}
+      </div>
+    )}
+
+    {output.evaluations.length > 0 && (
+      <section class="evaluation-strip" aria-label={`${output.model} evaluator results`}>
+        <div class="evaluation-strip-header">
+          <span>Evaluator results</span>
+          {hasEvaluationReport && <a href={output.evaluationReportUrl}>Open report</a>}
+        </div>
+        <div class="evaluation-metrics">
+          {output.evaluations.map((item) => (
+            <div class={`evaluation-metric tone-${item.tone}`} style={`--score: ${item.percent}%`}>
+              <span>{item.label}</span>
+              <strong>{item.value}</strong>
+              <small>{item.detail}</small>
+              <i aria-hidden="true"></i>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <p>{output.note}</p>
+  </div>
+
+  <div class="output-preview-area">
+    {
+      hasPreview ? (
+        <div class="live-preview-shell">
+          <iframe
+            src={output.previewUrl}
+            title={`${output.model} generated pricing page preview`}
+            sandbox="allow-scripts"
+            loading="lazy"
+          />
+        </div>
+      ) : (
+        <div class="mock-screenshot" aria-label={`Placeholder screenshot for ${output.model}`}>
+          <div class="mock-browser">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="mock-hero">
+            <div>
+              <span></span>
+              <strong></strong>
+              <small></small>
+            </div>
+            <button type="button" tabindex="-1">Start</button>
+          </div>
+          <div class="mock-plans">
+            <div></div>
+            <div class="is-featured"></div>
+            <div></div>
+          </div>
+        </div>
+      )
+    }
+  </div>
+
+  <div class="artifact-actions" aria-label={`${output.model} artifacts`}>
+    <a href={output.previewUrl} aria-disabled={!hasPreview ? "true" : undefined}>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 17 17 7M9 7h8v8"></path>
+      </svg>
+      Preview
+    </a>
+    <a href={output.screenshotUrl} aria-disabled={!hasScreenshot ? "true" : undefined}>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 7h16v10H4z"></path>
+        <path d="m8 15 3-3 2 2 2-3 2 4"></path>
+      </svg>
+      Screenshot
+    </a>
+    <a href={output.sourceUrl} aria-disabled={!hasSource ? "true" : undefined}>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m8 9-4 3 4 3M16 9l4 3-4 3M14 5l-4 14"></path>
+      </svg>
+      Source
+    </a>
+  </div>
+</article>

@@ -1,0 +1,113 @@
+---
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import Header from "../../../../components/Header.astro";
+import Footer from "../../../../components/Footer.astro";
+import { generatedResults } from "../../../../data/generated-results.js";
+import { generatedSources } from "../../../../data/generated-sources.js";
+import { interfaceById } from "../../../../data/interfaces.js";
+
+export async function getStaticPaths() {
+  return generatedResults
+    .filter((result) => result.status === "complete" && result.artifacts?.source)
+    .map((result) => ({
+      params: {
+        interfaceId: result.interfaceId,
+        runId: result.runId,
+      },
+      props: { result },
+    }));
+}
+
+function escapeHtml(value) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function lineClass(value) {
+  const trimmed = value.trim();
+
+  if (trimmed.startsWith("<!--")) {
+    return "is-comment";
+  }
+
+  if (trimmed.startsWith("<style") || trimmed.startsWith("</style") || trimmed.includes("{") || trimmed.includes("}")) {
+    return "is-style";
+  }
+
+  if (trimmed.startsWith("<script") || trimmed.startsWith("</script") || trimmed.includes("const ") || trimmed.includes("=>")) {
+    return "is-script";
+  }
+
+  if (trimmed.startsWith("<")) {
+    return "is-markup";
+  }
+
+  return "";
+}
+
+const { result } = Astro.props;
+const interfacePrompt = interfaceById(result.interfaceId);
+const source = generatedSources[`${result.interfaceId}/${result.runId}`] ?? "";
+const lines = source.split("\n").map((line, index) => ({
+  number: index + 1,
+  html: escapeHtml(line) || " ",
+  className: lineClass(line),
+}));
+const renderedLines = lines
+  .map(
+    (line) =>
+      `<span class="source-line ${line.className}"><span class="line-number">${line.number}</span><code>${line.html}</code></span>`,
+  )
+  .join("");
+---
+
+<BaseLayout
+  title={`${result.modelDisplayName} Source - UI Arena`}
+  description={`Rendered source for ${result.modelDisplayName}'s ${interfacePrompt?.title ?? "interface"} output.`}
+  canonicalPath={`/interfaces/${result.interfaceId}/${result.runId}/source/`}
+>
+  <Header active="interfaces" />
+
+  <main>
+    <section class="source-hero">
+      <div class="container source-hero-inner">
+        <div>
+          <p class="eyebrow">Source</p>
+          <h1>{result.modelDisplayName}</h1>
+          <p>{interfacePrompt?.title ?? result.interfaceId}</p>
+        </div>
+        <div class="source-actions">
+          <a class="button button-secondary" href={`/interfaces/${result.interfaceId}/`}>Back to outputs</a>
+          <a class="button button-primary" href={result.artifacts.preview}>Preview</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section source-section">
+      <div class="container">
+        <div class="source-editor-shell">
+          <div class="source-toolbar">
+            <div class="window-dots" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="source-file">index.html</div>
+            <div class="source-meta">{lines.length} lines</div>
+          </div>
+          <pre
+            class="source-code"
+            tabindex="0"
+            aria-label={`${result.modelDisplayName} generated source code`}
+            set:html={renderedLines}
+          ></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>

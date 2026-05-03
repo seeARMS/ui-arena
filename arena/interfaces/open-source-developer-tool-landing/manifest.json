@@ -1,0 +1,9 @@
+{
+  "id": "open-source-developer-tool-landing",
+  "number": 8,
+  "title": "Landing page for an open-source developer tool",
+  "category": "landing-page",
+  "summary": "A homepage that explains the tool, earns trust, and gets developers to try it.",
+  "artifacts": ["preview", "screenshot", "source", "result-manifest"],
+  "status": "prompt-ready"
+}

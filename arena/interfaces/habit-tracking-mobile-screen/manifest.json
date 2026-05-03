@@ -1,0 +1,9 @@
+{
+  "id": "habit-tracking-mobile-screen",
+  "number": 9,
+  "title": "Mobile screen for a habit-tracking app",
+  "category": "mobile-app",
+  "summary": "A compact daily-use screen with progress, streaks, editing, and motivation.",
+  "artifacts": ["preview", "screenshot", "source", "result-manifest"],
+  "status": "prompt-ready"
+}

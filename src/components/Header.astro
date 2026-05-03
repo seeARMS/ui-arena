@@ -1,0 +1,20 @@
+---
+const { active = "home" } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/" aria-label="UI Arena home">
+      <span class="brand-mark" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+      <span>UI Arena</span>
+    </a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="/interfaces/" aria-current={active === "interfaces" ? "page" : undefined}>Interfaces</a>
+    </nav>
+  </div>
+</header>

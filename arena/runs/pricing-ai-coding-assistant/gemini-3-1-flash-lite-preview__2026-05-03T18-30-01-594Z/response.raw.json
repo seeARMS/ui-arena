@@ -1,0 +1,53 @@
+{
+  "id": "gen-1777833001-VnLQReUFc8RyLtVViNoB",
+  "object": "chat.completion",
+  "created": 1777833001,
+  "model": "google/gemini-3.1-flash-lite-preview-20260303",
+  "provider": "Google AI Studio",
+  "system_fingerprint": null,
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "STOP",
+      "message": {
+        "role": "assistant",
+        "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Pricing | NexusAI Coding Assistant</title>\n    <style>\n        :root {\n            --bg: #0a0a0c;\n            --card-bg: #121216;\n            --text: #e4e4e7;\n            --text-muted: #a1a1aa;\n            --accent: #8b5cf6;\n            --accent-hover: #7c3aed;\n            --border: #27272a;\n            --white: #ffffff;\n        }\n\n        * { box-sizing: border-box; margin: 0; padding: 0; }\n        body { \n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif; \n            background: var(--bg); \n            color: var(--text);\n            line-height: 1.6;\n        }\n\n        .container { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }\n        \n        header { text-align: center; margin-bottom: 4rem; }\n        h1 { font-size: 3rem; margin-bottom: 1rem; letter-spacing: -0.05em; }\n        .subtitle { color: var(--text-muted); font-size: 1.2rem; }\n\n        .pricing-grid { \n            display: grid; \n            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); \n            gap: 2rem; \n            align-items: start;\n        }\n\n        .card { \n            background: var(--card-bg); \n            border: 1px solid var(--border); \n            border-radius: 1rem; \n            padding: 2rem; \n            position: relative;\n            display: flex;\n            flex-direction: column;\n            height: 100%;\n        }\n\n        .card.featured { border-color: var(--accent); box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); }\n        .badge { position: absolute; top: -12px; left: 2rem; background: var(--accent); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 600; }\n\n        .price { font-size: 2.5rem; font-weight: 700; margin: 1.5rem 0; }\n        .price span { font-size: 1rem; color: var(--text-muted); font-weight: 400; }\n\n        ul { list-style: none; margin-bottom: 2rem; flex-grow: 1; }\n        li { margin-bottom: 1rem; display: flex; align-items: center; font-size: 0.95rem; }\n        li::before { content: \"✓\"; color: var(--accent); margin-right: 0.75rem; font-weight: bold; }\n\n        button { \n            width: 100%; padding: 0.8rem; border-radius: 0.5rem; border: none; \n            font-weight: 600; cursor: pointer; transition: 0.2s;\n        }\n        .btn-primary { background: var(--accent); color: white; }\n        .btn-primary:hover { background: var(--accent-hover); }\n        .btn-secondary { background: transparent; border: 1px solid var(--border); color: white; }\n        .btn-secondary:hover { border-color: var(--text-muted); }\n\n        .trust-signals { \n            margin-top: 4rem; padding: 2rem; border-top: 1px solid var(--border);\n            display: flex; justify-content: space-around; flex-wrap: wrap; gap: 2rem;\n            color: var(--text-muted); font-size: 0.9rem;\n        }\n\n        .faq { margin-top: 4rem; }\n        .faq-item { margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }\n        .faq-item h3 { margin-bottom: 0.5rem; }\n\n        @media (max-width: 768px) {\n            h1 { font-size: 2rem; }\n        }\n    </style>\n</head>\n<body>\n\n<div class=\"container\">\n    <header>\n        <h1>Simple, transparent pricing</h1>\n        <p class=\"subtitle\">Scale your development velocity with AI that understands your codebase.</p>\n    </header>\n\n    <div class=\"pricing-grid\">\n        <!-- Individual -->\n        <div class=\"card\">\n            <h3>Individual</h3>\n            <div class=\"price\">$20<span>/mo</span></div>\n            <ul>\n                <li>Unlimited AI chat</li>\n                <li>Context-aware code completion</li>\n                <li>500 AI-assisted edits/mo</li>\n                <li>Standard model access</li>\n            </ul>\n            <button class=\"btn-secondary\">Get Started</button>\n        </div>\n\n        <!-- Pro -->\n        <div class=\"card featured\">\n            <div class=\"badge\">RECOMMENDED</div>\n            <h3>Pro Team</h3>\n            <div class=\"price\">$45<span>/user/mo</span></div>\n            <ul>\n                <li>Everything in Individual</li>\n                <li>Shared codebase context</li>\n                <li>Unlimited AI-assisted edits</li>\n                <li>Pull Request review agent</li>\n                <li>Priority model access</li>\n            </ul>\n            <button class=\"btn-primary\">Start Free Trial</button>\n        </div>\n\n        <!-- Enterprise -->\n        <div class=\"card\">\n            <h3>Enterprise</h3>\n            <div class=\"price\">Custom</div>\n            <ul>\n                <li>Everything in Pro</li>\n                <li>SSO & SAML integration</li>\n                <li>Self-hosted deployment</li>\n                <li>Custom model fine-tuning</li>\n                <li>Dedicated support manager</li>\n            </ul>\n            <button class=\"btn-secondary\">Contact Sales</button>\n        </div>\n    </div>\n\n    <div class=\"trust-signals\">\n        <div>🔒 SOC2 Type II Compliant</div>\n        <div>🛡️ Zero-retention data policy</div>\n        <div>💻 On-premise options available</div>\n    </div>\n\n    <section class=\"faq\">\n        <h2 style=\"margin-bottom: 2rem;\">Frequently Asked Questions</h2>\n        <div class=\"faq-item\">\n            <h3>Does NexusAI train on my code?</h3>\n            <p>No. We treat your source code as strictly confidential. We do not use your code to train our base models.</p>\n        </div>\n        <div class=\"faq-item\">\n            <h3>Can I switch plans later?</h3>\n            <p>Yes, you can upgrade or downgrade your team's plan at any time from the dashboard settings.</p>\n        </div>\n        <div class=\"faq-item\">\n            <h3>What happens if I hit my usage limit?</h3>\n            <p>On the Individual plan, you'll be prompted to upgrade or purchase a top-up pack. Pro plans have unlimited usage.</p>\n        </div>\n    </section>\n</div>\n\n<script>\n    // Simple interaction for buttons\n    document.querySelectorAll('button').forEach(btn => {\n        btn.addEventListener('click', () => {\n            alert('Redirecting to secure checkout...');\n        });\n    });\n</script>\n\n</body>\n</html>",
+        "refusal": null,
+        "reasoning": null,
+        "reasoning_details": [
+          {
+            "type": "reasoning.encrypted",
+            "data": "EjQKMgEMOdbH6MI253dt4DFs+eYEBzWPyxuNjk4otcbRaqbFAXi9EkIHQw1moMCoRb3QhTK+",
+            "format": "google-gemini-v1",
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 426,
+    "completion_tokens": 1806,
+    "total_tokens": 2232,
+    "cost": 0.0028155,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.0028155,
+      "upstream_inference_prompt_cost": 0.0001065,
+      "upstream_inference_completions_cost": 0.002709
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

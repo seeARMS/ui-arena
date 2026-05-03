@@ -1,0 +1,89 @@
+{
+  "gateway": "openrouter",
+  "models": [
+    {
+      "id": "gpt-5-2",
+      "displayName": "GPT-5.2",
+      "family": "OpenAI",
+      "adapter": "openrouter",
+      "model": "openai/gpt-5.2",
+      "accent": "#e04f2f",
+      "accentSoft": "#f7d9cd",
+      "enabled": true,
+      "params": {
+        "temperature": 0.2,
+        "max_tokens": 16000
+      }
+    },
+    {
+      "id": "claude-sonnet-4-5",
+      "displayName": "Claude Sonnet 4.5",
+      "family": "Anthropic",
+      "adapter": "openrouter",
+      "model": "anthropic/claude-sonnet-4.5",
+      "accent": "#0c8f83",
+      "accentSoft": "#c9ebe4",
+      "enabled": true,
+      "params": {
+        "temperature": 0.2,
+        "max_tokens": 16000
+      }
+    },
+    {
+      "id": "gemini-3-1-pro-preview",
+      "displayName": "Gemini 3.1 Pro Preview",
+      "family": "Google",
+      "adapter": "openrouter",
+      "model": "google/gemini-3.1-pro-preview",
+      "accent": "#276fc2",
+      "accentSoft": "#d5e4f7",
+      "enabled": true,
+      "params": {
+        "temperature": 0.2,
+        "max_tokens": 16000
+      }
+    },
+    {
+      "id": "grok-4-3",
+      "displayName": "Grok 4.3",
+      "family": "xAI",
+      "adapter": "openrouter",
+      "model": "x-ai/grok-4.3",
+      "accent": "#2d2a24",
+      "accentSoft": "#dfd6c5",
+      "enabled": true,
+      "params": {
+        "temperature": 0.2,
+        "max_tokens": 16000
+      }
+    },
+    {
+      "id": "gemini-3-1-flash-lite-preview",
+      "displayName": "Gemini 3.1 Flash Lite Preview",
+      "family": "Google",
+      "adapter": "openrouter",
+      "model": "google/gemini-3.1-flash-lite-preview",
+      "accent": "#6b8f1f",
+      "accentSoft": "#e0ebbf",
+      "enabled": true,
+      "params": {
+        "temperature": 0.2,
+        "max_tokens": 8000
+      }
+    },
+    {
+      "id": "kimi-k2-6",
+      "displayName": "Kimi K2.6",
+      "family": "Moonshot AI",
+      "adapter": "openrouter",
+      "model": "moonshotai/kimi-k2.6",
+      "accent": "#b43f72",
+      "accentSoft": "#efd2de",
+      "enabled": false,
+      "params": {
+        "temperature": 0.2,
+        "max_tokens": 16000
+      }
+    }
+  ]
+}

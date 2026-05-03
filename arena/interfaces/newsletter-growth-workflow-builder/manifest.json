@@ -1,0 +1,9 @@
+{
+  "id": "newsletter-growth-workflow-builder",
+  "number": 10,
+  "title": "Workflow builder for automating newsletter growth",
+  "category": "workflow-builder",
+  "summary": "A visual automation surface for triggers, branches, actions, and performance.",
+  "artifacts": ["preview", "screenshot", "source", "result-manifest"],
+  "status": "prompt-ready"
+}

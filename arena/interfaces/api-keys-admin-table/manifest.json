@@ -1,0 +1,9 @@
+{
+  "id": "api-keys-admin-table",
+  "number": 7,
+  "title": "Admin table for managing API keys and permissions",
+  "category": "admin-table",
+  "summary": "Dense operational UI with scopes, ownership, rotation state, and audit trails.",
+  "artifacts": ["preview", "screenshot", "source", "result-manifest"],
+  "status": "prompt-ready"
+}

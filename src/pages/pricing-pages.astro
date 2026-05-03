@@ -1,0 +1,17 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import InterfaceComparison from "../components/InterfaceComparison.astro";
+import { pricingInterface, pricingOutputs } from "../data/interfaces.js";
+---
+
+<BaseLayout
+  title="SaaS Pricing Page - UI Arena"
+  description="Compare model outputs for UI Arena's SaaS pricing page interface prompt."
+  canonicalPath="/pricing-pages/"
+>
+  <Header active="interfaces" />
+  <InterfaceComparison interfacePrompt={pricingInterface} outputs={pricingOutputs} />
+  <Footer />
+</BaseLayout>

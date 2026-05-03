@@ -1,0 +1,43 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { interfacePrompts } from "../../data/interfaces.js";
+---
+
+<BaseLayout
+  title="Interfaces - UI Arena"
+  description="Browse interface prompts and compare how different AI models generate product surfaces."
+  canonicalPath="/interfaces/"
+>
+  <Header active="interfaces" />
+
+  <main>
+    <section class="interfaces-hero">
+      <div class="container section-copy">
+        <p class="eyebrow">Interfaces</p>
+        <h1>Product surfaces, generated from the same prompt.</h1>
+        <p>
+          Pick an interface prompt to see how different models interpret the same product brief,
+          from layout choices and copy to responsiveness, source code, and final screenshots.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container interface-grid">
+        {interfacePrompts.map((item) => (
+          <a class="interface-card" href={item.href}>
+            <span>{item.number}</span>
+            <p class="eyebrow">{item.eyebrow}</p>
+            <h2>{item.title}</h2>
+            <p>{item.summary}</p>
+            <small>{item.status}</small>
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>

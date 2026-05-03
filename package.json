@@ -1,0 +1,41 @@
+{
+  "name": "uiarena-web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Astro site for UI Arena.",
+  "type": "module",
+  "scripts": {
+    "arena:run": "node scripts/arena/run-models.mjs",
+    "arena:dry-run": "node scripts/arena/run-models.mjs --dry-run",
+    "arena:index": "node scripts/arena/build-index.mjs",
+    "arena:screenshot": "node scripts/arena/capture-screenshots.mjs",
+    "arena:evaluate": "node scripts/arena/evaluate-results.mjs",
+    "arena:refresh-usage": "node scripts/arena/refresh-openrouter-usage.mjs",
+    "arena:install-browsers": "playwright install chromium",
+    "generate-og": "node scripts/generate-og.mjs",
+    "dev": "npm run generate-og && astro dev",
+    "start": "npm run generate-og && astro dev",
+    "build": "npm run arena:index && npm run generate-og && astro build",
+    "preview": "npm run build && wrangler dev",
+    "astro": "astro",
+    "generate-types": "wrangler types",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
+    "@tailwindcss/vite": "^4.2.4",
+    "astro": "^6.2.0",
+    "lighthouse": "^13.2.0",
+    "playwright": "^1.59.1",
+    "tailwindcss": "^4.2.4",
+    "wrangler": "^4.86.0"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^13.3.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "satori": "^0.26.0"
+  },
+  "overrides": {
+    "vite": "^7"
+  }
+}

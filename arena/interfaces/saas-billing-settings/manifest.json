@@ -1,0 +1,9 @@
+{
+  "id": "saas-billing-settings",
+  "number": 5,
+  "title": "Billing settings page for a SaaS team workspace",
+  "category": "settings",
+  "summary": "Seat management, invoices, plan changes, payment state, and admin controls.",
+  "artifacts": ["preview", "screenshot", "source", "result-manifest"],
+  "status": "prompt-ready"
+}

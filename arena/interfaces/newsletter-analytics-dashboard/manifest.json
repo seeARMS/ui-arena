@@ -1,0 +1,9 @@
+{
+  "id": "newsletter-analytics-dashboard",
+  "number": 2,
+  "title": "Dashboard for a newsletter analytics product",
+  "category": "dashboard",
+  "summary": "Creator-facing metrics for growth, retention, revenue, and content performance.",
+  "artifacts": ["preview", "screenshot", "source", "result-manifest"],
+  "status": "prompt-ready"
+}

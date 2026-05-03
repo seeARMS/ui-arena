@@ -1,0 +1,9 @@
+{
+  "id": "creator-publication-onboarding",
+  "number": 6,
+  "title": "Onboarding flow for a creator starting a publication",
+  "category": "onboarding",
+  "summary": "A focused setup journey that balances speed, confidence, and useful defaults.",
+  "artifacts": ["preview", "screenshot", "source", "result-manifest"],
+  "status": "prompt-ready"
+}

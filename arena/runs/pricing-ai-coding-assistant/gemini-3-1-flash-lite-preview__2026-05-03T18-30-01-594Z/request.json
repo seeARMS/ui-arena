@@ -1,0 +1,15 @@
+{
+  "model": "google/gemini-3.1-flash-lite-preview",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are participating in UI Arena, a gallery of AI-generated product interface examples.\nReturn exactly one complete static HTML document.\nThe document must include all CSS and JavaScript inline.\nDo not use external fonts, images, scripts, stylesheets, CDNs, analytics, or network requests.\nThe output must work by opening index.html directly in a browser.\nDo not include explanations outside the HTML."
+    },
+    {
+      "role": "user",
+      "content": "Interface prompt: SaaS pricing page\nCategory: pricing-page\n\nDesign and implement a pricing page for an AI coding assistant.\n\nThe product helps developers plan changes, edit code, run tests, and review pull requests with an AI agent. The pricing page should help an individual developer understand the entry plan, help a growing engineering team compare usage limits, and give larger organizations a clear path to contact sales.\n\nRequired content:\n\n- Three paid plans with realistic prices and usage limits.\n- A clear team upgrade path.\n- Trust signals for security, privacy, and source-code handling.\n- FAQs that answer practical buying objections.\n- Responsive behavior for mobile, tablet, and desktop.\n- Strong visual hierarchy that makes the recommended plan obvious without hiding tradeoffs.\n\nDo not build a generic SaaS template. Make the page feel specific to an AI coding assistant.\n\nImplementation requirements:\n- Build a production-quality product interface, not a marketing explanation.\n- Use semantic HTML and accessible controls.\n- Make it responsive from mobile to desktop.\n- Include realistic copy, states, and content needed for the interface.\n- Keep it self-contained in one index.html file."
+    }
+  ],
+  "temperature": 0.2,
+  "max_tokens": 8000
+}

@@ -1,0 +1,9 @@
+{
+  "id": "pricing-ai-coding-assistant",
+  "number": 1,
+  "title": "Pricing page for an AI coding assistant",
+  "category": "pricing-page",
+  "summary": "A three-tier SaaS pricing page with usage limits, trust cues, and team upgrade paths.",
+  "artifacts": ["preview", "screenshot", "source", "result-manifest"],
+  "status": "scaffolded"
+}

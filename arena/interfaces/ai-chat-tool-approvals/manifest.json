@@ -1,0 +1,9 @@
+{
+  "id": "ai-chat-tool-approvals",
+  "number": 3,
+  "title": "AI chat interface with tool calls and approvals",
+  "category": "ai-chat",
+  "summary": "A chat workspace that makes agent actions inspectable before they run.",
+  "artifacts": ["preview", "screenshot", "source", "result-manifest"],
+  "status": "prompt-ready"
+}

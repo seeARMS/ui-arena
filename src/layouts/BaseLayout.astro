@@ -1,0 +1,95 @@
+---
+import "../styles/global.css";
+import {
+  authorName,
+  defaultSiteUrl,
+  description as defaultDescription,
+  ogImageAlt,
+  ogImagePath,
+  siteName,
+  title as defaultTitle,
+  xHandle,
+} from "../site-meta.js";
+
+const {
+  title = defaultTitle,
+  description = defaultDescription,
+  canonicalPath = "/",
+} = Astro.props;
+
+const siteUrl = Astro.site?.toString().replace(/\/$/, "") ?? defaultSiteUrl;
+const pageUrl = new URL(canonicalPath, `${siteUrl}/`).toString();
+const metaImage = `${siteUrl}${ogImagePath}`;
+const robotsContent = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+const structuredData = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteName,
+  url: siteUrl,
+  description,
+  inLanguage: "en-US",
+  publisher: {
+    "@type": "Person",
+    name: authorName,
+  },
+});
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/ui-arena.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#f3efe6" />
+    <meta name="application-name" content={siteName} />
+    <meta name="apple-mobile-web-app-title" content={siteName} />
+    <meta name="author" content={authorName} />
+    <meta name="creator" content={authorName} />
+    <meta name="publisher" content={authorName} />
+    <meta name="robots" content={robotsContent} />
+    <meta name="googlebot" content={robotsContent} />
+    <link rel="canonical" href={pageUrl} />
+    <link rel="sitemap" type="application/xml" href={`${siteUrl}/sitemap.xml`} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta property="og:image" content={metaImage} />
+    <meta property="og:image:secure_url" content={metaImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={pageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={xHandle} />
+    <meta name="twitter:creator" content={xHandle} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={metaImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
+    <script type="application/ld+json" set:html={structuredData}></script>
+    <script is:inline>
+      const root = document.documentElement;
+
+      if (window.matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+        root.classList.add("motion-pending");
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => {
+            root.classList.remove("motion-pending");
+            root.classList.add("motion-ready");
+          });
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

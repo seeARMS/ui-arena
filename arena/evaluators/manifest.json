@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "evaluators": [
+    {
+      "id": "lighthouse",
+      "displayName": "Lighthouse",
+      "description": "Runs Lighthouse against the generated preview and records performance and accessibility scores.",
+      "module": "lighthouse.mjs",
+      "enabled": true,
+      "categories": ["performance", "accessibility"]
+    },
+    {
+      "id": "axe",
+      "displayName": "Axe",
+      "description": "Runs axe-core accessibility checks through Playwright and records violations by impact.",
+      "module": "axe.mjs",
+      "enabled": true,
+      "categories": ["accessibility"]
+    }
+  ]
+}

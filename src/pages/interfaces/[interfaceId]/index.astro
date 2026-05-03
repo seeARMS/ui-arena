@@ -1,0 +1,32 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Header from "../../../components/Header.astro";
+import Footer from "../../../components/Footer.astro";
+import InterfaceComparison from "../../../components/InterfaceComparison.astro";
+import { interfacePrompts, outputsForInterface } from "../../../data/interfaces.js";
+
+export async function getStaticPaths() {
+  return interfacePrompts.map((item) => ({
+    params: { interfaceId: item.id },
+    props: {
+      interfacePrompt: {
+        ...item,
+        prompt: item.prompt ?? item.summary,
+      },
+    },
+  }));
+}
+
+const { interfacePrompt } = Astro.props;
+const outputs = outputsForInterface(interfacePrompt.id);
+---
+
+<BaseLayout
+  title={`${interfacePrompt.title} - UI Arena`}
+  description={`Compare AI model outputs for the ${interfacePrompt.title} interface prompt.`}
+  canonicalPath={`/interfaces/${interfacePrompt.id}/`}
+>
+  <Header active="interfaces" />
+  <InterfaceComparison interfacePrompt={interfacePrompt} outputs={outputs} />
+  <Footer />
+</BaseLayout>

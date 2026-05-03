@@ -1,0 +1,78 @@
+---
+import PricingOutputCard from "./PricingOutputCard.astro";
+
+const { interfacePrompt, outputs } = Astro.props;
+---
+
+<main>
+  <section class="gallery-hero">
+    <div class="container gallery-hero-inner">
+      <div>
+        <p class="eyebrow">Interface {interfacePrompt.number}</p>
+        <h1>{interfacePrompt.title}</h1>
+        <p>{interfacePrompt.prompt}</p>
+      </div>
+      <aside class="interface-brief" aria-label={`${interfacePrompt.title} metadata`}>
+        <dl>
+          <div>
+            <dt>Surface</dt>
+            <dd>{interfacePrompt.eyebrow}</dd>
+          </div>
+          <div>
+            <dt>Models</dt>
+            <dd>{outputs.length} output slots</dd>
+          </div>
+          <div>
+            <dt>Artifacts</dt>
+            <dd>Preview, screenshot, source, evaluation</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section gallery-controls-section">
+    <div class="container gallery-controls">
+      <div class="gallery-control-copy">
+        <span>Model outputs</span>
+        <p>Same prompt, different product decisions.</p>
+      </div>
+      <div class="view-toggle" aria-label="Display mode">
+        <button type="button" data-view-option="list" aria-pressed="true">List</button>
+        <button type="button" data-view-option="grid" aria-pressed="false">Grid</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-gallery">
+    <div class="container output-grid" data-view="list" data-output-collection>
+      <div class="model-list-header" aria-hidden="true">
+        <span>Screenshot</span>
+        <span>Model and metrics</span>
+        <span>Artifacts</span>
+      </div>
+      {outputs.map((output) => (
+        <PricingOutputCard output={output} />
+      ))}
+    </div>
+  </section>
+</main>
+
+<script>
+  const collection = document.querySelector("[data-output-collection]");
+  const buttons = Array.from(document.querySelectorAll("[data-view-option]"));
+
+  function setView(view) {
+    collection?.setAttribute("data-view", view);
+
+    for (const button of buttons) {
+      button.setAttribute("aria-pressed", String(button.dataset.viewOption === view));
+    }
+  }
+
+  for (const button of buttons) {
+    button.addEventListener("click", () => {
+      setView(button.dataset.viewOption ?? "list");
+    });
+  }
+</script>

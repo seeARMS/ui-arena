@@ -1,0 +1,9 @@
+{
+  "id": "route-planner",
+  "number": 4,
+  "title": "Route planner for cyclists and runners",
+  "category": "route-planning",
+  "summary": "A planning surface for distance, elevation, pace, weather, and route comparison.",
+  "artifacts": ["preview", "screenshot", "source", "result-manifest"],
+  "status": "prompt-ready"
+}

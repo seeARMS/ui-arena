@@ -1,0 +1,11 @@
+{
+  "name": "UI Arena",
+  "short_name": "UI Arena",
+  "description": "A gallery of AI-generated product interface examples.",
+  "icons": [
+    { "src": "ui-arena.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "theme_color": "#f3efe6",
+  "background_color": "#f3efe6",
+  "display": "standalone"
+}

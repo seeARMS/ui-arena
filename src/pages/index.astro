@@ -1,0 +1,173 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { interfacePrompts, pricingOutputs } from "../data/interfaces.js";
+---
+
+<BaseLayout canonicalPath="/">
+  <Header active="home" />
+
+  <main>
+    <section class="hero">
+      <div class="hero-grid" aria-hidden="true">
+        <div class="hero-preview hero-preview-a">
+          <div class="preview-bar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="preview-body">
+            <div class="mini-column is-tall"></div>
+            <div class="mini-column"></div>
+            <div class="mini-column is-short"></div>
+          </div>
+        </div>
+        <div class="hero-preview hero-preview-b">
+          <div class="preview-badge">UI</div>
+          <div class="preview-lines">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        <div class="hero-preview hero-preview-c">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+
+      <div class="container hero-content stagger-fade-group">
+        <p class="eyebrow">AI interface gallery</p>
+        <h1>UI Arena</h1>
+        <p class="hero-hook">See how models design the same product surface.</p>
+        <p class="hero-copy">
+          UI Arena collects concrete interface prompts, runs them through different models, and
+          publishes the live HTML, screenshots, and source so you can compare their product instincts.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="/interfaces/">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 5h16v14H4z"></path>
+              <path d="M8 9h8M8 13h5"></path>
+            </svg>
+            Browse interfaces
+          </a>
+          <a class="button button-secondary" href="/interfaces/pricing-ai-coding-assistant/">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 17 17 7M9 7h8v8"></path>
+            </svg>
+            View SaaS pricing page
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tight">
+      <div class="container metric-strip stagger-fade-group">
+        <div>
+          <strong>10</strong>
+          <span>interface prompts</span>
+        </div>
+        <div>
+          <strong>5</strong>
+          <span>model slots</span>
+        </div>
+        <div>
+          <strong>HTML</strong>
+          <span>live static previews</span>
+        </div>
+        <div>
+          <strong>SRC</strong>
+          <span>rendered source views</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container split-section">
+        <div class="section-copy">
+          <p class="eyebrow">What it is</p>
+          <h2>A catalog of model-made product surfaces.</h2>
+          <p>
+            The point is not to crown a winner. It is to make the differences visible: what each
+            model prioritizes, how it structures information, what it forgets, and how usable the
+            generated interface feels in a browser.
+          </p>
+        </div>
+        <div class="pipeline-list" aria-label="UI Arena publishing flow">
+          <div>
+            <span>01</span>
+            <strong>Prompt</strong>
+            <p>One concrete interface brief, such as a SaaS pricing page or admin table.</p>
+          </div>
+          <div>
+            <span>02</span>
+            <strong>Generate</strong>
+            <p>Multiple models receive the same prompt and return standalone HTML.</p>
+          </div>
+          <div>
+            <span>03</span>
+            <strong>Render</strong>
+            <p>Each output becomes a live static preview with desktop and mobile screenshots.</p>
+          </div>
+          <div>
+            <span>04</span>
+            <strong>Inspect</strong>
+            <p>Open the preview, screenshot, generated source, and run metadata side by side.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-ink" id="pricing-pages">
+      <div class="container gallery-teaser">
+        <div class="section-copy">
+          <p class="eyebrow">Live interface</p>
+          <h2>SaaS pricing page</h2>
+          <p>
+            The first interface prompt compares how models build a pricing page for an AI coding
+            assistant, including plan hierarchy, usage limits, trust cues, and responsive behavior.
+          </p>
+        </div>
+        <div class="teaser-board" aria-label="SaaS pricing page model outputs">
+          {pricingOutputs.slice(0, 5).map((output, index) => (
+            <a href="/interfaces/pricing-ai-coding-assistant/" class="teaser-row" style={`--accent: ${output.accent};`}>
+              <span class="rank">{index + 1}</span>
+              <span class="model">{output.model}</span>
+              <span class="status">{output.status}</span>
+              <span class="state">{output.stateLabel}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="interfaces">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Interfaces</p>
+            <h2>Start from a product surface.</h2>
+          </div>
+          <a class="text-link" href="/interfaces/">View all interfaces</a>
+        </div>
+        <div class="interface-grid">
+          {interfacePrompts.slice(0, 6).map((item) => (
+            <a class="interface-card" href={item.href}>
+              <span>{item.number}</span>
+              <p class="eyebrow">{item.eyebrow}</p>
+              <h3>{item.title}</h3>
+              <p>{item.summary}</p>
+              <small>{item.status}</small>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
