@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UI Arena — Council direction</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-soft: #fafafa;
+        --ink: #09090b;
+        --ink-soft: #52525b;
+        --ink-mute: #a1a1aa;
+        --line: #e4e4e7;
+        --line-soft: #f4f4f5;
+        --accent: #2563eb;
+        --accent-warm: #f97316;
+        --good: #16a34a;
+        --warn: #d97706;
+        --bad: #dc2626;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px/1.55 "Inter", system-ui, sans-serif;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; text-decoration: none; }
+      .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+      .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+      /* nav */
+      nav {
+        position: sticky; top: 0; z-index: 10;
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(18px);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav-inner {
+        display: flex; align-items: center; justify-content: space-between;
+        height: 60px;
+      }
+      .brand {
+        display: inline-flex; align-items: center; gap: 10px;
+        font-weight: 600; letter-spacing: -0.01em;
+      }
+      .brand-mark {
+        width: 22px; height: 22px; border-radius: 6px;
+        background:
+          radial-gradient(60% 70% at 65% 30%, rgba(249,115,22,0.9), rgba(249,115,22,0) 70%),
+          radial-gradient(60% 70% at 30% 80%, rgba(37,99,235,0.95), rgba(37,99,235,0) 70%),
+          #18181b;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.08);
+      }
+      .nav-links { display: flex; gap: 22px; color: var(--ink-soft); font-size: 14px; }
+      .nav-links a:hover { color: var(--ink); }
+
+      /* breadcrumb / hero */
+      .hero { padding: 48px 0 36px; position: relative; overflow: hidden; }
+      .hero::before {
+        content: "";
+        position: absolute; inset: -40% -10% auto -10%; height: 380px;
+        background:
+          radial-gradient(50% 60% at 70% 40%, rgba(249,115,22,0.18), rgba(249,115,22,0) 70%),
+          radial-gradient(50% 60% at 30% 60%, rgba(37,99,235,0.18), rgba(37,99,235,0) 70%);
+        filter: blur(40px);
+        pointer-events: none;
+        z-index: -1;
+      }
+      .crumb {
+        font: 500 12px/1 "Geist Mono", monospace;
+        color: var(--ink-mute);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        display: flex; gap: 8px; align-items: center;
+      }
+      .crumb a:hover { color: var(--ink); }
+      .crumb span { color: var(--ink-mute); }
+      .hero h1 {
+        margin: 18px 0 12px;
+        font-size: clamp(40px, 5.4vw, 64px);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 1.04;
+        max-width: 22ch;
+      }
+      .hero .lead {
+        max-width: 64ch;
+        color: var(--ink-soft);
+        font-size: 18px;
+        line-height: 1.6;
+        margin: 0 0 28px;
+      }
+
+      /* prompt block */
+      .prompt {
+        margin-top: 8px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--bg-soft);
+        padding: 18px 20px;
+        font: 14px/1.6 "Geist Mono", monospace;
+        color: var(--ink-soft);
+        position: relative;
+      }
+      .prompt strong {
+        display: block;
+        color: var(--ink-mute);
+        font: 500 11px/1 "Geist Mono", monospace;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      .prompt-actions {
+        position: absolute; top: 14px; right: 14px;
+        display: flex; gap: 6px;
+      }
+      .chip {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 9px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: white;
+        font: 500 12px/1 "Geist Mono", monospace;
+        color: var(--ink-soft);
+      }
+
+      /* meta strip */
+      .meta {
+        display: grid; grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+        margin-top: 28px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: white;
+        overflow: hidden;
+      }
+      .meta > div { padding: 14px 18px; border-right: 1px solid var(--line); }
+      .meta > div:last-child { border-right: 0; }
+      .meta dt {
+        font: 500 11px/1 "Geist Mono", monospace;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-mute);
+        margin-bottom: 6px;
+      }
+      .meta dd {
+        margin: 0;
+        font-weight: 500;
+        font-size: 15px;
+      }
+
+      /* section header */
+      .section { padding: 56px 0; }
+      .section-head {
+        display: flex; align-items: end; justify-content: space-between;
+        gap: 24px; margin-bottom: 24px;
+      }
+      .section-head h2 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+      }
+      .section-head p {
+        margin: 4px 0 0;
+        color: var(--ink-soft);
+        font-size: 14px;
+      }
+      .toggle {
+        display: inline-flex; padding: 3px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+      }
+      .toggle button {
+        appearance: none; border: 0; background: transparent;
+        padding: 7px 14px;
+        font: 500 13px/1 "Inter", sans-serif;
+        color: var(--ink-soft);
+        border-radius: 7px;
+        cursor: pointer;
+      }
+      .toggle button[aria-pressed="true"] {
+        background: white;
+        color: var(--ink);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      }
+
+      /* output cards */
+      .runs { display: grid; gap: 20px; }
+      .run {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 0;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+        background: white;
+        transition: box-shadow 200ms ease, transform 200ms ease;
+      }
+      .run:hover {
+        box-shadow:
+          0 1px 2px rgba(15,23,42,0.04),
+          0 12px 28px rgba(15,23,42,0.06);
+        transform: translateY(-1px);
+      }
+      .run-meta {
+        padding: 22px;
+        border-right: 1px solid var(--line);
+        display: flex; flex-direction: column;
+        gap: 18px;
+      }
+      .run-model {
+        display: flex; align-items: center; gap: 12px;
+      }
+      .model-dot {
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent);
+      }
+      .run h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .run-family {
+        margin: 2px 0 0;
+        font: 500 11px/1 "Geist Mono", monospace;
+        color: var(--ink-mute);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .run-state {
+        margin-left: auto;
+        font: 500 11px/1 "Geist Mono", monospace;
+        color: var(--good);
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--good) 10%, transparent);
+      }
+      .run-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1px;
+        background: var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+      }
+      .run-stats > div { padding: 10px 12px; background: white; }
+      .run-stats dt {
+        font: 500 10px/1 "Geist Mono", monospace;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-mute);
+        margin-bottom: 4px;
+      }
+      .run-stats dd {
+        margin: 0;
+        font: 500 14px/1.2 "Geist Mono", monospace;
+      }
+      .scores { display: grid; gap: 10px; }
+      .score-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: center;
+      }
+      .score-row .label {
+        font-size: 13px;
+        color: var(--ink-soft);
+        font-weight: 500;
+      }
+      .score-row .val {
+        font: 500 13px/1 "Geist Mono", monospace;
+      }
+      .bar {
+        grid-column: 1 / -1;
+        height: 4px; border-radius: 999px;
+        background: var(--line-soft);
+        position: relative; overflow: hidden;
+      }
+      .bar > i {
+        position: absolute; inset: 0 auto 0 0;
+        border-radius: inherit;
+        background: var(--good);
+      }
+      .bar.warn > i { background: var(--warn); }
+      .bar.bad > i { background: var(--bad); }
+      .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
+      .actions a {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 11px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+        font: 500 13px/1 "Inter", sans-serif;
+        color: var(--ink-soft);
+      }
+      .actions a:hover { border-color: var(--ink-mute); color: var(--ink); }
+
+      .preview {
+        position: relative;
+        background:
+          linear-gradient(180deg, var(--bg-soft), white);
+        min-height: 320px;
+        overflow: hidden;
+      }
+      .preview-frame {
+        position: absolute; inset: 16px 16px 16px 0;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 16px 36px rgba(15,23,42,0.06);
+      }
+      .preview-bar {
+        height: 28px;
+        border-bottom: 1px solid var(--line);
+        background: var(--bg-soft);
+        display: flex; align-items: center; gap: 5px;
+        padding: 0 12px;
+      }
+      .preview-bar i {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--line);
+      }
+      .preview-bar .url {
+        margin-left: auto; padding: 3px 10px;
+        background: white; border: 1px solid var(--line);
+        border-radius: 999px;
+        font: 500 11px/1 "Geist Mono", monospace;
+        color: var(--ink-mute);
+      }
+
+      /* fake page content for placeholders, varies per accent */
+      .fake { padding: 24px 28px; display: grid; gap: 18px; }
+      .fake-title { width: 60%; height: 16px; border-radius: 4px; background: var(--ink); opacity: 0.85; }
+      .fake-sub { width: 80%; height: 8px; border-radius: 4px; background: #d4d4d8; }
+      .fake-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 6px; }
+      .fake-card {
+        height: 110px; border: 1px solid var(--line); border-radius: 10px;
+        background: linear-gradient(180deg, #fff, #fafafa);
+        position: relative;
+      }
+      .fake-card.is-pop {
+        background: linear-gradient(180deg, color-mix(in srgb, var(--card-accent, var(--accent)) 16%, white), white);
+        border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 30%, var(--line));
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(15,23,42,0.08);
+      }
+      .fake-card span {
+        position: absolute; top: 12px; left: 12px;
+        height: 6px; width: 38px; border-radius: 3px;
+        background: var(--card-accent, var(--accent));
+      }
+      .fake-card strong {
+        position: absolute; top: 28px; left: 12px;
+        height: 14px; width: 56%; border-radius: 4px;
+        background: var(--ink);
+        opacity: 0.8;
+      }
+      .fake-card small {
+        position: absolute; bottom: 14px; left: 12px; right: 12px;
+        height: 28px; border-radius: 6px;
+        background: var(--card-accent, var(--accent));
+        opacity: 0.86;
+      }
+
+      /* per-card themes */
+      .run.r1 .model-dot { background: #10b981; box-shadow: 0 0 0 4px rgba(16,185,129,0.16); }
+      .run.r1 .preview-frame .fake { --card-accent: #10b981; }
+      .run.r2 .model-dot { background: #f97316; box-shadow: 0 0 0 4px rgba(249,115,22,0.16); }
+      .run.r2 .preview-frame .fake { --card-accent: #f97316; }
+      .run.r3 .model-dot { background: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,0.16); }
+      .run.r3 .preview-frame .fake { --card-accent: #2563eb; }
+      .run.r4 .model-dot { background: #a855f7; box-shadow: 0 0 0 4px rgba(168,85,247,0.16); }
+      .run.r4 .preview-frame .fake { --card-accent: #a855f7; }
+      .run.r5 .model-dot { background: #ef4444; box-shadow: 0 0 0 4px rgba(239,68,68,0.16); }
+      .run.r5 .preview-frame .fake { --card-accent: #ef4444; }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 26px 0;
+        color: var(--ink-soft);
+        font-size: 14px;
+      }
+      .footer-inner { display: flex; justify-content: space-between; }
+
+      @media (max-width: 880px) {
+        .meta { grid-template-columns: repeat(2, 1fr); }
+        .meta > div:nth-child(2) { border-right: 0; }
+        .meta > div:nth-child(1), .meta > div:nth-child(2) { border-bottom: 1px solid var(--line); }
+        .run { grid-template-columns: 1fr; }
+        .run-meta { border-right: 0; border-bottom: 1px solid var(--line); }
+        .preview { min-height: 260px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="container nav-inner">
+        <a class="brand" href="#"><span class="brand-mark"></span> UI Arena</a>
+        <div class="nav-links">
+          <a href="#">Interfaces</a>
+          <a href="#">About</a>
+          <a href="#">GitHub</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="container">
+        <div class="crumb">
+          <a href="#">Interfaces</a>
+          <span>/</span>
+          <span>01 — SaaS pricing page</span>
+        </div>
+        <h1>SaaS pricing page for an AI coding assistant.</h1>
+        <p class="lead">
+          Five models received the same brief. Below is the live HTML each one produced, alongside performance, accessibility, and run metadata.
+        </p>
+
+        <div class="prompt">
+          <strong>Prompt</strong>
+          Design and implement a pricing page for an AI coding assistant. It should include three plans, a clear team upgrade path, usage limits, trust signals, FAQs, and responsive behavior.
+          <div class="prompt-actions">
+            <span class="chip">v1</span>
+            <span class="chip">Copy</span>
+          </div>
+        </div>
+
+        <dl class="meta">
+          <div><dt>Surface</dt><dd>Pricing page</dd></div>
+          <div><dt>Models</dt><dd>5 generated</dd></div>
+          <div><dt>Last run</dt><dd>May 3, 2026</dd></div>
+          <div><dt>Artifacts</dt><dd>Preview · Screenshot · Source · Eval</dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Model outputs</h2>
+            <p>Same prompt, different product instincts.</p>
+          </div>
+          <div class="toggle" role="tablist">
+            <button aria-pressed="true">List</button>
+            <button aria-pressed="false">Grid</button>
+            <button aria-pressed="false">Table</button>
+          </div>
+        </div>
+
+        <div class="runs">
+          <article class="run r1">
+            <div class="run-meta">
+              <div class="run-model">
+                <span class="model-dot"></span>
+                <div>
+                  <h3>Claude Sonnet 4.6</h3>
+                  <p class="run-family">Anthropic</p>
+                </div>
+                <span class="run-state">Generated</span>
+              </div>
+              <dl class="run-stats">
+                <div><dt>Time</dt><dd>11.4s</dd></div>
+                <div><dt>Tokens</dt><dd>3,184</dd></div>
+                <div><dt>Cost</dt><dd>$0.0184</dd></div>
+                <div><dt>Lines</dt><dd>412</dd></div>
+              </dl>
+              <div class="scores">
+                <div class="score-row">
+                  <span class="label">Performance</span><span class="val">96</span>
+                  <span class="bar"><i style="width: 96%"></i></span>
+                </div>
+                <div class="score-row">
+                  <span class="label">Accessibility</span><span class="val">98</span>
+                  <span class="bar"><i style="width: 98%"></i></span>
+                </div>
+                <div class="score-row">
+                  <span class="label">Axe</span><span class="val">0 issues</span>
+                  <span class="bar"><i style="width: 100%"></i></span>
+                </div>
+              </div>
+              <div class="actions">
+                <a href="#">↗ Preview</a>
+                <a href="#">⛁ Source</a>
+                <a href="#">⌗ Report</a>
+              </div>
+            </div>
+            <div class="preview">
+              <div class="preview-frame">
+                <div class="preview-bar">
+                  <i></i><i></i><i></i>
+                  <span class="url">claude-sonnet-4-6 / pricing</span>
+                </div>
+                <div class="fake">
+                  <div class="fake-title"></div>
+                  <div class="fake-sub"></div>
+                  <div class="fake-row">
+                    <div class="fake-card"><span></span><strong></strong><small></small></div>
+                    <div class="fake-card is-pop"><span></span><strong></strong><small></small></div>
+                    <div class="fake-card"><span></span><strong></strong><small></small></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="run r2">
+            <div class="run-meta">
+              <div class="run-model">
+                <span class="model-dot"></span>
+                <div>
+                  <h3>GPT-5.2</h3>
+                  <p class="run-family">OpenAI</p>
+                </div>
+                <span class="run-state">Generated</span>
+              </div>
+              <dl class="run-stats">
+                <div><dt>Time</dt><dd>9.2s</dd></div>
+                <div><dt>Tokens</dt><dd>2,847</dd></div>
+                <div><dt>Cost</dt><dd>$0.0162</dd></div>
+                <div><dt>Lines</dt><dd>378</dd></div>
+              </dl>
+              <div class="scores">
+                <div class="score-row">
+                  <span class="label">Performance</span><span class="val">92</span>
+                  <span class="bar"><i style="width: 92%"></i></span>
+                </div>
+                <div class="score-row">
+                  <span class="label">Accessibility</span><span class="val">88</span>
+                  <span class="bar warn"><i style="width: 88%"></i></span>
+                </div>
+                <div class="score-row">
+                  <span class="label">Axe</span><span class="val">2 issues</span>
+                  <span class="bar warn"><i style="width: 64%"></i></span>
+                </div>
+              </div>
+              <div class="actions">
+                <a href="#">↗ Preview</a>
+                <a href="#">⛁ Source</a>
+                <a href="#">⌗ Report</a>
+              </div>
+            </div>
+            <div class="preview">
+              <div class="preview-frame">
+                <div class="preview-bar">
+                  <i></i><i></i><i></i>
+                  <span class="url">gpt-5-2 / pricing</span>
+                </div>
+                <div class="fake">
+                  <div class="fake-title"></div>
+                  <div class="fake-sub"></div>
+                  <div class="fake-row">
+                    <div class="fake-card"><span></span><strong></strong><small></small></div>
+                    <div class="fake-card is-pop"><span></span><strong></strong><small></small></div>
+                    <div class="fake-card"><span></span><strong></strong><small></small></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="run r3">
+            <div class="run-meta">
+              <div class="run-model">
+                <span class="model-dot"></span>
+                <div>
+                  <h3>Gemini 3.1 Flash</h3>
+                  <p class="run-family">Google</p>
+                </div>
+                <span class="run-state">Generated</span>
+              </div>
+              <dl class="run-stats">
+                <div><dt>Time</dt><dd>4.8s</dd></div>
+                <div><dt>Tokens</dt><dd>2,012</dd></div>
+                <div><dt>Cost</dt><dd>$0.0021</dd></div>
+                <div><dt>Lines</dt><dd>241</dd></div>
+              </dl>
+              <div class="scores">
+                <div class="score-row">
+                  <span class="label">Performance</span><span class="val">99</span>
+                  <span class="bar"><i style="width: 99%"></i></span>
+                </div>
+                <div class="score-row">
+                  <span class="label">Accessibility</span><span class="val">94</span>
+                  <span class="bar"><i style="width: 94%"></i></span>
+                </div>
+                <div class="score-row">
+                  <span class="label">Axe</span><span class="val">1 issue</span>
+                  <span class="bar warn"><i style="width: 78%"></i></span>
+                </div>
+              </div>
+              <div class="actions">
+                <a href="#">↗ Preview</a>
+                <a href="#">⛁ Source</a>
+                <a href="#">⌗ Report</a>
+              </div>
+            </div>
+            <div class="preview">
+              <div class="preview-frame">
+                <div class="preview-bar">
+                  <i></i><i></i><i></i>
+                  <span class="url">gemini-3-1-flash / pricing</span>
+                </div>
+                <div class="fake">
+                  <div class="fake-title"></div>
+                  <div class="fake-sub"></div>
+                  <div class="fake-row">
+                    <div class="fake-card"><span></span><strong></strong><small></small></div>
+                    <div class="fake-card is-pop"><span></span><strong></strong><small></small></div>
+                    <div class="fake-card"><span></span><strong></strong><small></small></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="run r4">
+            <div class="run-meta">
+              <div class="run-model">
+                <span class="model-dot"></span>
+                <div>
+                  <h3>Grok 4</h3>
+                  <p class="run-family">xAI</p>
+                </div>
+                <span class="run-state">Generated</span>
+              </div>
+              <dl class="run-stats">
+                <div><dt>Time</dt><dd>13.6s</dd></div>
+                <div><dt>Tokens</dt><dd>3,612</dd></div>
+                <div><dt>Cost</dt><dd>$0.0291</dd></div>
+                <div><dt>Lines</dt><dd>489</dd></div>
+              </dl>
+              <div class="scores">
+                <div class="score-row">
+                  <span class="label">Performance</span><span class="val">86</span>
+                  <span class="bar warn"><i style="width: 86%"></i></span>
+                </div>
+                <div class="score-row">
+                  <span class="label">Accessibility</span><span class="val">72</span>
+                  <span class="bar warn"><i style="width: 72%"></i></span>
+                </div>
+                <div class="score-row">
+                  <span class="label">Axe</span><span class="val">5 issues</span>
+                  <span class="bar bad"><i style="width: 38%"></i></span>
+                </div>
+              </div>
+              <div class="actions">
+                <a href="#">↗ Preview</a>
+                <a href="#">⛁ Source</a>
+                <a href="#">⌗ Report</a>
+              </div>
+            </div>
+            <div class="preview">
+              <div class="preview-frame">
+                <div class="preview-bar">
+                  <i></i><i></i><i></i>
+                  <span class="url">grok-4 / pricing</span>
+                </div>
+                <div class="fake">
+                  <div class="fake-title"></div>
+                  <div class="fake-sub"></div>
+                  <div class="fake-row">
+                    <div class="fake-card"><span></span><strong></strong><small></small></div>
+                    <div class="fake-card is-pop"><span></span><strong></strong><small></small></div>
+                    <div class="fake-card"><span></span><strong></strong><small></small></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-inner">
+        <span>© 2026 UI Arena</span>
+        <span class="mono">Built with Astro · Cloudflare</span>
+      </div>
+    </footer>
+  </body>
+</html>

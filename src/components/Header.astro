@@ -13,8 +13,15 @@ const { active = "home" } = Astro.props;
       </span>
       <span>UI Arena</span>
     </a>
+    <div class="nav-search" aria-hidden="true">
+      <span>⌕</span>
+      <span>Find an interface or model…</span>
+      <kbd>⌘K</kbd>
+    </div>
     <nav class="site-nav" aria-label="Primary navigation">
       <a href="/interfaces/" aria-current={active === "interfaces" ? "page" : undefined}>Interfaces</a>
+      <a href="/#how-it-works">Method</a>
+      <a href="https://github.com/colinarms/uiarena" rel="noopener noreferrer">GitHub</a>
     </nav>
   </div>
 </header>

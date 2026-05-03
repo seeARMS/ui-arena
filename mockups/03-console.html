@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UI Arena — Dark console direction</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #08080a;
+        --bg-1: #0c0c10;
+        --bg-2: #131318;
+        --bg-3: #1a1a22;
+        --line: #1f1f27;
+        --line-2: #2a2a33;
+        --ink: #f5f5f7;
+        --ink-soft: #a1a1ac;
+        --ink-mute: #6b6b76;
+        --good: #4ade80;
+        --warn: #fbbf24;
+        --bad: #f87171;
+        --accent: #818cf8;
+        --accent-soft: rgba(129,140,248,0.16);
+        --glow-1: rgba(129,140,248,0.4);
+        --glow-2: rgba(244,114,182,0.32);
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font: 14px/1.55 "Inter", system-ui, sans-serif;
+        font-feature-settings: "cv11";
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; text-decoration: none; }
+      .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+      .container { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
+
+      nav {
+        position: sticky; top: 0; z-index: 10;
+        background: rgba(8,8,10,0.86);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav-inner {
+        display: flex; align-items: center; justify-content: space-between;
+        height: 52px;
+      }
+      .brand {
+        display: inline-flex; align-items: center; gap: 10px;
+        font-weight: 600; font-size: 14px;
+      }
+      .brand-mark {
+        width: 22px; height: 22px; border-radius: 6px;
+        background:
+          conic-gradient(from 200deg at 50% 50%, #818cf8, #f472b6, #fbbf24, #4ade80, #818cf8);
+        position: relative;
+      }
+      .brand-mark::after {
+        content: "";
+        position: absolute; inset: 4px;
+        background: var(--bg-1);
+        border-radius: 4px;
+      }
+      .nav-links { display: flex; gap: 4px; font-size: 13px; }
+      .nav-links a {
+        padding: 6px 12px;
+        color: var(--ink-soft);
+        border-radius: 6px;
+      }
+      .nav-links a:hover, .nav-links a[aria-current="page"] {
+        color: var(--ink); background: var(--bg-2);
+      }
+
+      /* hero */
+      .hero {
+        padding: 36px 0 28px;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid var(--line);
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: -30% -10% auto -10%;
+        height: 460px;
+        background:
+          radial-gradient(40% 50% at 80% 20%, var(--glow-1), transparent 70%),
+          radial-gradient(45% 50% at 20% 70%, var(--glow-2), transparent 70%);
+        filter: blur(40px);
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      .hero-inner {
+        position: relative; z-index: 1;
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 36px;
+        align-items: end;
+      }
+      .crumb {
+        display: flex; gap: 8px; align-items: center;
+        font: 500 11px/1 "Geist Mono", monospace;
+        color: var(--ink-mute);
+        letter-spacing: 0.06em; text-transform: uppercase;
+        margin-bottom: 18px;
+      }
+      .crumb a:hover { color: var(--ink); }
+      .hero h1 {
+        margin: 0 0 12px;
+        font-size: clamp(34px, 4.4vw, 48px);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 1.04;
+        max-width: 22ch;
+      }
+      .hero p {
+        margin: 0;
+        color: var(--ink-soft);
+        font-size: 16px;
+        max-width: 60ch;
+        line-height: 1.6;
+      }
+      .status-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--bg-1);
+        padding: 16px;
+        font: 12px/1.6 "Geist Mono", monospace;
+        color: var(--ink-soft);
+      }
+      .status-card header {
+        display: flex; justify-content: space-between;
+        margin-bottom: 10px;
+        color: var(--ink-mute);
+        font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+      }
+      .status-card .row {
+        display: flex; justify-content: space-between;
+        padding: 4px 0;
+        border-bottom: 1px dashed var(--line);
+      }
+      .status-card .row:last-child { border-bottom: 0; }
+      .status-card .row .v { color: var(--ink); }
+      .pulse {
+        display: inline-flex; align-items: center; gap: 6px;
+        color: var(--good);
+      }
+      .pulse i {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: var(--good);
+        box-shadow: 0 0 0 4px rgba(74,222,128,0.18);
+        animation: pulse 1.6s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        50% { box-shadow: 0 0 0 6px rgba(74,222,128,0.04); }
+      }
+
+      /* prompt */
+      .prompt-wrap {
+        margin-top: 22px;
+        position: relative; z-index: 1;
+      }
+      .prompt-shell {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--bg-1);
+        overflow: hidden;
+        box-shadow:
+          0 1px 0 rgba(255,255,255,0.04) inset,
+          0 12px 30px rgba(0,0,0,0.32);
+      }
+      .prompt-tabs {
+        display: flex;
+        background: var(--bg-2);
+        border-bottom: 1px solid var(--line);
+        padding: 0 12px;
+        font: 500 12px/1 "Geist Mono", monospace;
+      }
+      .prompt-tabs .tab {
+        padding: 11px 14px;
+        color: var(--ink-mute);
+        border-bottom: 1px solid transparent;
+        cursor: default;
+      }
+      .prompt-tabs .tab.active {
+        color: var(--ink);
+        border-bottom-color: var(--accent);
+      }
+      .prompt-tabs .tab.dim { color: var(--ink-mute); }
+      .prompt-tabs .right {
+        margin-left: auto;
+        display: flex; gap: 6px; align-items: center;
+        padding: 8px 0;
+      }
+      .prompt-tabs .right button {
+        appearance: none; border: 1px solid var(--line-2);
+        background: var(--bg-1); color: var(--ink-soft);
+        padding: 5px 10px;
+        font: 500 11px/1 "Geist Mono", monospace;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .prompt-body {
+        padding: 18px 18px;
+        font: 13px/1.7 "Geist Mono", monospace;
+        color: var(--ink-soft);
+      }
+      .prompt-body .ln { display: grid; grid-template-columns: 32px 1fr; gap: 14px; }
+      .prompt-body .ln span:first-child { color: var(--ink-mute); text-align: right; }
+      .prompt-body .ln span:last-child .kw { color: #c4b5fd; }
+      .prompt-body .ln span:last-child .str { color: #86efac; }
+
+      /* runs */
+      .runs-section { padding: 32px 0 56px; }
+      .runs-head {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 18px;
+      }
+      .runs-head h2 {
+        margin: 0;
+        font: 600 16px/1 "Inter", sans-serif;
+        letter-spacing: -0.01em;
+      }
+      .runs-head h2 small {
+        margin-left: 8px;
+        color: var(--ink-mute);
+        font: 500 12px/1 "Geist Mono", monospace;
+      }
+      .toolbar { display: flex; gap: 6px; }
+      .toolbar button {
+        appearance: none;
+        padding: 6px 10px;
+        border: 1px solid var(--line-2);
+        background: var(--bg-1);
+        color: var(--ink-soft);
+        font: 500 12px/1 "Geist Mono", monospace;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .toolbar button.primary {
+        background: var(--ink); color: var(--bg);
+        border-color: var(--ink);
+      }
+
+      .run-list { display: grid; gap: 10px; }
+      .run {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--bg-1);
+        overflow: hidden;
+        transition: border-color 200ms ease;
+      }
+      .run:hover { border-color: var(--line-2); }
+      .run summary {
+        list-style: none;
+        cursor: pointer;
+        display: grid;
+        grid-template-columns: 28px 220px 1fr auto auto;
+        gap: 18px;
+        align-items: center;
+        padding: 14px 18px;
+      }
+      .run summary::-webkit-details-marker { display: none; }
+      .run .caret {
+        color: var(--ink-mute);
+        font-family: "Geist Mono", monospace;
+        transition: transform 160ms ease;
+      }
+      .run[open] .caret { transform: rotate(90deg); color: var(--accent); }
+      .run-id {
+        display: flex; align-items: center; gap: 10px;
+      }
+      .run-id .dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--good);
+        box-shadow: 0 0 0 3px rgba(74,222,128,0.2);
+      }
+      .run-id .dot.fail { background: var(--bad); box-shadow: 0 0 0 3px rgba(248,113,113,0.2); }
+      .run-id .name {
+        font: 500 14px/1 "Inter", sans-serif;
+        letter-spacing: -0.01em;
+      }
+      .run-id .sub {
+        display: block;
+        font: 500 11px/1 "Geist Mono", monospace;
+        color: var(--ink-mute);
+        margin-top: 4px;
+        letter-spacing: 0.04em;
+      }
+      .scoreline {
+        display: flex; gap: 16px;
+        font: 500 12px/1 "Geist Mono", monospace;
+        color: var(--ink-soft);
+      }
+      .scoreline .pair { display: inline-flex; gap: 6px; }
+      .scoreline .k { color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.06em; font-size: 10px; }
+      .scoreline .v.good { color: var(--good); }
+      .scoreline .v.warn { color: var(--warn); }
+      .scoreline .v.bad { color: var(--bad); }
+      .runtime {
+        font: 500 12px/1 "Geist Mono", monospace;
+        color: var(--ink-soft);
+      }
+      .runtime small { color: var(--ink-mute); display: block; margin-top: 4px; }
+      .pill-actions { display: flex; gap: 6px; }
+      .pill-actions a {
+        padding: 6px 10px;
+        border: 1px solid var(--line-2);
+        background: var(--bg-2);
+        font: 500 11px/1 "Geist Mono", monospace;
+        color: var(--ink-soft);
+        border-radius: 6px;
+      }
+      .pill-actions a:hover { background: var(--bg-3); color: var(--ink); }
+
+      /* expanded */
+      .run-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        padding: 0 18px 18px;
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+      }
+      .run-body .panel {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg-2);
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 8px 12px;
+        background: var(--bg-3);
+        border-bottom: 1px solid var(--line);
+        font: 500 11px/1 "Geist Mono", monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ink-mute);
+      }
+      .panel-head a { color: var(--ink-soft); }
+      .panel-head a:hover { color: var(--ink); }
+
+      .preview-shell {
+        background: white; min-height: 280px;
+        position: relative;
+      }
+      .preview-shell .bar {
+        height: 24px;
+        background: #f4f4f5;
+        border-bottom: 1px solid #e4e4e7;
+        display: flex; align-items: center; gap: 4px;
+        padding: 0 10px;
+      }
+      .preview-shell .bar i { width: 6px; height: 6px; border-radius: 50%; background: #d4d4d8; }
+      .preview-shell .body { padding: 16px; color: #18181b; }
+      .preview-shell .h { width: 60%; height: 14px; background: #18181b; border-radius: 3px; }
+      .preview-shell .s { width: 80%; height: 7px; background: #d4d4d8; border-radius: 3px; margin-top: 6px; }
+      .preview-shell .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+      .preview-shell .grid div { height: 92px; border: 1px solid #e4e4e7; border-radius: 8px; background: #fafafa; }
+      .preview-shell .grid div.pop { background: var(--card-accent, #ddd6fe); border-color: var(--card-accent-strong, #a78bfa); transform: translateY(-4px); box-shadow: 0 8px 16px rgba(15,23,42,0.06); }
+
+      .logs {
+        font: 12px/1.7 "Geist Mono", monospace;
+        color: var(--ink-soft);
+        padding: 12px 0;
+      }
+      .logs .ln {
+        display: grid; grid-template-columns: 60px 80px 1fr; gap: 12px;
+        padding: 0 12px;
+      }
+      .logs .ln + .ln { border-top: 1px dashed var(--line); padding-top: 4px; margin-top: 4px; }
+      .logs .ln .t { color: var(--ink-mute); }
+      .logs .ln .l { color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.06em; font-size: 10px; }
+      .logs .ln.ok .l { color: var(--good); }
+      .logs .ln.warn .l { color: var(--warn); }
+      .logs .ln.err .l { color: var(--bad); }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 22px 0;
+        color: var(--ink-mute);
+        font-size: 12px;
+      }
+      .footer-inner { display: flex; justify-content: space-between; }
+      footer .mono { color: var(--ink-soft); }
+
+      @media (max-width: 980px) {
+        .hero-inner { grid-template-columns: 1fr; align-items: start; }
+        .run summary { grid-template-columns: 24px 1fr; gap: 10px; }
+        .scoreline, .runtime, .pill-actions { grid-column: 2; }
+        .run-body { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="container nav-inner">
+        <a class="brand" href="#"><span class="brand-mark"></span> ui-arena</a>
+        <div class="nav-links">
+          <a href="#" aria-current="page">Interfaces</a>
+          <a href="#">Models</a>
+          <a href="#">Runs</a>
+          <a href="#">Docs</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="container hero-inner">
+        <div>
+          <div class="crumb"><a href="#">Interfaces</a> <span>/</span> <span>pricing-ai-coding-assistant</span></div>
+          <h1>SaaS pricing page for an AI coding assistant.</h1>
+          <p>Five models received the same brief. Below: the live HTML each one shipped, scored against Lighthouse and axe.</p>
+        </div>
+        <div class="status-card">
+          <header><span>Run status</span><span class="pulse"><i></i> live</span></header>
+          <div class="row"><span>Surface</span><span class="v">pricing-page</span></div>
+          <div class="row"><span>Models</span><span class="v">5 / 5</span></div>
+          <div class="row"><span>Last run</span><span class="v">2026-05-03T18:30Z</span></div>
+          <div class="row"><span>Avg time</span><span class="v">9.0s</span></div>
+          <div class="row"><span>Total cost</span><span class="v">$0.0668</span></div>
+        </div>
+      </div>
+
+      <div class="container prompt-wrap">
+        <div class="prompt-shell">
+          <div class="prompt-tabs">
+            <span class="tab active">prompt.md</span>
+            <span class="tab dim">manifest.json</span>
+            <span class="tab dim">history</span>
+            <span class="right">
+              <button>Edit</button>
+              <button>Re-run all</button>
+            </span>
+          </div>
+          <div class="prompt-body">
+            <div class="ln"><span>1</span><span><span class="kw">#</span> SaaS pricing page</span></div>
+            <div class="ln"><span>2</span><span></span></div>
+            <div class="ln"><span>3</span><span>Design and implement a pricing page for an <span class="str">AI coding assistant</span>.</span></div>
+            <div class="ln"><span>4</span><span>It should include three plans, a clear team upgrade path, usage limits,</span></div>
+            <div class="ln"><span>5</span><span>trust signals, FAQs, and responsive behavior.</span></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="runs-section">
+      <div class="container">
+        <div class="runs-head">
+          <h2>Runs <small>5 generated · sorted by aggregate score</small></h2>
+          <div class="toolbar">
+            <button>Sort: aggregate ↓</button>
+            <button>Filter</button>
+            <button class="primary">Compare</button>
+          </div>
+        </div>
+
+        <div class="run-list">
+          <details class="run" open>
+            <summary>
+              <span class="caret">▸</span>
+              <div class="run-id">
+                <span class="dot"></span>
+                <div>
+                  <span class="name">claude-sonnet-4-6</span>
+                  <span class="sub">anthropic / sonnet · 2026-05-03 18:30Z</span>
+                </div>
+              </div>
+              <div class="scoreline">
+                <span class="pair"><span class="k">PERF</span> <span class="v good">96</span></span>
+                <span class="pair"><span class="k">A11Y</span> <span class="v good">98</span></span>
+                <span class="pair"><span class="k">AXE</span> <span class="v good">0</span></span>
+                <span class="pair"><span class="k">LINES</span> <span class="v">412</span></span>
+              </div>
+              <div class="runtime">11.4s<small>$0.0184 · 3,184 tok</small></div>
+              <div class="pill-actions">
+                <a href="#">preview ↗</a>
+                <a href="#">source</a>
+                <a href="#">eval</a>
+              </div>
+            </summary>
+            <div class="run-body">
+              <div class="panel">
+                <div class="panel-head"><span>Live preview</span><a href="#">Open ↗</a></div>
+                <div class="preview-shell" style="--card-accent: #ddd6fe; --card-accent-strong: #a78bfa;">
+                  <div class="bar"><i></i><i></i><i></i></div>
+                  <div class="body">
+                    <div class="h"></div><div class="s"></div>
+                    <div class="grid"><div></div><div class="pop"></div><div></div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="panel-head"><span>Run log</span><a href="#">Full log</a></div>
+                <div class="logs">
+                  <div class="ln"><span class="t">+0.0s</span><span class="l">info</span><span>POST /v1/responses</span></div>
+                  <div class="ln ok"><span class="t">+11.4s</span><span class="l">ok</span><span>200 · 3184 tokens · streamed 412 lines</span></div>
+                  <div class="ln"><span class="t">+11.6s</span><span class="l">info</span><span>screenshot:desktop captured (1440×900)</span></div>
+                  <div class="ln"><span class="t">+12.1s</span><span class="l">info</span><span>lighthouse: perf 96, a11y 98</span></div>
+                  <div class="ln ok"><span class="t">+13.4s</span><span class="l">ok</span><span>axe: 0 violations</span></div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details class="run">
+            <summary>
+              <span class="caret">▸</span>
+              <div class="run-id">
+                <span class="dot"></span>
+                <div>
+                  <span class="name">gemini-3-1-flash</span>
+                  <span class="sub">google / flash-lite · 2026-05-03 18:30Z</span>
+                </div>
+              </div>
+              <div class="scoreline">
+                <span class="pair"><span class="k">PERF</span> <span class="v good">99</span></span>
+                <span class="pair"><span class="k">A11Y</span> <span class="v good">94</span></span>
+                <span class="pair"><span class="k">AXE</span> <span class="v warn">1</span></span>
+                <span class="pair"><span class="k">LINES</span> <span class="v">241</span></span>
+              </div>
+              <div class="runtime">4.8s<small>$0.0021 · 2,012 tok</small></div>
+              <div class="pill-actions">
+                <a href="#">preview ↗</a>
+                <a href="#">source</a>
+                <a href="#">eval</a>
+              </div>
+            </summary>
+          </details>
+
+          <details class="run">
+            <summary>
+              <span class="caret">▸</span>
+              <div class="run-id">
+                <span class="dot"></span>
+                <div>
+                  <span class="name">gpt-5-2</span>
+                  <span class="sub">openai / gpt-5-2 · 2026-05-03 18:30Z</span>
+                </div>
+              </div>
+              <div class="scoreline">
+                <span class="pair"><span class="k">PERF</span> <span class="v good">92</span></span>
+                <span class="pair"><span class="k">A11Y</span> <span class="v warn">88</span></span>
+                <span class="pair"><span class="k">AXE</span> <span class="v warn">2</span></span>
+                <span class="pair"><span class="k">LINES</span> <span class="v">378</span></span>
+              </div>
+              <div class="runtime">9.2s<small>$0.0162 · 2,847 tok</small></div>
+              <div class="pill-actions">
+                <a href="#">preview ↗</a>
+                <a href="#">source</a>
+                <a href="#">eval</a>
+              </div>
+            </summary>
+          </details>
+
+          <details class="run">
+            <summary>
+              <span class="caret">▸</span>
+              <div class="run-id">
+                <span class="dot"></span>
+                <div>
+                  <span class="name">grok-4</span>
+                  <span class="sub">xai / grok-4 · 2026-05-03 18:30Z</span>
+                </div>
+              </div>
+              <div class="scoreline">
+                <span class="pair"><span class="k">PERF</span> <span class="v warn">86</span></span>
+                <span class="pair"><span class="k">A11Y</span> <span class="v warn">72</span></span>
+                <span class="pair"><span class="k">AXE</span> <span class="v bad">5</span></span>
+                <span class="pair"><span class="k">LINES</span> <span class="v">489</span></span>
+              </div>
+              <div class="runtime">13.6s<small>$0.0291 · 3,612 tok</small></div>
+              <div class="pill-actions">
+                <a href="#">preview ↗</a>
+                <a href="#">source</a>
+                <a href="#">eval</a>
+              </div>
+            </summary>
+          </details>
+
+          <details class="run">
+            <summary>
+              <span class="caret">▸</span>
+              <div class="run-id">
+                <span class="dot fail"></span>
+                <div>
+                  <span class="name">deepseek-v3-5</span>
+                  <span class="sub">deepseek / v3-5 · 2026-05-03 18:30Z</span>
+                </div>
+              </div>
+              <div class="scoreline">
+                <span class="pair"><span class="k">PERF</span> <span class="v warn">78</span></span>
+                <span class="pair"><span class="k">A11Y</span> <span class="v warn">70</span></span>
+                <span class="pair"><span class="k">AXE</span> <span class="v bad">7</span></span>
+                <span class="pair"><span class="k">LINES</span> <span class="v">601</span></span>
+              </div>
+              <div class="runtime">6.1s<small>$0.0010 · 2,601 tok</small></div>
+              <div class="pill-actions">
+                <a href="#">preview ↗</a>
+                <a href="#">source</a>
+                <a href="#">eval</a>
+              </div>
+            </summary>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-inner">
+        <span class="mono">ui-arena · 2026 · static</span>
+        <span class="mono">node 22 · astro · cloudflare</span>
+      </div>
+    </footer>
+  </body>
+</html>

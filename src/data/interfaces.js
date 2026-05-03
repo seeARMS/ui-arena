@@ -6,25 +6,25 @@ export const interfacePrompts = [
     id: "pricing-ai-coding-assistant",
     title: "SaaS pricing page",
     eyebrow: "AI coding assistant",
-    summary: "A three-tier pricing page with usage limits, trust cues, and team upgrade paths.",
+    summary: "Three plans, a team upgrade path, usage limits, trust signals, FAQs.",
     prompt:
       "Design and implement a pricing page for an AI coding assistant. It should include three plans, a clear team upgrade path, usage limits, trust signals, FAQs, and responsive behavior.",
-    status: "Live example",
+    status: "Live · ranked",
   },
   {
     number: "02",
     id: "newsletter-analytics-dashboard",
     title: "Newsletter analytics dashboard",
     eyebrow: "Creator analytics",
-    summary: "Creator-facing metrics for growth, retention, revenue, and content performance.",
+    summary: "Growth, retention, revenue, and content-level performance for a working creator.",
     status: "Prompt ready",
   },
   {
     number: "03",
     id: "ai-chat-tool-approvals",
-    title: "AI chat approvals",
+    title: "AI chat with tool approvals",
     eyebrow: "Agent workspace",
-    summary: "A chat surface that makes tool calls inspectable before they run.",
+    summary: "A chat surface that makes every tool call inspectable before it runs.",
     status: "Prompt ready",
   },
   {
@@ -32,7 +32,7 @@ export const interfacePrompts = [
     id: "route-planner",
     title: "Route planner",
     eyebrow: "Cycling and running",
-    summary: "A planning surface for distance, elevation, pace, weather, and route comparison.",
+    summary: "Distance, elevation, pace, weather, and route comparison on one canvas.",
     status: "Prompt ready",
   },
   {
@@ -40,7 +40,7 @@ export const interfacePrompts = [
     id: "saas-billing-settings",
     title: "Billing settings",
     eyebrow: "Team workspace",
-    summary: "Seat management, invoices, plan changes, payment state, and admin controls.",
+    summary: "Seats, invoices, plan changes, payment state, and admin controls in one screen.",
     status: "Prompt ready",
   },
   {
@@ -48,7 +48,7 @@ export const interfacePrompts = [
     id: "creator-publication-onboarding",
     title: "Publication onboarding",
     eyebrow: "Creator setup",
-    summary: "A focused setup journey that balances speed, confidence, and useful defaults.",
+    summary: "A focused setup that balances speed, confidence, and sensible defaults.",
     status: "Prompt ready",
   },
   {
@@ -56,7 +56,7 @@ export const interfacePrompts = [
     id: "api-keys-admin-table",
     title: "API keys admin table",
     eyebrow: "Permissions",
-    summary: "Dense operational UI with scopes, ownership, rotation state, and audit trails.",
+    summary: "Dense operational UI: scopes, ownership, rotation state, and audit trail.",
     status: "Prompt ready",
   },
   {
@@ -64,7 +64,7 @@ export const interfacePrompts = [
     id: "open-source-developer-tool-landing",
     title: "Developer tool landing page",
     eyebrow: "Open source",
-    summary: "A homepage that explains the tool, earns trust, and gets developers to try it.",
+    summary: "Explain the tool, earn trust, and get a developer to install in under a minute.",
     status: "Prompt ready",
   },
   {
@@ -72,7 +72,7 @@ export const interfacePrompts = [
     id: "habit-tracking-mobile-screen",
     title: "Habit tracking mobile screen",
     eyebrow: "Daily use",
-    summary: "A compact daily-use screen with progress, streaks, editing, and motivation.",
+    summary: "A daily-use mobile screen with progress, streaks, editing, and motivation.",
     status: "Prompt ready",
   },
   {
@@ -80,7 +80,7 @@ export const interfacePrompts = [
     id: "newsletter-growth-workflow-builder",
     title: "Newsletter workflow builder",
     eyebrow: "Automation",
-    summary: "A visual automation surface for triggers, branches, actions, and performance.",
+    summary: "A visual automation surface: triggers, branches, actions, and performance.",
     status: "Prompt ready",
   },
 ].map((item) => ({

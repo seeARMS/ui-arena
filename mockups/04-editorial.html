@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UI Arena — Editorial direction</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #fbf9f4;
+        --paper: #ffffff;
+        --ink: #1a1612;
+        --ink-soft: #514a40;
+        --ink-mute: #8b8278;
+        --rule: #d8cfc1;
+        --rule-soft: #ebe4d6;
+        --highlight: #ec5b1f;
+        --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+        --sans: "Inter", system-ui, sans-serif;
+        --mono: "JetBrains Mono", ui-monospace, monospace;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font: 17px/1.7 var(--serif);
+        font-feature-settings: "ss01", "kern";
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; text-decoration: none; }
+      .mono { font-family: var(--mono); }
+      .sans { font-family: var(--sans); }
+      .container { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+      .narrow { max-width: 720px; margin: 0 auto; padding: 0 32px; }
+
+      /* masthead */
+      .masthead {
+        border-bottom: 1px solid var(--ink);
+        padding: 14px 0;
+      }
+      .masthead-inner {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 24px;
+      }
+      .masthead .left, .masthead .right {
+        font: 500 12px/1 var(--sans);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--ink-soft);
+      }
+      .masthead .right { text-align: right; }
+      .wordmark {
+        font-family: var(--serif);
+        font-weight: 700;
+        font-size: 32px;
+        letter-spacing: -0.01em;
+        text-align: center;
+      }
+      .wordmark em {
+        font-style: italic;
+        font-weight: 400;
+      }
+
+      .subnav {
+        border-bottom: 1px solid var(--rule);
+        background: var(--bg);
+      }
+      .subnav-inner {
+        display: flex; gap: 28px; align-items: center;
+        height: 44px;
+        font: 500 13px/1 var(--sans);
+      }
+      .subnav-inner a { color: var(--ink-soft); }
+      .subnav-inner a:hover, .subnav-inner a[aria-current="page"] { color: var(--ink); }
+
+      /* article header */
+      article header.lede {
+        padding: 64px 0 48px;
+        border-bottom: 1px solid var(--ink);
+        text-align: center;
+      }
+      .kicker {
+        display: inline-flex; align-items: center; gap: 12px;
+        font: 500 12px/1 var(--sans);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--highlight);
+        margin-bottom: 18px;
+      }
+      .kicker::before, .kicker::after {
+        content: ""; width: 30px; height: 1px; background: currentColor;
+      }
+      h1.title {
+        margin: 0 auto 22px;
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: clamp(46px, 6.6vw, 84px);
+        line-height: 0.96;
+        letter-spacing: -0.02em;
+        max-width: 18ch;
+        font-variation-settings: "opsz" 144;
+      }
+      h1.title em {
+        font-style: italic;
+        font-weight: 400;
+      }
+      .dek {
+        margin: 0 auto;
+        max-width: 60ch;
+        font-family: var(--serif);
+        font-size: 20px;
+        line-height: 1.55;
+        color: var(--ink-soft);
+      }
+      .byline {
+        margin-top: 28px;
+        font: 500 12px/1.6 var(--sans);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-mute);
+      }
+
+      /* prompt callout */
+      .pull {
+        margin: 56px auto;
+        max-width: 880px;
+        padding: 36px 40px;
+        background: var(--paper);
+        border-top: 6px solid var(--ink);
+        border-bottom: 1px solid var(--rule);
+        position: relative;
+      }
+      .pull-label {
+        font: 500 11px/1 var(--sans);
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        color: var(--ink-mute);
+        margin-bottom: 14px;
+      }
+      .pull-text {
+        font-family: var(--serif);
+        font-size: 28px;
+        line-height: 1.32;
+        font-weight: 400;
+        font-style: italic;
+        color: var(--ink);
+        margin: 0;
+      }
+      .pull-text::before {
+        content: "“";
+        position: absolute;
+        left: 16px;
+        top: 8px;
+        font-family: var(--serif);
+        font-size: 110px;
+        line-height: 1;
+        color: var(--rule);
+        font-style: normal;
+      }
+
+      /* meta strip */
+      .meta-strip {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-top: 1px solid var(--ink);
+        border-bottom: 1px solid var(--ink);
+        background: var(--paper);
+      }
+      .meta-strip > div {
+        padding: 18px 22px;
+        border-right: 1px solid var(--rule);
+      }
+      .meta-strip > div:last-child { border-right: 0; }
+      .meta-strip dt {
+        font: 500 11px/1 var(--sans);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--ink-mute);
+        margin-bottom: 6px;
+      }
+      .meta-strip dd {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: 22px;
+        font-weight: 500;
+        font-variation-settings: "opsz" 144;
+      }
+
+      /* section heading */
+      .section-h {
+        margin: 80px 0 32px;
+        text-align: center;
+      }
+      .section-h .num {
+        display: inline-block;
+        font: 500 11px/1 var(--sans);
+        text-transform: uppercase;
+        letter-spacing: 0.24em;
+        color: var(--ink-mute);
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--rule);
+        margin-bottom: 16px;
+      }
+      .section-h h2 {
+        margin: 0;
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: clamp(34px, 4.4vw, 52px);
+        letter-spacing: -0.015em;
+        line-height: 1.05;
+      }
+
+      /* output entries */
+      .entries { display: grid; gap: 0; border-top: 1px solid var(--ink); }
+      .entry {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 48px;
+        padding: 56px 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .entry-meta {
+        position: sticky; top: 32px;
+        align-self: start;
+      }
+      .entry-rank {
+        font-family: var(--serif);
+        font-size: 56px;
+        font-weight: 500;
+        line-height: 1;
+        font-variation-settings: "opsz" 144;
+      }
+      .entry-rank em {
+        font-style: italic;
+        font-weight: 400;
+        color: var(--ink-mute);
+        font-size: 28px;
+        margin-left: 6px;
+      }
+      .entry-meta h3 {
+        margin: 18px 0 4px;
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: 28px;
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        font-variation-settings: "opsz" 144;
+      }
+      .entry-meta .family {
+        font: 500 12px/1 var(--sans);
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--ink-mute);
+        margin-bottom: 22px;
+      }
+      .entry-meta .stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 22px;
+        padding: 16px 0;
+        border-top: 1px solid var(--rule);
+        border-bottom: 1px solid var(--rule);
+      }
+      .entry-meta .stats > div { display: grid; gap: 4px; }
+      .entry-meta .stats dt {
+        font: 500 10px/1 var(--sans);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--ink-mute);
+      }
+      .entry-meta .stats dd {
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 16px;
+        font-weight: 500;
+      }
+      .entry-meta .links {
+        margin-top: 22px;
+        display: flex; flex-direction: column; gap: 10px;
+        font: 500 13px/1 var(--sans);
+      }
+      .entry-meta .links a {
+        display: inline-flex; align-items: center; gap: 8px;
+        color: var(--ink);
+        border-bottom: 1px solid var(--ink);
+        padding-bottom: 4px;
+        align-self: flex-start;
+      }
+      .entry-meta .links a:hover { color: var(--highlight); border-color: var(--highlight); }
+
+      /* big preview */
+      .entry-body {
+        display: grid;
+        gap: 24px;
+      }
+      .preview-figure {
+        position: relative;
+        background: var(--paper);
+        border: 1px solid var(--ink);
+        overflow: hidden;
+        box-shadow: 6px 6px 0 var(--ink);
+      }
+      .pf-bar {
+        height: 36px;
+        background: var(--bg);
+        border-bottom: 1px solid var(--ink);
+        display: flex; align-items: center; gap: 6px;
+        padding: 0 14px;
+        font: 500 11px/1 var(--mono);
+        color: var(--ink-mute);
+      }
+      .pf-bar .dots { display: flex; gap: 5px; margin-right: 10px; }
+      .pf-bar .dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); opacity: 0.32; }
+      .pf-body { padding: 32px 36px; min-height: 320px; }
+      .pf-eyebrow { width: 100px; height: 9px; background: var(--highlight); border-radius: 1px; }
+      .pf-h { width: 70%; height: 28px; background: var(--ink); border-radius: 2px; margin-top: 14px; }
+      .pf-s { width: 80%; height: 9px; background: var(--rule); border-radius: 2px; margin-top: 10px; }
+      .pf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 28px; }
+      .pf-card {
+        height: 140px;
+        border: 1px solid var(--rule);
+        background: var(--bg);
+        position: relative;
+      }
+      .pf-card.pop {
+        background: var(--paper);
+        border: 1px solid var(--ink);
+        transform: translateY(-8px);
+        box-shadow: 4px 4px 0 var(--highlight);
+      }
+      .pf-card span {
+        position: absolute; top: 14px; left: 14px;
+        height: 6px; width: 38px; background: var(--card-accent, var(--highlight)); border-radius: 1px;
+      }
+      .pf-card strong {
+        position: absolute; top: 30px; left: 14px;
+        height: 16px; width: 60%; background: var(--ink); border-radius: 2px; opacity: 0.85;
+      }
+      .pf-card small {
+        position: absolute; bottom: 14px; left: 14px; right: 14px;
+        height: 30px; background: var(--ink); border-radius: 2px;
+      }
+
+      /* eval table */
+      .eval-table {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        background: var(--paper);
+        border: 1px solid var(--rule);
+      }
+      .eval-table > div {
+        padding: 18px 20px;
+        border-right: 1px solid var(--rule);
+      }
+      .eval-table > div:last-child { border-right: 0; }
+      .eval-table dt {
+        font: 500 11px/1 var(--sans);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--ink-mute);
+        margin-bottom: 8px;
+      }
+      .eval-table dd {
+        margin: 0;
+        display: flex; align-items: baseline; gap: 12px;
+      }
+      .eval-table .v {
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: 44px;
+        line-height: 1;
+        font-variation-settings: "opsz" 144;
+      }
+      .eval-table .d {
+        font: 500 11px/1.4 var(--sans);
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--ink-mute);
+      }
+      .eval-table .v.warn { color: #b06b00; }
+      .eval-table .v.bad { color: #b3261e; }
+
+      .takeaway {
+        font-family: var(--serif);
+        font-size: 19px;
+        line-height: 1.65;
+        color: var(--ink-soft);
+      }
+      .takeaway::first-letter {
+        font-family: var(--serif);
+        float: left;
+        font-size: 64px;
+        font-weight: 500;
+        line-height: 0.85;
+        margin: 6px 8px 0 0;
+        color: var(--ink);
+        font-variation-settings: "opsz" 144;
+      }
+
+      /* per-entry accent */
+      .entry.r1 .pf-card span { background: #137a3d; }
+      .entry.r1 .pf-card.pop { box-shadow: 4px 4px 0 #137a3d; }
+      .entry.r2 .pf-card span { background: #ec5b1f; }
+      .entry.r2 .pf-card.pop { box-shadow: 4px 4px 0 #ec5b1f; }
+      .entry.r3 .pf-card span { background: #2563eb; }
+      .entry.r3 .pf-card.pop { box-shadow: 4px 4px 0 #2563eb; }
+      .entry.r4 .pf-card span { background: #a855f7; }
+      .entry.r4 .pf-card.pop { box-shadow: 4px 4px 0 #a855f7; }
+
+      footer.colophon {
+        border-top: 1px solid var(--ink);
+        padding: 56px 0;
+        text-align: center;
+        margin-top: 80px;
+        background: var(--paper);
+      }
+      footer.colophon h3 {
+        margin: 0 0 8px;
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: 22px;
+        font-variation-settings: "opsz" 144;
+      }
+      footer.colophon p {
+        margin: 0 auto;
+        max-width: 50ch;
+        color: var(--ink-soft);
+        font-size: 16px;
+      }
+      footer.colophon .links {
+        margin-top: 18px;
+        display: inline-flex; gap: 18px;
+        font: 500 12px/1 var(--sans);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--ink-mute);
+      }
+      footer.colophon .links a:hover { color: var(--ink); }
+
+      @media (max-width: 880px) {
+        .meta-strip { grid-template-columns: repeat(2, 1fr); }
+        .meta-strip > div:nth-child(2) { border-right: 0; }
+        .meta-strip > div:nth-child(1), .meta-strip > div:nth-child(2) { border-bottom: 1px solid var(--rule); }
+        .entry { grid-template-columns: 1fr; gap: 24px; }
+        .entry-meta { position: static; }
+        .pull-text { font-size: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="container masthead-inner">
+        <div class="left">No. 01 · May 2026</div>
+        <div class="wordmark">UI <em>Arena</em></div>
+        <div class="right">5 models · 1 brief</div>
+      </div>
+    </header>
+    <div class="subnav">
+      <div class="container subnav-inner">
+        <a href="#" aria-current="page">Interfaces</a>
+        <a href="#">Models</a>
+        <a href="#">Method</a>
+        <a href="#">About</a>
+        <span style="margin-left: auto; color: var(--ink-mute); font: 500 11px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase;">An AI interface gallery</span>
+      </div>
+    </div>
+
+    <article>
+      <header class="lede">
+        <div class="container">
+          <span class="kicker">Issue 01 · Pricing surface</span>
+          <h1 class="title">A pricing page, written <em>five different ways.</em></h1>
+          <p class="dek">
+            We gave the same brief to five frontier models and ran their HTML through Lighthouse and axe. What follows is a side by side reading of how each one chose to argue for the product.
+          </p>
+          <p class="byline">By UI Arena · Generated May 3, 2026</p>
+        </div>
+      </header>
+
+      <section class="container">
+        <div class="pull">
+          <p class="pull-label">The brief</p>
+          <p class="pull-text">
+            Design and implement a pricing page for an AI coding assistant. Three plans, a clear team upgrade path, usage limits, trust signals, FAQs, and responsive behavior.
+          </p>
+        </div>
+
+        <dl class="meta-strip">
+          <div><dt>Surface</dt><dd>Pricing</dd></div>
+          <div><dt>Models</dt><dd>5</dd></div>
+          <div><dt>Avg. time</dt><dd>9.0s</dd></div>
+          <div><dt>Total cost</dt><dd>$0.07</dd></div>
+        </dl>
+
+        <div class="section-h">
+          <span class="num">Part one — The outputs</span>
+          <h2>What each model <em>actually</em> shipped.</h2>
+        </div>
+
+        <div class="entries">
+
+          <div class="entry r1">
+            <aside class="entry-meta">
+              <div class="entry-rank">01<em>of 5</em></div>
+              <h3>Claude Sonnet 4.6</h3>
+              <p class="family">Anthropic</p>
+              <dl class="stats">
+                <div><dt>Time</dt><dd>11.4s</dd></div>
+                <div><dt>Tokens</dt><dd>3,184</dd></div>
+                <div><dt>Cost</dt><dd>$0.018</dd></div>
+                <div><dt>Lines</dt><dd>412</dd></div>
+              </dl>
+              <div class="links">
+                <a href="#">Open live preview ↗</a>
+                <a href="#">Read source</a>
+                <a href="#">Lighthouse report</a>
+              </div>
+            </aside>
+            <div class="entry-body">
+              <figure class="preview-figure">
+                <div class="pf-bar">
+                  <span class="dots"><i></i><i></i><i></i></span>
+                  <span>preview · claude-sonnet-4-6</span>
+                </div>
+                <div class="pf-body">
+                  <div class="pf-eyebrow"></div>
+                  <div class="pf-h"></div>
+                  <div class="pf-s"></div>
+                  <div class="pf-grid">
+                    <div class="pf-card"><span></span><strong></strong><small></small></div>
+                    <div class="pf-card pop"><span></span><strong></strong><small></small></div>
+                    <div class="pf-card"><span></span><strong></strong><small></small></div>
+                  </div>
+                </div>
+              </figure>
+              <dl class="eval-table">
+                <div><dt>Performance</dt><dd><span class="v">96</span><span class="d">Lighthouse</span></dd></div>
+                <div><dt>Accessibility</dt><dd><span class="v">98</span><span class="d">Lighthouse</span></dd></div>
+                <div><dt>Axe</dt><dd><span class="v">0</span><span class="d">violations</span></dd></div>
+              </dl>
+              <p class="takeaway">
+                Sonnet built the most complete page of the bunch — a confident hierarchy with the middle plan elevated, a usage table below the fold, and an FAQ block written in a calm, second-person voice. The HTML is clean, semantic, and indistinguishable from a thoughtful designer's work.
+              </p>
+            </div>
+          </div>
+
+          <div class="entry r2">
+            <aside class="entry-meta">
+              <div class="entry-rank">02<em>of 5</em></div>
+              <h3>GPT-5.2</h3>
+              <p class="family">OpenAI</p>
+              <dl class="stats">
+                <div><dt>Time</dt><dd>9.2s</dd></div>
+                <div><dt>Tokens</dt><dd>2,847</dd></div>
+                <div><dt>Cost</dt><dd>$0.016</dd></div>
+                <div><dt>Lines</dt><dd>378</dd></div>
+              </dl>
+              <div class="links">
+                <a href="#">Open live preview ↗</a>
+                <a href="#">Read source</a>
+                <a href="#">Lighthouse report</a>
+              </div>
+            </aside>
+            <div class="entry-body">
+              <figure class="preview-figure">
+                <div class="pf-bar">
+                  <span class="dots"><i></i><i></i><i></i></span>
+                  <span>preview · gpt-5-2</span>
+                </div>
+                <div class="pf-body">
+                  <div class="pf-eyebrow"></div>
+                  <div class="pf-h"></div>
+                  <div class="pf-s"></div>
+                  <div class="pf-grid">
+                    <div class="pf-card"><span></span><strong></strong><small></small></div>
+                    <div class="pf-card pop"><span></span><strong></strong><small></small></div>
+                    <div class="pf-card"><span></span><strong></strong><small></small></div>
+                  </div>
+                </div>
+              </figure>
+              <dl class="eval-table">
+                <div><dt>Performance</dt><dd><span class="v">92</span><span class="d">Lighthouse</span></dd></div>
+                <div><dt>Accessibility</dt><dd><span class="v warn">88</span><span class="d">Lighthouse</span></dd></div>
+                <div><dt>Axe</dt><dd><span class="v warn">2</span><span class="d">violations</span></dd></div>
+              </dl>
+              <p class="takeaway">
+                A fast, marketing-flavored answer. Heavier on social proof and trust signals than Claude, lighter on usage detail. The accessibility score is dinged by low-contrast secondary text — a recurring weakness across GPT runs in this gallery.
+              </p>
+            </div>
+          </div>
+
+          <div class="entry r3">
+            <aside class="entry-meta">
+              <div class="entry-rank">03<em>of 5</em></div>
+              <h3>Gemini 3.1 Flash</h3>
+              <p class="family">Google</p>
+              <dl class="stats">
+                <div><dt>Time</dt><dd>4.8s</dd></div>
+                <div><dt>Tokens</dt><dd>2,012</dd></div>
+                <div><dt>Cost</dt><dd>$0.002</dd></div>
+                <div><dt>Lines</dt><dd>241</dd></div>
+              </dl>
+              <div class="links">
+                <a href="#">Open live preview ↗</a>
+                <a href="#">Read source</a>
+                <a href="#">Lighthouse report</a>
+              </div>
+            </aside>
+            <div class="entry-body">
+              <figure class="preview-figure">
+                <div class="pf-bar">
+                  <span class="dots"><i></i><i></i><i></i></span>
+                  <span>preview · gemini-3-1-flash</span>
+                </div>
+                <div class="pf-body">
+                  <div class="pf-eyebrow"></div>
+                  <div class="pf-h"></div>
+                  <div class="pf-s"></div>
+                  <div class="pf-grid">
+                    <div class="pf-card"><span></span><strong></strong><small></small></div>
+                    <div class="pf-card pop"><span></span><strong></strong><small></small></div>
+                    <div class="pf-card"><span></span><strong></strong><small></small></div>
+                  </div>
+                </div>
+              </figure>
+              <dl class="eval-table">
+                <div><dt>Performance</dt><dd><span class="v">99</span><span class="d">Lighthouse</span></dd></div>
+                <div><dt>Accessibility</dt><dd><span class="v">94</span><span class="d">Lighthouse</span></dd></div>
+                <div><dt>Axe</dt><dd><span class="v warn">1</span><span class="d">violation</span></dd></div>
+              </dl>
+              <p class="takeaway">
+                Compact, idiomatic, and tenth the cost. Flash skips the team upgrade narrative entirely but ships a remarkably tight three-tier comparison — closer to a Linear pricing page than a Vercel one.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </article>
+
+    <footer class="colophon">
+      <div class="container">
+        <h3>UI Arena</h3>
+        <p>An evolving gallery of how different models design the same product surfaces. Updated whenever a new frontier model ships.</p>
+        <div class="links">
+          <a href="#">Method</a>
+          <a href="#">Models</a>
+          <a href="#">GitHub</a>
+          <a href="#">RSS</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

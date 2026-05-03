@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UI Arena — Design directions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; }
+      body {
+        background: #fafafa;
+        color: #09090b;
+        font: 16px/1.5 "Inter", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; }
+      .mono { font-family: "Geist Mono", monospace; }
+      .wrap { max-width: 1080px; margin: 0 auto; padding: 64px 32px; }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 44px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.05;
+      }
+      .lede {
+        max-width: 60ch; color: #52525b;
+        font-size: 18px;
+        margin: 0 0 48px;
+      }
+      .grid {
+        display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px;
+      }
+      .card {
+        display: block;
+        border: 1px solid #e4e4e7;
+        border-radius: 14px;
+        background: white;
+        padding: 24px;
+        text-decoration: none;
+        color: inherit;
+        transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+      }
+      .card:hover {
+        border-color: #a1a1aa;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 18px 38px rgba(15,23,42,0.07);
+        transform: translateY(-2px);
+      }
+      .num {
+        display: inline-block;
+        font: 500 11px/1 "Geist Mono", monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: #a1a1aa;
+        margin-bottom: 12px;
+      }
+      .card h2 {
+        margin: 0 0 6px;
+        font-size: 22px; font-weight: 600; letter-spacing: -0.015em;
+      }
+      .card p {
+        margin: 0 0 18px;
+        color: #52525b;
+        font-size: 14px;
+      }
+      .swatch {
+        height: 88px;
+        border-radius: 10px;
+        border: 1px solid #e4e4e7;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 14px;
+      }
+      .swatch.s1 {
+        background:
+          radial-gradient(50% 60% at 70% 40%, rgba(249,115,22,0.28), transparent 65%),
+          radial-gradient(50% 60% at 30% 70%, rgba(37,99,235,0.28), transparent 65%),
+          #ffffff;
+      }
+      .swatch.s2 {
+        background:
+          repeating-linear-gradient(0deg, transparent 0 22px, rgba(0,0,0,0.06) 22px 23px),
+          repeating-linear-gradient(90deg, transparent 0 22px, rgba(0,0,0,0.06) 22px 23px),
+          #f7f7f5;
+      }
+      .swatch.s2::before {
+        content: "";
+        position: absolute; inset: 12px;
+        background: linear-gradient(180deg, #ffe566 0 18%, #d0e3ff 18% 36%, #ffe1cf 36% 54%, #d6f5d4 54% 72%, #efd8ff 72% 100%);
+        border: 1px solid #1a1a1a;
+      }
+      .swatch.s3 {
+        background:
+          radial-gradient(45% 60% at 80% 20%, rgba(129,140,248,0.5), transparent 70%),
+          radial-gradient(45% 60% at 20% 75%, rgba(244,114,182,0.4), transparent 70%),
+          #08080a;
+      }
+      .swatch.s4 {
+        background:
+          linear-gradient(180deg, #fbf9f4 0 50%, #fff 50% 100%);
+        position: relative;
+      }
+      .swatch.s4::before {
+        content: "Aa";
+        position: absolute; inset: 0;
+        display: grid; place-items: center;
+        font-family: "Fraunces", Georgia, serif;
+        font-style: italic;
+        font-size: 56px;
+        font-weight: 500;
+        color: #1a1612;
+      }
+      .swatch.s4::after {
+        content: "";
+        position: absolute; left: 16px; right: 16px; bottom: 14px;
+        height: 1px; background: #1a1612;
+      }
+      .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+      .tag {
+        padding: 4px 9px;
+        border-radius: 999px;
+        background: #f4f4f5;
+        color: #52525b;
+        font: 500 11px/1 "Geist Mono", monospace;
+      }
+      .open {
+        margin-top: 8px;
+        display: inline-flex; align-items: center; gap: 6px;
+        font: 500 13px/1 "Inter", sans-serif;
+        color: #2563eb;
+      }
+      .small { color: #a1a1aa; font-size: 13px; margin-top: 24px; }
+      @media (max-width: 720px) {
+        .grid { grid-template-columns: 1fr; }
+        h1 { font-size: 34px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <span class="num">UI Arena · Design exploration</span>
+      <h1>Pick a direction.</h1>
+      <p class="lede">
+        Four mockups of the <strong>interface comparison page</strong> (the densest page on the site — same content in each). Open a few, tell me which feels right, and I'll redo the whole site in that direction.
+      </p>
+
+      <div class="grid">
+        <a class="card" href="./01-council.html">
+          <div class="swatch s1"></div>
+          <span class="num">01</span>
+          <h2>Council</h2>
+          <p>Light, airy, minimal. Subtle gradient glow, Inter + Geist Mono. The calm, modern-product direction. Closest to the council.armstr.ng feel you mentioned.</p>
+          <div class="tags">
+            <span class="tag">light</span>
+            <span class="tag">minimal</span>
+            <span class="tag">soft</span>
+          </div>
+          <span class="open">Open mockup →</span>
+        </a>
+
+        <a class="card" href="./02-arena.html">
+          <div class="swatch s2"></div>
+          <span class="num">02</span>
+          <h2>Arena / leaderboard</h2>
+          <p>Dense benchmark feel. Tabular leaderboard with rank, scores, preview thumbnail, run cost, all in one row. JetBrains Mono, hard borders, pastel swatches. Reads like a data product.</p>
+          <div class="tags">
+            <span class="tag">dense</span>
+            <span class="tag">tabular</span>
+            <span class="tag">data-y</span>
+          </div>
+          <span class="open">Open mockup →</span>
+        </a>
+
+        <a class="card" href="./03-console.html">
+          <div class="swatch s3"></div>
+          <span class="num">03</span>
+          <h2>Dark console</h2>
+          <p>Linear / Vercel / CI dashboard vibe. Dark, mono-driven, runs as expandable build entries with status dots and logs. Feels engineering-native.</p>
+          <div class="tags">
+            <span class="tag">dark</span>
+            <span class="tag">technical</span>
+            <span class="tag">dev-tool</span>
+          </div>
+          <span class="open">Open mockup →</span>
+        </a>
+
+        <a class="card" href="./04-editorial.html">
+          <div class="swatch s4"></div>
+          <span class="num">04</span>
+          <h2>Editorial</h2>
+          <p>Magazine layout. Big Fraunces serif, drop caps, pull quotes, masthead, big "issue 01" framing. Treats each comparison like a feature article. Stripe Press / Bloomberg energy.</p>
+          <div class="tags">
+            <span class="tag">serif</span>
+            <span class="tag">opinionated</span>
+            <span class="tag">magazine</span>
+          </div>
+          <span class="open">Open mockup →</span>
+        </a>
+      </div>
+
+      <p class="small">All four show the same content (a SaaS pricing page comparison) so you can compare apples to apples. They're standalone HTML files — open via file:// or any static server.</p>
+    </main>
+  </body>
+</html>

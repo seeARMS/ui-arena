@@ -2,69 +2,111 @@
 import PricingOutputCard from "./PricingOutputCard.astro";
 
 const { interfacePrompt, outputs } = Astro.props;
+
+const completedCount = outputs.filter((o) => !o.pending && o.stateLabel !== "Failed").length;
+const failedCount = outputs.filter((o) => o.stateLabel === "Failed").length;
+const pendingCount = outputs.length - completedCount - failedCount;
+
+const sorted = [...outputs].sort((a, b) => {
+  const score = (o) => {
+    if (o.pending || o.stateLabel === "Failed") return -1;
+    const perf = o.evaluations.find((e) => e.label === "Performance");
+    const a11y = o.evaluations.find((e) => e.label === "Accessibility");
+    return (perf?.percent ?? 0) + (a11y?.percent ?? 0);
+  };
+  return score(b) - score(a);
+});
+
+const lastRun = outputs
+  .map((o) => o.stats?.find((s) => s.label === "Time"))
+  .filter(Boolean).length;
 ---
 
 <main>
-  <section class="gallery-hero">
-    <div class="container gallery-hero-inner">
-      <div>
-        <p class="eyebrow">Interface {interfacePrompt.number}</p>
-        <h1>{interfacePrompt.title}</h1>
-        <p>{interfacePrompt.prompt}</p>
+  <section class="page-head">
+    <div class="container">
+      <div class="crumb">
+        <a href="/interfaces/">Interfaces</a>
+        <span>/</span>
+        <span>{interfacePrompt.number}</span>
       </div>
-      <aside class="interface-brief" aria-label={`${interfacePrompt.title} metadata`}>
-        <dl>
-          <div>
-            <dt>Surface</dt>
-            <dd>{interfacePrompt.eyebrow}</dd>
-          </div>
-          <div>
-            <dt>Models</dt>
-            <dd>{outputs.length} output slots</dd>
-          </div>
-          <div>
-            <dt>Artifacts</dt>
-            <dd>Preview, screenshot, source, evaluation</dd>
-          </div>
-        </dl>
-      </aside>
-    </div>
-  </section>
+      <h1><span class="id">{interfacePrompt.number}.</span> {interfacePrompt.title}</h1>
 
-  <section class="section gallery-controls-section">
-    <div class="container gallery-controls">
-      <div class="gallery-control-copy">
-        <span>Model outputs</span>
-        <p>Same prompt, different product decisions.</p>
-      </div>
-      <div class="view-toggle" aria-label="Display mode">
-        <button type="button" data-view-option="list" aria-pressed="true">List</button>
-        <button type="button" data-view-option="grid" aria-pressed="false">Grid</button>
+      <div class="page-head-grid">
+        <div>
+          <p class="lede">
+            {outputs.length} models received the same brief. Below: a leaderboard of their generated
+            HTML, ranked by aggregate of Lighthouse performance and accessibility.
+          </p>
+          <div class="badges">
+            <span class="badge">▣ {interfacePrompt.eyebrow}</span>
+            <span class="badge">⚙ {outputs.length} models</span>
+            <span class="badge">▤ {completedCount} generated</span>
+            {pendingCount > 0 && <span class="badge">○ {pendingCount} pending</span>}
+            {failedCount > 0 && <span class="badge">✕ {failedCount} failed</span>}
+            <span class="badge">⚡ Static HTML</span>
+          </div>
+        </div>
+        <div class="prompt-box">
+          <header>
+            <span>Prompt · v1</span>
+            <a href={`/interfaces/${interfacePrompt.id}/`} aria-label="Permalink to prompt">Copy</a>
+          </header>
+          <div>{interfacePrompt.prompt}</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="section section-gallery">
-    <div class="container output-grid" data-view="list" data-output-collection>
-      <div class="model-list-header" aria-hidden="true">
-        <span>Screenshot</span>
-        <span>Model and metrics</span>
-        <span>Artifacts</span>
+  <section>
+    <div class="container">
+      <div class="controls">
+        <div class="group">
+          <span class="controls-label">View</span>
+          <div class="seg" role="tablist" aria-label="Display mode">
+            <button type="button" data-view-option="leaderboard" aria-pressed="true">Leaderboard</button>
+            <button type="button" data-view-option="grid" aria-pressed="false">Grid</button>
+          </div>
+        </div>
+        <div class="group">
+          <span class="controls-label">Sort by</span>
+          <select class="sort-select" aria-label="Sort outputs">
+            <option>Aggregate</option>
+            <option>Performance</option>
+            <option>Accessibility</option>
+            <option>Speed</option>
+            <option>Cost</option>
+          </select>
+        </div>
       </div>
-      {outputs.map((output) => (
-        <PricingOutputCard output={output} />
-      ))}
+
+      <div class="leaderboard" data-view="leaderboard">
+        <div class="lb-row head" aria-hidden="true">
+          <div>#</div>
+          <div>Model</div>
+          <div>Scores</div>
+          <div>Preview</div>
+          <div>Run</div>
+          <div>Open</div>
+        </div>
+        {sorted.map((output, index) => (
+          <PricingOutputCard
+            output={output}
+            index={index}
+            interfaceId={interfacePrompt.id}
+          />
+        ))}
+      </div>
     </div>
   </section>
 </main>
 
 <script>
-  const collection = document.querySelector("[data-output-collection]");
+  const board = document.querySelector(".leaderboard");
   const buttons = Array.from(document.querySelectorAll("[data-view-option]"));
 
   function setView(view) {
-    collection?.setAttribute("data-view", view);
-
+    board?.setAttribute("data-view", view);
     for (const button of buttons) {
       button.setAttribute("aria-pressed", String(button.dataset.viewOption === view));
     }
@@ -72,7 +114,7 @@ const { interfacePrompt, outputs } = Astro.props;
 
   for (const button of buttons) {
     button.addEventListener("click", () => {
-      setView(button.dataset.viewOption ?? "list");
+      setView(button.dataset.viewOption ?? "leaderboard");
     });
   }
 </script>

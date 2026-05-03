@@ -1,138 +1,118 @@
 ---
-const { output } = Astro.props;
-const style = `--accent: ${output.accent}; --accent-soft: ${output.accentSoft};`;
+const { output, index = 0 } = Astro.props;
+const rowClass = `r${(index % 8) + 1}`;
 const hasPreview = output.previewUrl && output.previewUrl !== "#";
 const hasScreenshot = output.screenshotUrl && output.screenshotUrl !== "#";
 const hasSource = output.sourceUrl && output.sourceUrl !== "#";
-const hasEvaluationReport = output.evaluationReportUrl && output.evaluationReportUrl !== "#";
+
+const isPending = !!output.pending;
+const isFailed = output.stateLabel === "Failed";
+const isComplete = !isPending && !isFailed;
+
+const perfScore = output.evaluations.find((e) => e.label === "Performance");
+const a11yScore = output.evaluations.find((e) => e.label === "Accessibility");
+const axeScore = output.evaluations.find((e) => e.label === "Axe");
+
+function toneClass(item) {
+  if (!item) return "pending";
+  return item.tone === "good" ? "good" : item.tone === "warn" ? "warn" : item.tone === "bad" ? "bad" : "neutral";
+}
+
+const timeStat = output.stats?.find((s) => s.label === "Time");
+const costStat = output.stats?.find((s) => s.label === "Cost");
+const tokenStat = output.stats?.find((s) => s.label === "Completion") ?? output.stats?.find((s) => s.label === "Prompt");
+
+const rankLabel = index + 1;
+const medalClass = !isComplete
+  ? ""
+  : index === 0
+    ? "gold"
+    : index === 1
+      ? "silver"
+      : index === 2
+        ? "bronze"
+        : "";
 ---
 
-<article class="output-card" style={style}>
-  <div class="output-thumbnail">
-    {
-      hasScreenshot ? (
-        <img src={output.screenshotUrl} alt={`${output.model} generated interface screenshot`} loading="lazy" />
-      ) : (
-        <div class="mock-screenshot mock-screenshot-compact" aria-label={`Placeholder screenshot for ${output.model}`}>
-          <div class="mock-browser">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <div class="mock-hero">
-            <div>
-              <span></span>
-              <strong></strong>
-              <small></small>
-            </div>
-          </div>
-          <div class="mock-plans">
-            <div></div>
-            <div class="is-featured"></div>
-            <div></div>
-          </div>
-        </div>
-      )
-    }
+<div class={`lb-row ${rowClass} ${isPending ? "is-pending" : ""}`}>
+  <div class="rank-cell">
+    {isComplete ? (
+      <span class={`rank-medal ${medalClass}`}>{rankLabel}</span>
+    ) : (
+      <span class="rank">—</span>
+    )}
   </div>
 
-  <div class="output-main">
-    <div class="output-meta">
-      <div>
-        <p class="eyebrow">{output.family}</p>
-        <h2>{output.model}</h2>
-      </div>
-      <span>{output.stateLabel}</span>
+  <div class="model-cell">
+    <span class="swatch" style={`background: ${output.accentSoft};`}></span>
+    <div class="model-name">
+      <strong>{output.model}</strong>
+      <span>{output.family} · {output.modelId}</span>
     </div>
+  </div>
 
-    {output.stats.length > 0 && (
-      <div class="run-stats" aria-label={`${output.model} run statistics`}>
-        {output.stats.map((stat) => (
-          <div>
-            <span>{stat.label}</span>
-            <strong>{stat.value}</strong>
-          </div>
-        ))}
+  <div>
+    <dl class="scores-cell">
+      <div class={`score ${toneClass(perfScore)}`}>
+        <dt>Perf</dt>
+        <dd>{perfScore ? perfScore.value : "—"}</dd>
       </div>
-    )}
-
-    {output.evaluations.length > 0 && (
-      <section class="evaluation-strip" aria-label={`${output.model} evaluator results`}>
-        <div class="evaluation-strip-header">
-          <span>Evaluator results</span>
-          {hasEvaluationReport && <a href={output.evaluationReportUrl}>Open report</a>}
-        </div>
-        <div class="evaluation-metrics">
-          {output.evaluations.map((item) => (
-            <div class={`evaluation-metric tone-${item.tone}`} style={`--score: ${item.percent}%`}>
-              <span>{item.label}</span>
-              <strong>{item.value}</strong>
-              <small>{item.detail}</small>
-              <i aria-hidden="true"></i>
-            </div>
-          ))}
-        </div>
-      </section>
-    )}
-
-    <p>{output.note}</p>
+      <div class={`score ${toneClass(a11yScore)}`}>
+        <dt>A11y</dt>
+        <dd>{a11yScore ? a11yScore.value : "—"}</dd>
+      </div>
+      <div class={`score ${toneClass(axeScore)}`}>
+        <dt>Axe</dt>
+        <dd>{axeScore ? axeScore.value : "—"}</dd>
+      </div>
+    </dl>
   </div>
 
-  <div class="output-preview-area">
-    {
-      hasPreview ? (
-        <div class="live-preview-shell">
-          <iframe
-            src={output.previewUrl}
-            title={`${output.model} generated pricing page preview`}
-            sandbox="allow-scripts"
-            loading="lazy"
-          />
-        </div>
+  <div class="preview-cell">
+    <div class="lb-preview">
+      {hasPreview ? (
+        <iframe
+          src={output.previewUrl}
+          title={`${output.model} generated interface preview`}
+          sandbox="allow-scripts"
+          loading="lazy"
+        />
       ) : (
-        <div class="mock-screenshot" aria-label={`Placeholder screenshot for ${output.model}`}>
-          <div class="mock-browser">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <div class="mock-hero">
-            <div>
-              <span></span>
-              <strong></strong>
-              <small></small>
+        <div class="lb-preview-fallback">
+          <div class="bar"><i></i><i></i><i></i></div>
+          <div class="lb-fake">
+            <div class="row1"></div>
+            <div class="row2"></div>
+            <div class="grid">
+              <div></div>
+              <div class="pop"></div>
+              <div></div>
             </div>
-            <button type="button" tabindex="-1">Start</button>
-          </div>
-          <div class="mock-plans">
-            <div></div>
-            <div class="is-featured"></div>
-            <div></div>
           </div>
         </div>
-      )
-    }
+      )}
+    </div>
   </div>
 
-  <div class="artifact-actions" aria-label={`${output.model} artifacts`}>
-    <a href={output.previewUrl} aria-disabled={!hasPreview ? "true" : undefined}>
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M7 17 17 7M9 7h8v8"></path>
-      </svg>
-      Preview
-    </a>
-    <a href={output.screenshotUrl} aria-disabled={!hasScreenshot ? "true" : undefined}>
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 7h16v10H4z"></path>
-        <path d="m8 15 3-3 2 2 2-3 2 4"></path>
-      </svg>
-      Screenshot
-    </a>
-    <a href={output.sourceUrl} aria-disabled={!hasSource ? "true" : undefined}>
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m8 9-4 3 4 3M16 9l4 3-4 3M14 5l-4 14"></path>
-      </svg>
-      Source
-    </a>
+  <div class="run-cell">
+    {isComplete && timeStat ? (
+      <>
+        <span class="primary">{timeStat.value}</span>
+        <span class="secondary">
+          {tokenStat ? `${tokenStat.value} tok` : ""}
+          {costStat && tokenStat ? " · " : ""}
+          {costStat ? costStat.value : ""}
+        </span>
+      </>
+    ) : isFailed ? (
+      <span class="pending">Run failed</span>
+    ) : (
+      <span class="pending">Not yet run</span>
+    )}
   </div>
-</article>
+
+  <div class="actions-cell">
+    <a href={output.previewUrl} aria-disabled={!hasPreview ? "true" : undefined}>Preview ↗</a>
+    <a href={output.sourceUrl} aria-disabled={!hasSource ? "true" : undefined}>Source</a>
+  </div>
+</div>

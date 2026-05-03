@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UI Arena — Arena/leaderboard direction</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f7f7f5;
+        --paper: #ffffff;
+        --ink: #111111;
+        --ink-soft: #4a4a4a;
+        --ink-mute: #8c8c8c;
+        --line: #e2e2dd;
+        --line-strong: #1a1a1a;
+        --hl: #ffe566;
+        --good: #137a3d;
+        --warn: #b06b00;
+        --bad: #b3261e;
+        --accent-1: #d0e3ff;
+        --accent-2: #ffe1cf;
+        --accent-3: #d6f5d4;
+        --accent-4: #efd8ff;
+        --accent-5: #ffd6d6;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font: 15px/1.5 "Inter", system-ui, sans-serif;
+        font-feature-settings: "ss01", "cv11";
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; text-decoration: none; }
+      .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+      .container { max-width: 1280px; margin: 0 auto; padding: 0 28px; }
+
+      /* nav */
+      nav {
+        position: sticky; top: 0; z-index: 10;
+        background: var(--bg);
+        border-bottom: 1px solid var(--line-strong);
+      }
+      .nav-inner {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 20px;
+        height: 56px;
+      }
+      .brand {
+        display: inline-flex; align-items: center; gap: 10px;
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: -0.01em;
+      }
+      .brand-mark {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+        width: 18px; height: 18px;
+        background: var(--ink);
+        padding: 1px;
+      }
+      .brand-mark span { background: white; }
+      .brand-mark span:nth-child(1) { background: var(--accent-1); }
+      .brand-mark span:nth-child(2) { background: var(--accent-2); }
+      .brand-mark span:nth-child(3) { background: var(--accent-3); }
+      .brand-mark span:nth-child(4) { background: var(--accent-4); }
+
+      .nav-search {
+        display: flex; align-items: center; gap: 10px;
+        max-width: 540px; width: 100%;
+        margin: 0 auto;
+        padding: 7px 12px;
+        border: 1px solid var(--line);
+        background: white;
+        border-radius: 0;
+        font: 13px/1 "JetBrains Mono", monospace;
+        color: var(--ink-mute);
+      }
+      .nav-search kbd {
+        margin-left: auto;
+        font: 11px/1 "JetBrains Mono", monospace;
+        padding: 3px 5px;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        background: var(--bg);
+      }
+      .nav-links { display: flex; gap: 18px; font-size: 13px; color: var(--ink-soft); }
+      .nav-links a:hover { color: var(--ink); border-bottom: 2px solid var(--ink); }
+
+      /* page header */
+      .page-head {
+        padding: 36px 0 20px;
+        border-bottom: 1px solid var(--line-strong);
+      }
+      .crumb {
+        display: flex; gap: 8px; align-items: center;
+        font: 500 11px/1 "JetBrains Mono", monospace;
+        color: var(--ink-mute);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 18px;
+      }
+      .crumb a:hover { color: var(--ink); }
+      .page-head h1 {
+        margin: 0 0 8px;
+        font-size: clamp(32px, 4.4vw, 44px);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 1.05;
+        max-width: 26ch;
+      }
+      .page-head .id {
+        font: 600 13px/1 "JetBrains Mono", monospace;
+        color: var(--ink-mute);
+        letter-spacing: 0;
+      }
+      .head-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 36px;
+        align-items: start;
+        margin-top: 18px;
+      }
+      .head-grid p { margin: 0; color: var(--ink-soft); font-size: 16px; max-width: 60ch; }
+      .badges {
+        display: flex; flex-wrap: wrap; gap: 6px;
+        margin-top: 14px;
+      }
+      .badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 4px 9px;
+        border: 1px solid var(--ink);
+        background: white;
+        font: 600 11px/1 "JetBrains Mono", monospace;
+        text-transform: uppercase; letter-spacing: 0.04em;
+      }
+
+      .prompt-box {
+        border: 1px solid var(--line-strong);
+        background: var(--paper);
+        padding: 18px 20px;
+        font: 13px/1.6 "JetBrains Mono", monospace;
+      }
+      .prompt-box header {
+        display: flex; justify-content: space-between;
+        font: 600 11px/1 "JetBrains Mono", monospace;
+        letter-spacing: 0.08em; text-transform: uppercase;
+        color: var(--ink-mute);
+        margin-bottom: 10px;
+      }
+      .prompt-box header a { color: var(--ink); border-bottom: 1px solid var(--ink); }
+      .prompt-box .text { color: var(--ink); }
+      .prompt-box mark { background: var(--hl); padding: 0 2px; }
+
+      /* leaderboard */
+      .controls {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 18px 0 14px;
+        gap: 16px;
+        border-bottom: 1px solid var(--line);
+      }
+      .controls .group {
+        display: flex; align-items: center; gap: 10px;
+      }
+      .seg {
+        display: inline-flex;
+        border: 1px solid var(--ink);
+      }
+      .seg button {
+        appearance: none; border: 0;
+        padding: 7px 12px;
+        font: 600 12px/1 "JetBrains Mono", monospace;
+        text-transform: uppercase; letter-spacing: 0.04em;
+        background: white; color: var(--ink-soft);
+        border-right: 1px solid var(--ink);
+        cursor: pointer;
+      }
+      .seg button:last-child { border-right: 0; }
+      .seg button[aria-pressed="true"] {
+        background: var(--ink); color: white;
+      }
+      .sort-select {
+        appearance: none;
+        padding: 7px 28px 7px 12px;
+        border: 1px solid var(--ink);
+        background:
+          url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%23111' stroke-width='1.4' fill='none'/></svg>") right 10px center no-repeat,
+          white;
+        font: 600 12px/1 "JetBrains Mono", monospace;
+        text-transform: uppercase; letter-spacing: 0.04em;
+      }
+
+      /* table */
+      .leaderboard {
+        margin-top: 24px;
+        border: 1px solid var(--line-strong);
+        background: white;
+      }
+      .lb-row {
+        display: grid;
+        grid-template-columns: 56px 1.4fr 1fr 280px 220px 120px;
+        align-items: stretch;
+      }
+      .lb-row + .lb-row { border-top: 1px solid var(--line); }
+      .lb-row.head {
+        background: var(--ink);
+        color: white;
+      }
+      .lb-row.head > div {
+        padding: 10px 14px;
+        font: 600 11px/1 "JetBrains Mono", monospace;
+        text-transform: uppercase; letter-spacing: 0.06em;
+        border-right: 1px solid rgba(255,255,255,0.18);
+      }
+      .lb-row.head > div:last-child { border-right: 0; }
+      .lb-row > div {
+        padding: 14px;
+        border-right: 1px solid var(--line);
+        display: flex; align-items: center;
+      }
+      .lb-row > div:last-child { border-right: 0; justify-content: flex-end; }
+
+      .rank {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 600;
+        font-size: 18px;
+      }
+      .rank-medal {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 32px; height: 32px;
+        border: 1.5px solid var(--ink);
+        font: 600 14px/1 "JetBrains Mono", monospace;
+      }
+      .rank-medal.gold { background: var(--hl); }
+      .rank-medal.silver { background: var(--accent-1); }
+      .rank-medal.bronze { background: var(--accent-2); }
+
+      .model {
+        display: flex; align-items: center; gap: 12px;
+      }
+      .swatch {
+        width: 36px; height: 36px;
+        border: 1px solid var(--ink);
+      }
+      .model-name {
+        display: flex; flex-direction: column;
+        gap: 2px;
+      }
+      .model-name strong { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+      .model-name span {
+        font: 500 11px/1 "JetBrains Mono", monospace;
+        text-transform: uppercase; letter-spacing: 0.06em;
+        color: var(--ink-mute);
+      }
+
+      .scores-cell {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+        width: 100%;
+      }
+      .score {
+        display: grid; gap: 3px;
+        align-content: center;
+      }
+      .score dt {
+        font: 600 10px/1 "JetBrains Mono", monospace;
+        text-transform: uppercase; letter-spacing: 0.08em;
+        color: var(--ink-mute);
+      }
+      .score dd {
+        margin: 0;
+        font: 600 18px/1 "JetBrains Mono", monospace;
+      }
+      .score.good dd { color: var(--good); }
+      .score.warn dd { color: var(--warn); }
+      .score.bad dd { color: var(--bad); }
+
+      .preview-cell {
+        position: relative;
+        padding: 0 !important;
+        align-items: stretch !important;
+      }
+      .lb-preview {
+        flex: 1;
+        margin: 10px 12px;
+        border: 1px solid var(--line);
+        background: white;
+        overflow: hidden;
+        position: relative;
+      }
+      .lb-preview .bar {
+        height: 16px;
+        border-bottom: 1px solid var(--line);
+        background: var(--bg);
+        display: flex; align-items: center; gap: 4px;
+        padding: 0 6px;
+      }
+      .lb-preview .bar i { width: 5px; height: 5px; border-radius: 50%; background: var(--line); }
+      .lb-fake { padding: 10px 12px; }
+      .lb-fake .row1 { width: 70%; height: 8px; background: var(--ink); border-radius: 2px; }
+      .lb-fake .row2 { width: 50%; height: 5px; background: var(--ink-mute); margin-top: 5px; border-radius: 2px; }
+      .lb-fake .grid {
+        margin-top: 10px;
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+      }
+      .lb-fake .grid div {
+        height: 38px; border: 1px solid var(--line); background: var(--bg);
+      }
+      .lb-fake .grid div.pop { background: var(--row-accent, var(--accent-1)); }
+
+      .actions-cell { display: flex !important; gap: 8px !important; flex-direction: column; align-items: stretch !important; }
+      .actions-cell a {
+        padding: 6px 10px;
+        border: 1px solid var(--ink);
+        background: white;
+        font: 600 11px/1 "JetBrains Mono", monospace;
+        text-transform: uppercase; letter-spacing: 0.06em;
+        text-align: center;
+      }
+      .actions-cell a:hover { background: var(--ink); color: white; }
+
+      /* runs accent themes */
+      .lb-row.r1 .swatch { background: var(--accent-1); }
+      .lb-row.r1 .lb-fake { --row-accent: var(--accent-1); }
+      .lb-row.r2 .swatch { background: var(--accent-2); }
+      .lb-row.r2 .lb-fake { --row-accent: var(--accent-2); }
+      .lb-row.r3 .swatch { background: var(--accent-3); }
+      .lb-row.r3 .lb-fake { --row-accent: var(--accent-3); }
+      .lb-row.r4 .swatch { background: var(--accent-4); }
+      .lb-row.r4 .lb-fake { --row-accent: var(--accent-4); }
+      .lb-row.r5 .swatch { background: var(--accent-5); }
+      .lb-row.r5 .lb-fake { --row-accent: var(--accent-5); }
+
+      footer {
+        border-top: 1px solid var(--line-strong);
+        padding: 22px 0;
+        color: var(--ink-soft);
+        font-size: 13px;
+        margin-top: 56px;
+      }
+      .footer-inner { display: flex; justify-content: space-between; }
+
+      @media (max-width: 1100px) {
+        .lb-row {
+          grid-template-columns: 56px 1.2fr 1fr 200px 120px;
+        }
+        .preview-cell { display: none !important; }
+      }
+      @media (max-width: 760px) {
+        .head-grid { grid-template-columns: 1fr; }
+        .lb-row {
+          grid-template-columns: 1fr 1fr;
+          padding: 12px 0;
+        }
+        .lb-row > div { border-right: 0; }
+        .lb-row > div:nth-child(odd) { border-right: 1px solid var(--line); }
+        .nav-search { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="container nav-inner">
+        <a class="brand" href="#"><span class="brand-mark"><span></span><span></span><span></span><span></span></span> UI ARENA</a>
+        <div class="nav-search mono">
+          <span>⌕</span> Find an interface or model…
+          <kbd>⌘K</kbd>
+        </div>
+        <div class="nav-links">
+          <a href="#">Interfaces</a>
+          <a href="#">Models</a>
+          <a href="#">About</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="page-head">
+      <div class="container">
+        <div class="crumb">
+          <a href="#">Interfaces</a> <span>/</span> <span>01</span>
+        </div>
+        <h1><span class="id">01.</span> SaaS pricing page for an AI coding assistant.</h1>
+
+        <div class="head-grid">
+          <div>
+            <p>Five frontier models received the same brief. Below is a leaderboard of their generated HTML, ranked by an aggregate of Lighthouse and axe scores.</p>
+            <div class="badges">
+              <span class="badge">▣ Pricing surface</span>
+              <span class="badge">⚙ 5 models</span>
+              <span class="badge">⏱ Updated May 3</span>
+              <span class="badge">⚡ Static HTML</span>
+            </div>
+          </div>
+          <div class="prompt-box">
+            <header>
+              <span>Prompt · v1</span>
+              <a href="#">Copy</a>
+            </header>
+            <div class="text">
+              Design and implement a pricing page for an <mark>AI coding assistant</mark>.
+              Include three plans, a clear team upgrade path, usage limits,
+              trust signals, FAQs, and responsive behavior.
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="container">
+      <div class="controls">
+        <div class="group">
+          <span class="mono" style="font-size: 12px; color: var(--ink-mute); letter-spacing: 0.06em; text-transform: uppercase;">View</span>
+          <div class="seg" role="tablist">
+            <button aria-pressed="true">Leaderboard</button>
+            <button aria-pressed="false">Grid</button>
+            <button aria-pressed="false">Diff</button>
+          </div>
+        </div>
+        <div class="group">
+          <span class="mono" style="font-size: 12px; color: var(--ink-mute); letter-spacing: 0.06em; text-transform: uppercase;">Sort by</span>
+          <select class="sort-select">
+            <option>Aggregate score</option>
+            <option>Performance</option>
+            <option>Accessibility</option>
+            <option>Cost</option>
+            <option>Speed</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="leaderboard">
+        <div class="lb-row head">
+          <div>#</div>
+          <div>Model</div>
+          <div>Scores</div>
+          <div>Preview</div>
+          <div>Run</div>
+          <div>Open</div>
+        </div>
+
+        <div class="lb-row r1">
+          <div><span class="rank-medal gold">1</span></div>
+          <div class="model">
+            <span class="swatch"></span>
+            <div class="model-name">
+              <strong>Claude Sonnet 4.6</strong>
+              <span>Anthropic · sonnet-4-6</span>
+            </div>
+          </div>
+          <div>
+            <dl class="scores-cell">
+              <div class="score good"><dt>Perf</dt><dd>96</dd></div>
+              <div class="score good"><dt>A11y</dt><dd>98</dd></div>
+              <div class="score good"><dt>Axe</dt><dd>0</dd></div>
+            </dl>
+          </div>
+          <div class="preview-cell">
+            <div class="lb-preview">
+              <div class="bar"><i></i><i></i><i></i></div>
+              <div class="lb-fake">
+                <div class="row1"></div><div class="row2"></div>
+                <div class="grid"><div></div><div class="pop"></div><div></div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:12px; line-height:1.5;">
+              <div>11.4s</div>
+              <div style="color:var(--ink-mute)">3,184 tok · $0.018</div>
+            </div>
+          </div>
+          <div class="actions-cell">
+            <a href="#">Preview ↗</a>
+            <a href="#">Source</a>
+          </div>
+        </div>
+
+        <div class="lb-row r3">
+          <div><span class="rank-medal silver">2</span></div>
+          <div class="model">
+            <span class="swatch"></span>
+            <div class="model-name">
+              <strong>Gemini 3.1 Flash</strong>
+              <span>Google · flash-lite</span>
+            </div>
+          </div>
+          <div>
+            <dl class="scores-cell">
+              <div class="score good"><dt>Perf</dt><dd>99</dd></div>
+              <div class="score good"><dt>A11y</dt><dd>94</dd></div>
+              <div class="score warn"><dt>Axe</dt><dd>1</dd></div>
+            </dl>
+          </div>
+          <div class="preview-cell">
+            <div class="lb-preview">
+              <div class="bar"><i></i><i></i><i></i></div>
+              <div class="lb-fake">
+                <div class="row1"></div><div class="row2"></div>
+                <div class="grid"><div></div><div class="pop"></div><div></div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:12px; line-height:1.5;">
+              <div>4.8s</div>
+              <div style="color:var(--ink-mute)">2,012 tok · $0.002</div>
+            </div>
+          </div>
+          <div class="actions-cell">
+            <a href="#">Preview ↗</a>
+            <a href="#">Source</a>
+          </div>
+        </div>
+
+        <div class="lb-row r2">
+          <div><span class="rank-medal bronze">3</span></div>
+          <div class="model">
+            <span class="swatch"></span>
+            <div class="model-name">
+              <strong>GPT-5.2</strong>
+              <span>OpenAI · gpt-5-2</span>
+            </div>
+          </div>
+          <div>
+            <dl class="scores-cell">
+              <div class="score good"><dt>Perf</dt><dd>92</dd></div>
+              <div class="score warn"><dt>A11y</dt><dd>88</dd></div>
+              <div class="score warn"><dt>Axe</dt><dd>2</dd></div>
+            </dl>
+          </div>
+          <div class="preview-cell">
+            <div class="lb-preview">
+              <div class="bar"><i></i><i></i><i></i></div>
+              <div class="lb-fake">
+                <div class="row1"></div><div class="row2"></div>
+                <div class="grid"><div></div><div class="pop"></div><div></div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:12px; line-height:1.5;">
+              <div>9.2s</div>
+              <div style="color:var(--ink-mute)">2,847 tok · $0.016</div>
+            </div>
+          </div>
+          <div class="actions-cell">
+            <a href="#">Preview ↗</a>
+            <a href="#">Source</a>
+          </div>
+        </div>
+
+        <div class="lb-row r4">
+          <div><span class="rank">4</span></div>
+          <div class="model">
+            <span class="swatch"></span>
+            <div class="model-name">
+              <strong>Grok 4</strong>
+              <span>xAI · grok-4</span>
+            </div>
+          </div>
+          <div>
+            <dl class="scores-cell">
+              <div class="score warn"><dt>Perf</dt><dd>86</dd></div>
+              <div class="score warn"><dt>A11y</dt><dd>72</dd></div>
+              <div class="score bad"><dt>Axe</dt><dd>5</dd></div>
+            </dl>
+          </div>
+          <div class="preview-cell">
+            <div class="lb-preview">
+              <div class="bar"><i></i><i></i><i></i></div>
+              <div class="lb-fake">
+                <div class="row1"></div><div class="row2"></div>
+                <div class="grid"><div></div><div class="pop"></div><div></div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:12px; line-height:1.5;">
+              <div>13.6s</div>
+              <div style="color:var(--ink-mute)">3,612 tok · $0.029</div>
+            </div>
+          </div>
+          <div class="actions-cell">
+            <a href="#">Preview ↗</a>
+            <a href="#">Source</a>
+          </div>
+        </div>
+
+        <div class="lb-row r5">
+          <div><span class="rank">5</span></div>
+          <div class="model">
+            <span class="swatch"></span>
+            <div class="model-name">
+              <strong>DeepSeek V3.5</strong>
+              <span>DeepSeek · v3-5</span>
+            </div>
+          </div>
+          <div>
+            <dl class="scores-cell">
+              <div class="score warn"><dt>Perf</dt><dd>78</dd></div>
+              <div class="score warn"><dt>A11y</dt><dd>70</dd></div>
+              <div class="score bad"><dt>Axe</dt><dd>7</dd></div>
+            </dl>
+          </div>
+          <div class="preview-cell">
+            <div class="lb-preview">
+              <div class="bar"><i></i><i></i><i></i></div>
+              <div class="lb-fake">
+                <div class="row1"></div><div class="row2"></div>
+                <div class="grid"><div></div><div class="pop"></div><div></div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:12px; line-height:1.5;">
+              <div>6.1s</div>
+              <div style="color:var(--ink-mute)">2,601 tok · $0.001</div>
+            </div>
+          </div>
+          <div class="actions-cell">
+            <a href="#">Preview ↗</a>
+            <a href="#">Source</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-inner">
+        <span class="mono">UI_ARENA / 2026</span>
+        <span class="mono">A11Y · LIGHTHOUSE · SOURCE · DIFF</span>
+      </div>
+    </footer>
+  </body>
+</html>

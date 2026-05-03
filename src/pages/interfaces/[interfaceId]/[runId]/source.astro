@@ -62,11 +62,13 @@ const renderedLines = lines
       `<span class="source-line ${line.className}"><span class="line-number">${line.number}</span><code>${line.html}</code></span>`,
   )
   .join("");
+
+const sizeKb = Math.max(1, Math.round((source.length / 1024) * 10) / 10);
 ---
 
 <BaseLayout
-  title={`${result.modelDisplayName} Source - UI Arena`}
-  description={`Rendered source for ${result.modelDisplayName}'s ${interfacePrompt?.title ?? "interface"} output.`}
+  title={`${result.modelDisplayName} · ${interfacePrompt?.title ?? "Source"} — UI Arena`}
+  description={`Rendered HTML source for ${result.modelDisplayName}'s ${interfacePrompt?.title ?? "interface"} run.`}
   canonicalPath={`/interfaces/${result.interfaceId}/${result.runId}/source/`}
 >
   <Header active="interfaces" />
@@ -75,18 +77,30 @@ const renderedLines = lines
     <section class="source-hero">
       <div class="container source-hero-inner">
         <div>
-          <p class="eyebrow">Source</p>
+          <div class="crumb" style="display:flex; gap:8px; align-items:center; font: 500 11px/1 'JetBrains Mono', monospace; color: var(--ink-mute); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px;">
+            <a href="/interfaces/">Interfaces</a>
+            <span>/</span>
+            <a href={`/interfaces/${result.interfaceId}/`}>{interfacePrompt?.number ?? result.interfaceId}</a>
+            <span>/</span>
+            <span>Source</span>
+          </div>
           <h1>{result.modelDisplayName}</h1>
-          <p>{interfacePrompt?.title ?? result.interfaceId}</p>
+          <p style="color: var(--ink-soft); font-size: 15px; margin: 4px 0 0;">{interfacePrompt?.title ?? result.interfaceId}</p>
+          <div class="meta">
+            <span class="badge">⌗ index.html</span>
+            <span class="badge">▤ {lines.length} lines</span>
+            <span class="badge">⚖ {sizeKb} KB</span>
+            <span class="badge">⚡ {result.family}</span>
+          </div>
         </div>
         <div class="source-actions">
-          <a class="button button-secondary" href={`/interfaces/${result.interfaceId}/`}>Back to outputs</a>
-          <a class="button button-primary" href={result.artifacts.preview}>Preview</a>
+          <a class="button button-secondary" href={`/interfaces/${result.interfaceId}/`}>← Leaderboard</a>
+          <a class="button button-primary" href={result.artifacts.preview}>Open preview ↗</a>
         </div>
       </div>
     </section>
 
-    <section class="section source-section">
+    <section class="source-section">
       <div class="container">
         <div class="source-editor-shell">
           <div class="source-toolbar">
@@ -95,8 +109,8 @@ const renderedLines = lines
               <span></span>
               <span></span>
             </div>
-            <div class="source-file">index.html</div>
-            <div class="source-meta">{lines.length} lines</div>
+            <div class="source-file">{result.runId}/index.html</div>
+            <div class="source-meta">{lines.length} lines · {sizeKb} KB</div>
           </div>
           <pre
             class="source-code"
