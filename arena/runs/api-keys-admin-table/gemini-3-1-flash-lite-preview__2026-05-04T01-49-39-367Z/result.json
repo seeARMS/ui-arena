@@ -1,0 +1,289 @@
+{
+  "schemaVersion": 1,
+  "runId": "gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z",
+  "interfaceId": "api-keys-admin-table",
+  "interfaceTitle": "Admin table for managing API keys and permissions",
+  "modelId": "gemini-3-1-flash-lite-preview",
+  "modelDisplayName": "Gemini 3.1 Flash Lite Preview",
+  "family": "Google",
+  "gateway": "openrouter",
+  "gatewayModel": "google/gemini-3.1-flash-lite-preview",
+  "gatewayGenerationId": "gen-1777859513-60Shx9c3ppDwMdyy3zzV",
+  "providerName": null,
+  "status": "complete",
+  "createdAt": "2026-05-04T01:49:39.367Z",
+  "completedAt": "2026-05-04T01:52:10.881Z",
+  "request": {
+    "dryRun": false,
+    "artifactType": "react-vite",
+    "promptSha256": "52062d85753ed4ff825f65280fc8dc282b741c4e8b3ca08458d75a2c08fa7fff",
+    "params": {
+      "temperature": 0.2,
+      "max_tokens": 16000
+    }
+  },
+  "execution": {
+    "startedAt": "2026-05-04T01:49:39.367Z",
+    "completedAt": "2026-05-04T01:52:10.881Z",
+    "durationMs": 17190,
+    "modelStartedAt": "2026-05-04T01:51:53.691Z",
+    "modelCompletedAt": "2026-05-04T01:51:58.883Z",
+    "modelDurationMs": 5192,
+    "generationTimeMs": null,
+    "latencyMs": null
+  },
+  "usage": {
+    "source": "openrouter:response",
+    "promptTokens": 711,
+    "completionTokens": 1773,
+    "totalTokens": 2484,
+    "nativePromptTokens": null,
+    "nativeCompletionTokens": null,
+    "reasoningTokens": 0,
+    "cachedPromptTokens": 0,
+    "cacheDiscount": null,
+    "totalCost": 0.00283725,
+    "upstreamInferenceCost": 0.00283725,
+    "currency": "USD",
+    "rawResponseUsage": {
+      "prompt_tokens": 711,
+      "completion_tokens": 1773,
+      "total_tokens": 2484,
+      "cost": 0.00283725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00283725,
+        "upstream_inference_prompt_cost": 0.00017775,
+        "upstream_inference_completions_cost": 0.0026595
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "artifacts": {
+    "preview": "/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/",
+    "source": "/sources/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/source.txt",
+    "localResultPath": "arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/result.json",
+    "localRunPath": "arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z",
+    "localSourcePath": "arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/source",
+    "localPreviewPath": "public/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z",
+    "sourceFormat": "react-vite",
+    "sourceFiles": [
+      "src/App.jsx",
+      "src/styles.css",
+      "index.html",
+      "src/main.jsx"
+    ],
+    "desktopScreenshot": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z__desktop.png",
+    "mobileScreenshot": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z__mobile.png"
+  },
+  "finishReason": "stop",
+  "screenshots": {
+    "desktop": {
+      "width": 1440,
+      "height": 1100,
+      "path": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z__desktop.png",
+      "capturedAt": "2026-05-04T01:52:11.857Z"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "path": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z__mobile.png",
+      "capturedAt": "2026-05-04T01:52:12.465Z"
+    }
+  },
+  "evaluations": {
+    "lighthouse": {
+      "id": "lighthouse",
+      "displayName": "Lighthouse",
+      "status": "complete",
+      "version": "13.2.0",
+      "completedAt": "2026-05-04T01:52:19.891Z",
+      "durationMs": 7379,
+      "scores": {
+        "performance": {
+          "title": "Performance",
+          "score": 0.86,
+          "value": 86
+        },
+        "accessibility": {
+          "title": "Accessibility",
+          "score": 0.85,
+          "value": 85
+        }
+      },
+      "metrics": {
+        "firstContentfulPaint": {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "displayValue": "1.7 s",
+          "numericValue": 1652.9528,
+          "score": 0.46
+        },
+        "largestContentfulPaint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "displayValue": "1.7 s",
+          "numericValue": 1652.9528,
+          "score": 0.75
+        },
+        "speedIndex": {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "displayValue": "1.7 s",
+          "numericValue": 1652.9528,
+          "score": 0.77
+        },
+        "totalBlockingTime": {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "displayValue": "0 ms",
+          "numericValue": 0,
+          "score": 1
+        },
+        "cumulativeLayoutShift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "displayValue": "0",
+          "numericValue": 0,
+          "score": 1
+        }
+      },
+      "summary": {
+        "requestedUrl": "http://127.0.0.1:62408/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/",
+        "finalUrl": "http://127.0.0.1:62408/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/",
+        "fetchTime": "2026-05-04T01:52:15.393Z",
+        "accessibilityIssueCount": 3
+      },
+      "issues": [
+        {
+          "id": "label",
+          "title": "Form elements do not have associated labels",
+          "score": 0,
+          "displayValue": null,
+          "description": "Labels ensure that form controls are announced properly by assistive technologies, like screen readers. [Learn more about form element labels](https://dequeuniversity.com/rules/axe/4.11/label)."
+        },
+        {
+          "id": "landmark-one-main",
+          "title": "Document does not have a main landmark.",
+          "score": 0,
+          "displayValue": null,
+          "description": "One main landmark helps screen reader users navigate a web page. [Learn more about landmarks](https://dequeuniversity.com/rules/axe/4.11/landmark-one-main)."
+        },
+        {
+          "id": "td-has-header",
+          "title": "`<td>` elements in a large `<table>` do not have table headers.",
+          "score": 0,
+          "displayValue": null,
+          "description": "Screen readers have features to make navigating tables easier. Ensuring that `<td>` elements in a large table (3 or more cells in width and height) have an associated table header may improve the experience for screen reader users. [Learn more about table headers](https://dequeuniversity.com/rules/axe/4.11/td-has-header)."
+        }
+      ],
+      "artifacts": {
+        "report": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/lighthouse/report.html",
+        "json": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/lighthouse/lhr.json"
+      },
+      "error": null
+    },
+    "axe": {
+      "id": "axe",
+      "displayName": "Axe",
+      "status": "complete",
+      "version": "4.11.4",
+      "completedAt": "2026-05-04T01:52:20.972Z",
+      "durationMs": 1078,
+      "scores": null,
+      "metrics": null,
+      "summary": {
+        "violationCount": 5,
+        "passCount": 20,
+        "incompleteCount": 1,
+        "inapplicableCount": 67,
+        "seriousOrCriticalCount": 1,
+        "impactCounts": {
+          "critical": 1,
+          "serious": 0,
+          "moderate": 3,
+          "minor": 1,
+          "unknown": 0
+        }
+      },
+      "issues": [
+        {
+          "id": "empty-table-header",
+          "impact": "minor",
+          "help": "Table header text should not be empty",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+          "description": "Ensure table headers have discernible text",
+          "nodeCount": 2,
+          "targets": [
+            "th:nth-child(1)",
+            "th:nth-child(8)"
+          ]
+        },
+        {
+          "id": "label",
+          "impact": "critical",
+          "help": "Form elements must have labels",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/label?application=playwright",
+          "description": "Ensure every form element has a label",
+          "nodeCount": 26,
+          "targets": [
+            "th:nth-child(1) > input[type=\"checkbox\"]",
+            "tr:nth-child(1) > td:nth-child(1) > input[type=\"checkbox\"]",
+            "tr:nth-child(2) > td:nth-child(1) > input[type=\"checkbox\"]",
+            "tr:nth-child(3) > td:nth-child(1) > input[type=\"checkbox\"]"
+          ]
+        },
+        {
+          "id": "landmark-one-main",
+          "impact": "moderate",
+          "help": "Document should have one main landmark",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/landmark-one-main?application=playwright",
+          "description": "Ensure the document has a main landmark",
+          "nodeCount": 1,
+          "targets": [
+            "html"
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/page-has-heading-one?application=playwright",
+          "description": "Ensure that the page, or at least one of its frames contains a level-one heading",
+          "nodeCount": 1,
+          "targets": [
+            "html"
+          ]
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "help": "All page content should be contained by landmarks",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/region?application=playwright",
+          "description": "Ensure all page content is contained by landmarks",
+          "nodeCount": 177,
+          "targets": [
+            "input[type=\"search\"]",
+            "thead",
+            "tr:nth-child(1) > td:nth-child(1)",
+            "tr:nth-child(1) > td:nth-child(2)"
+          ]
+        }
+      ],
+      "artifacts": {
+        "json": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/axe/axe.json"
+      },
+      "error": null
+    }
+  }
+}

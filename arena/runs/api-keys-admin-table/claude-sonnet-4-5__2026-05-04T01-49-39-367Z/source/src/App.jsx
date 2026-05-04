@@ -1,0 +1,447 @@
+import { useState, useMemo } from 'react';
+
+const MOCK_KEYS = [
+  { id: 1, name: 'prod-api-gateway', owner: 'alice@eng.io', scopes: ['read:all', 'write:all', 'admin:users'], lastUsed: Date.now() - 3600000, created: Date.now() - 86400000 * 30, expires: Date.now() + 86400000 * 60, status: 'over-scoped' },
+  { id: 2, name: 'ci-deploy-key', owner: 'bob@eng.io', scopes: ['write:deployments'], lastUsed: Date.now() - 7200000, created: Date.now() - 86400000 * 90, expires: Date.now() + 86400000 * 5, status: 'expiring' },
+  { id: 3, name: 'analytics-reader', owner: 'carol@eng.io', scopes: ['read:analytics'], lastUsed: Date.now() - 86400000 * 45, created: Date.now() - 86400000 * 180, expires: Date.now() + 86400000 * 180, status: 'stale' },
+  { id: 4, name: 'webhook-processor', owner: 'dave@eng.io', scopes: ['read:webhooks', 'write:webhooks'], lastUsed: Date.now() - 1800000, created: Date.now() - 86400000 * 15, expires: Date.now() + 86400000 * 345, status: 'healthy' },
+  { id: 5, name: 'legacy-integration', owner: 'eve@eng.io', scopes: ['read:all', 'write:all', 'delete:all'], lastUsed: Date.now() - 86400000 * 120, created: Date.now() - 86400000 * 365, expires: Date.now() + 86400000 * 30, status: 'leaked-suspected' },
+  { id: 6, name: 'mobile-app-prod', owner: 'frank@eng.io', scopes: ['read:users', 'write:sessions'], lastUsed: Date.now() - 900000, created: Date.now() - 86400000 * 60, expires: Date.now() + 86400000 * 300, status: 'healthy' },
+  { id: 7, name: 'data-pipeline', owner: 'grace@eng.io', scopes: ['read:data', 'write:data'], lastUsed: Date.now() - 3600000, created: Date.now() - 86400000 * 120, expires: Date.now() + 86400000 * 240, status: 'healthy' },
+  { id: 8, name: 'test-automation', owner: 'henry@eng.io', scopes: ['read:all', 'write:all', 'admin:all'], lastUsed: Date.now() - 86400000 * 30, created: Date.now() - 86400000 * 200, expires: Date.now() + 86400000 * 165, status: 'over-scoped' },
+  { id: 9, name: 'monitoring-service', owner: 'iris@eng.io', scopes: ['read:metrics'], lastUsed: Date.now() - 600000, created: Date.now() - 86400000 * 45, expires: Date.now() + 86400000 * 320, status: 'healthy' },
+  { id: 10, name: 'backup-script', owner: 'jack@eng.io', scopes: ['read:backups'], lastUsed: Date.now() - 86400000 * 60, created: Date.now() - 86400000 * 240, expires: Date.now() + 86400000 * 125, status: 'stale' },
+  { id: 11, name: 'customer-portal', owner: 'karen@eng.io', scopes: ['read:customers', 'write:tickets'], lastUsed: Date.now() - 1200000, created: Date.now() - 86400000 * 75, expires: Date.now() + 86400000 * 290, status: 'healthy' },
+  { id: 12, name: 'slack-bot', owner: 'leo@eng.io', scopes: ['read:notifications', 'write:notifications'], lastUsed: Date.now() - 2400000, created: Date.now() - 86400000 * 100, expires: Date.now() + 86400000 * 265, status: 'healthy' },
+  { id: 13, name: 'admin-dashboard', owner: 'maria@eng.io', scopes: ['read:all', 'write:all', 'admin:all', 'delete:all'], lastUsed: Date.now() - 86400000 * 90, created: Date.now() - 86400000 * 400, expires: Date.now() + 86400000 * 2, status: 'expiring' },
+  { id: 14, name: 'email-service', owner: 'nathan@eng.io', scopes: ['write:emails'], lastUsed: Date.now() - 1800000, created: Date.now() - 86400000 * 50, expires: Date.now() + 86400000 * 315, status: 'healthy' },
+  { id: 15, name: 'payment-processor', owner: 'olivia@eng.io', scopes: ['read:payments', 'write:payments'], lastUsed: Date.now() - 900000, created: Date.now() - 86400000 * 40, expires: Date.now() + 86400000 * 325, status: 'healthy' },
+  { id: 16, name: 'search-indexer', owner: 'paul@eng.io', scopes: ['read:all', 'write:search'], lastUsed: Date.now() - 86400000 * 75, created: Date.now() - 86400000 * 300, expires: Date.now() + 86400000 * 65, status: 'stale' },
+  { id: 17, name: 'cdn-purge', owner: 'quinn@eng.io', scopes: ['write:cdn'], lastUsed: Date.now() - 86400000 * 10, created: Date.now() - 86400000 * 150, expires: Date.now() + 86400000 * 215, status: 'healthy' },
+  { id: 18, name: 'audit-logger', owner: 'rachel@eng.io', scopes: ['write:logs'], lastUsed: Date.now() - 600000, created: Date.now() - 86400000 * 20, expires: Date.now() + 86400000 * 345, status: 'healthy' },
+  { id: 19, name: 'temp-debug-key', owner: 'sam@eng.io', scopes: ['read:all', 'write:all', 'admin:all'], lastUsed: Date.now() - 86400000 * 150, created: Date.now() - 86400000 * 180, expires: Date.now() - 86400000 * 10, status: 'revoked' },
+  { id: 20, name: 'reporting-engine', owner: 'tina@eng.io', scopes: ['read:reports'], lastUsed: Date.now() - 3600000, created: Date.now() - 86400000 * 80, expires: Date.now() + 86400000 * 285, status: 'healthy' },
+  { id: 21, name: 'third-party-sync', owner: 'uma@eng.io', scopes: ['read:all', 'write:integrations'], lastUsed: Date.now() - 86400000 * 100, created: Date.now() - 86400000 * 250, expires: Date.now() + 86400000 * 115, status: 'stale' },
+  { id: 22, name: 'feature-flags', owner: 'victor@eng.io', scopes: ['read:flags', 'write:flags'], lastUsed: Date.now() - 1200000, created: Date.now() - 86400000 * 35, expires: Date.now() + 86400000 * 330, status: 'healthy' },
+  { id: 23, name: 'load-balancer', owner: 'wendy@eng.io', scopes: ['read:health'], lastUsed: Date.now() - 300000, created: Date.now() - 86400000 * 25, expires: Date.now() + 86400000 * 340, status: 'healthy' },
+  { id: 24, name: 'security-scanner', owner: 'xander@eng.io', scopes: ['read:all', 'admin:security'], lastUsed: Date.now() - 86400000 * 5, created: Date.now() - 86400000 * 110, expires: Date.now() + 86400000 * 4, status: 'expiring' },
+  { id: 25, name: 'cache-warmer', owner: 'yara@eng.io', scopes: ['read:cache', 'write:cache'], lastUsed: Date.now() - 7200000, created: Date.now() - 86400000 * 55, expires: Date.now() + 86400000 * 310, status: 'healthy' },
+  { id: 26, name: 'old-migration-key', owner: 'zoe@eng.io', scopes: ['read:all', 'write:all', 'delete:all', 'admin:all'], lastUsed: Date.now() - 86400000 * 200, created: Date.now() - 86400000 * 500, expires: Date.now() + 86400000 * 50, status: 'leaked-suspected' },
+];
+
+const AUDIT_EVENTS = {
+  1: [
+    { timestamp: Date.now() - 3600000, event: 'key_used', ip: '203.0.113.42', location: 'US-WEST-2' },
+    { timestamp: Date.now() - 86400000 * 2, event: 'scope_modified', user: 'alice@eng.io', changes: 'Added admin:users' },
+    { timestamp: Date.now() - 86400000 * 30, event: 'key_created', user: 'alice@eng.io' },
+  ],
+  2: [
+    { timestamp: Date.now() - 7200000, event: 'key_used', ip: '198.51.100.10', location: 'US-EAST-1' },
+    { timestamp: Date.now() - 86400000 * 90, event: 'key_created', user: 'bob@eng.io' },
+  ],
+};
+
+const STATUS_CONFIG = {
+  healthy: { label: 'Healthy', color: '#10b981' },
+  stale: { label: 'Stale', color: '#f59e0b' },
+  expiring: { label: 'Expiring', color: '#ef4444' },
+  'over-scoped': { label: 'Over-scoped', color: '#8b5cf6' },
+  'leaked-suspected': { label: 'Leaked?', color: '#dc2626' },
+  revoked: { label: 'Revoked', color: '#6b7280' },
+};
+
+function formatRelativeTime(timestamp) {
+  const diff = Date.now() - timestamp;
+  const absDiff = Math.abs(diff);
+  const minutes = Math.floor(absDiff / 60000);
+  const hours = Math.floor(absDiff / 3600000);
+  const days = Math.floor(absDiff / 86400000);
+
+  if (days > 0) return diff > 0 ? `${days}d ago` : `in ${days}d`;
+  if (hours > 0) return diff > 0 ? `${hours}h ago` : `in ${hours}h`;
+  return diff > 0 ? `${minutes}m ago` : `in ${minutes}m`;
+}
+
+function formatDate(timestamp) {
+  return new Date(timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+export default function App() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [sortColumn, setSortColumn] = useState('lastUsed');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [selectedKeys, setSelectedKeys] = useState(new Set());
+  const [drawerKey, setDrawerKey] = useState(null);
+  const [actionPopover, setActionPopover] = useState(null);
+
+  const filteredAndSortedKeys = useMemo(() => {
+    let filtered = MOCK_KEYS.filter(key => {
+      const matchesSearch = searchQuery === '' || 
+        key.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        key.owner.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesFilter = filterStatus === 'all' || 
+        (filterStatus === 'active' && (key.status === 'healthy' || key.status === 'expiring')) ||
+        (filterStatus === 'stale' && key.status === 'stale') ||
+        (filterStatus === 'expiring' && key.status === 'expiring') ||
+        (filterStatus === 'over-scoped' && key.status === 'over-scoped');
+      
+      return matchesSearch && matchesFilter;
+    });
+
+    filtered.sort((a, b) => {
+      let aVal = a[sortColumn];
+      let bVal = b[sortColumn];
+
+      if (sortColumn === 'scopes') {
+        aVal = a.scopes.length;
+        bVal = b.scopes.length;
+      }
+
+      if (typeof aVal === 'string') {
+        return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      }
+      return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+    });
+
+    return filtered;
+  }, [searchQuery, filterStatus, sortColumn, sortDirection]);
+
+  const stats = useMemo(() => {
+    const total = MOCK_KEYS.length;
+    const active = MOCK_KEYS.filter(k => k.status === 'healthy').length;
+    const overScoped = MOCK_KEYS.filter(k => k.status === 'over-scoped').length;
+    const expiringThisWeek = MOCK_KEYS.filter(k => k.status === 'expiring' && k.expires - Date.now() < 86400000 * 7).length;
+    return { total, active, overScoped, expiringThisWeek };
+  }, []);
+
+  const handleSort = (column) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('desc');
+    }
+  };
+
+  const toggleSelectKey = (id) => {
+    const newSelected = new Set(selectedKeys);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedKeys(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedKeys.size === filteredAndSortedKeys.length) {
+      setSelectedKeys(new Set());
+    } else {
+      setSelectedKeys(new Set(filteredAndSortedKeys.map(k => k.id)));
+    }
+  };
+
+  const handleBulkAction = (action) => {
+    console.log(`Bulk ${action} on keys:`, Array.from(selectedKeys));
+    setSelectedKeys(new Set());
+  };
+
+  const handleRowAction = (action, keyId) => {
+    console.log(`${action} on key:`, keyId);
+    setActionPopover(null);
+  };
+
+  return (
+    <div className="app">
+      <header className="header">
+        <h1>API Key Management</h1>
+      </header>
+
+      <div className="stats-bar">
+        <div className="stat">
+          <span className="stat-value">{stats.total}</span>
+          <span className="stat-label">Total Keys</span>
+        </div>
+        <div className="stat">
+          <span className="stat-value" style={{ color: '#10b981' }}>{stats.active}</span>
+          <span className="stat-label">Active</span>
+        </div>
+        <div className="stat">
+          <span className="stat-value" style={{ color: '#8b5cf6' }}>{stats.overScoped}</span>
+          <span className="stat-label">Over-scoped</span>
+        </div>
+        <div className="stat">
+          <span className="stat-value" style={{ color: '#ef4444' }}>{stats.expiringThisWeek}</span>
+          <span className="stat-label">Expiring This Week</span>
+        </div>
+      </div>
+
+      <div className="controls">
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search keys, owners..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <div className="filter-tabs">
+          {['all', 'active', 'stale', 'expiring', 'over-scoped'].map(filter => (
+            <button
+              key={filter}
+              className={`filter-tab ${filterStatus === filter ? 'active' : ''}`}
+              onClick={() => setFilterStatus(filter)}
+            >
+              {filter.replace('-', ' ')}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="table-container">
+        <table className="keys-table">
+          <thead>
+            <tr>
+              <th className="checkbox-col">
+                <input
+                  type="checkbox"
+                  checked={selectedKeys.size === filteredAndSortedKeys.length && filteredAndSortedKeys.length > 0}
+                  onChange={toggleSelectAll}
+                />
+              </th>
+              <th onClick={() => handleSort('name')} className="sortable">
+                Name {sortColumn === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
+              <th onClick={() => handleSort('owner')} className="sortable">
+                Owner {sortColumn === 'owner' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
+              <th onClick={() => handleSort('scopes')} className="sortable">
+                Scopes {sortColumn === 'scopes' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
+              <th onClick={() => handleSort('lastUsed')} className="sortable">
+                Last Used {sortColumn === 'lastUsed' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
+              <th onClick={() => handleSort('created')} className="sortable">
+                Created {sortColumn === 'created' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
+              <th onClick={() => handleSort('expires')} className="sortable">
+                Expires {sortColumn === 'expires' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
+              <th onClick={() => handleSort('status')} className="sortable">
+                Status {sortColumn === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
+              <th className="actions-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredAndSortedKeys.map(key => (
+              <tr
+                key={key.id}
+                className={selectedKeys.has(key.id) ? 'selected' : ''}
+                onClick={(e) => {
+                  if (!e.target.closest('input, button, .actions-cell')) {
+                    setDrawerKey(key);
+                  }
+                }}
+              >
+                <td className="checkbox-col">
+                  <input
+                    type="checkbox"
+                    checked={selectedKeys.has(key.id)}
+                    onChange={() => toggleSelectKey(key.id)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </td>
+                <td className="name-cell">
+                  <span className="key-name">{key.name}</span>
+                </td>
+                <td className="owner-cell">{key.owner}</td>
+                <td className="scopes-cell">
+                  <div className="scopes-list">
+                    {key.scopes.slice(0, 2).map((scope, i) => (
+                      <span key={i} className="scope-badge">{scope}</span>
+                    ))}
+                    {key.scopes.length > 2 && (
+                      <span className="scope-badge more">+{key.scopes.length - 2}</span>
+                    )}
+                  </div>
+                </td>
+                <td className="time-cell">{formatRelativeTime(key.lastUsed)}</td>
+                <td className="date-cell">{formatDate(key.created)}</td>
+                <td className="date-cell">{formatDate(key.expires)}</td>
+                <td className="status-cell">
+                  <span
+                    className="status-pill"
+                    style={{ backgroundColor: STATUS_CONFIG[key.status].color }}
+                  >
+                    {STATUS_CONFIG[key.status].label}
+                  </span>
+                </td>
+                <td className="actions-cell">
+                  <button
+                    className="actions-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActionPopover(actionPopover === key.id ? null : key.id);
+                    }}
+                  >
+                    ⋯
+                  </button>
+                  {actionPopover === key.id && (
+                    <div className="action-popover">
+                      <button onClick={() => handleRowAction('rotate', key.id)}>Rotate Key</button>
+                      <button onClick={() => handleRowAction('revoke', key.id)}>Revoke</button>
+                      <button onClick={() => handleRowAction('edit', key.id)}>Edit Scopes</button>
+                      <button onClick={() => {
+                        setDrawerKey(key);
+                        setActionPopover(null);
+                      }}>View Audit Trail</button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div className="mobile-list">
+          {filteredAndSortedKeys.map(key => (
+            <div
+              key={key.id}
+              className={`mobile-card ${selectedKeys.has(key.id) ? 'selected' : ''}`}
+              onClick={() => setDrawerKey(key)}
+            >
+              <div className="mobile-card-header">
+                <input
+                  type="checkbox"
+                  checked={selectedKeys.has(key.id)}
+                  onChange={() => toggleSelectKey(key.id)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <span className="key-name">{key.name}</span>
+                <span
+                  className="status-pill"
+                  style={{ backgroundColor: STATUS_CONFIG[key.status].color }}
+                >
+                  {STATUS_CONFIG[key.status].label}
+                </span>
+              </div>
+              <div className="mobile-card-body">
+                <div className="mobile-row">
+                  <span className="mobile-label">Owner:</span>
+                  <span>{key.owner}</span>
+                </div>
+                <div className="mobile-row">
+                  <span className="mobile-label">Last Used:</span>
+                  <span>{formatRelativeTime(key.lastUsed)}</span>
+                </div>
+                <div className="mobile-row">
+                  <span className="mobile-label">Expires:</span>
+                  <span>{formatDate(key.expires)}</span>
+                </div>
+                <div className="mobile-row">
+                  <span className="mobile-label">Scopes:</span>
+                  <div className="scopes-list">
+                    {key.scopes.slice(0, 2).map((scope, i) => (
+                      <span key={i} className="scope-badge">{scope}</span>
+                    ))}
+                    {key.scopes.length > 2 && (
+                      <span className="scope-badge more">+{key.scopes.length - 2}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {selectedKeys.size > 0 && (
+        <div className="bulk-action-bar">
+          <span className="bulk-count">{selectedKeys.size} selected</span>
+          <div className="bulk-actions">
+            <button onClick={() => handleBulkAction('rotate')}>Rotate</button>
+            <button onClick={() => handleBulkAction('revoke')} className="danger">Revoke</button>
+            <button onClick={() => handleBulkAction('edit')}>Edit Scopes</button>
+            <button onClick={() => setSelectedKeys(new Set())}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {drawerKey && (
+        <>
+          <div className="drawer-overlay" onClick={() => setDrawerKey(null)} />
+          <div className="drawer">
+            <div className="drawer-header">
+              <h2>{drawerKey.name}</h2>
+              <button className="drawer-close" onClick={() => setDrawerKey(null)}>×</button>
+            </div>
+            <div className="drawer-body">
+              <section className="drawer-section">
+                <h3>Key Details</h3>
+                <div className="detail-row">
+                  <span className="detail-label">Owner</span>
+                  <span className="detail-value">{drawerKey.owner}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Status</span>
+                  <span
+                    className="status-pill"
+                    style={{ backgroundColor: STATUS_CONFIG[drawerKey.status].color }}
+                  >
+                    {STATUS_CONFIG[drawerKey.status].label}
+                  </span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Created</span>
+                  <span className="detail-value">{formatDate(drawerKey.created)}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Expires</span>
+                  <span className="detail-value">{formatDate(drawerKey.expires)}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Last Used</span>
+                  <span className="detail-value">{formatRelativeTime(drawerKey.lastUsed)}</span>
+                </div>
+              </section>
+
+              <section className="drawer-section">
+                <h3>Scopes ({drawerKey.scopes.length})</h3>
+                <div className="scopes-grid">
+                  {drawerKey.scopes.map((scope, i) => (
+                    <span key={i} className="scope-badge large">{scope}</span>
+                  ))}
+                </div>
+              </section>
+
+              <section className="drawer-section">
+                <h3>Audit Trail</h3>
+                <div className="audit-list">
+                  {(AUDIT_EVENTS[drawerKey.id] || []).map((event, i) => (
+                    <div key={i} className="audit-event">
+                      <div className="audit-event-header">
+                        <span className="audit-event-type">{event.event.replace('_', ' ')}</span>
+                        <span className="audit-event-time">{formatRelativeTime(event.timestamp)}</span>
+                      </div>
+                      <div className="audit-event-details">
+                        {event.user && <span>User: {event.user}</span>}
+                        {event.ip && <span>IP: {event.ip}</span>}
+                        {event.location && <span>Location: {event.location}</span>}
+                        {event.changes && <span>Changes: {event.changes}</span>}
+                      </div>
+                    </div>
+                  ))}
+                  {(!AUDIT_EVENTS[drawerKey.id] || AUDIT_EVENTS[drawerKey.id].length === 0) && (
+                    <p className="no-events">No audit events recorded</p>
+                  )}
+                </div>
+              </section>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

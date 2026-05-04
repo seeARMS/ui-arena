@@ -1,0 +1,53 @@
+{
+  "id": "gen-1777859513-60Shx9c3ppDwMdyy3zzV",
+  "object": "chat.completion",
+  "created": 1777859513,
+  "model": "google/gemini-3.1-flash-lite-preview-20260303",
+  "provider": "Google",
+  "system_fingerprint": null,
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "STOP",
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"files\": [\n    {\n      \"path\": \"src/App.jsx\",\n      \"content\": \"import React, { useState, useMemo } from 'react';\\nimport './styles.css';\\n\\nconst MOCK_DATA = Array.from({ length: 25 }, (_, i) => ({\\n  id: `key_${i}`,\\n  name: ['Production-Read', 'Staging-Write', 'CI-CD-Runner', 'Analytics-Bot', 'Internal-Tool'][i % 5],\\n  owner: ['Alice', 'Bob', 'Charlie', 'Dana', 'Eve'][i % 5],\\n  scopes: ['read:all', 'write:logs', 'admin:keys', 'read:metrics'][i % 4],\\n  lastUsed: i % 3 === 0 ? '2 mins ago' : i % 5 === 0 ? '3 months ago' : '1 day ago',\\n  created: '2023-10-01',\\n  expires: i % 4 === 0 ? '2023-12-01' : '2024-05-20',\\n  status: ['healthy', 'stale', 'expiring', 'leaked-suspected', 'revoked'][i % 5],\\n}));\\n\\nexport default function App() {\\n  const [selected, setSelected] = useState([]);\\n  const [filter, setFilter] = useState('all');\\n  const [drawer, setDrawer] = useState(null);\\n\\n  const filteredData = useMemo(() => {\\n    if (filter === 'all') return MOCK_DATA;\\n    return MOCK_DATA.filter(d => d.status === filter || (filter === 'over-scoped' && d.scopes === 'admin:keys'));\\n  }, [filter]);\\n\\n  const toggleSelect = (id) => {\\n    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);\\n  };\\n\\n  return (\\n    <div className=\\\"admin-container\\\">\\n      <header className=\\\"summary-strip\\\">\\n        <div><span>Total Keys</span><strong>{MOCK_DATA.length}</strong></div>\\n        <div><span>Active</span><strong>{MOCK_DATA.filter(x => x.status === 'healthy').length}</strong></div>\\n        <div><span>Over-scoped</span><strong>{MOCK_DATA.filter(x => x.scopes === 'admin:keys').length}</strong></div>\\n        <div><span>Expiring</span><strong>{MOCK_DATA.filter(x => x.status === 'expiring').length}</strong></div>\\n      </header>\\n\\n      <div className=\\\"controls\\\">\\n        <input type=\\\"search\\\" placeholder=\\\"Search keys...\\\" />\\n        <div className=\\\"filters\\\">\\n          {['all', 'active', 'stale', 'expiring', 'over-scoped'].map(f => (\\n            <button key={f} className={filter === f ? 'active' : ''} onClick={() => setFilter(f)}>{f}</button>\\n          ))}\\n        </div>\\n      </div>\\n\\n      <table className=\\\"key-table\\\">\\n        <thead>\\n          <tr>\\n            <th><input type=\\\"checkbox\\\" /></th>\\n            <th>Name</th><th>Owner</th><th>Scopes</th><th>Last Used</th><th>Expires</th><th>Status</th><th></th>\\n          </tr>\\n        </thead>\\n        <tbody>\\n          {filteredData.map(row => (\\n            <tr key={row.id} onClick={() => setDrawer(row)}>\\n              <td><input type=\\\"checkbox\\\" checked={selected.includes(row.id)} onChange={() => toggleSelect(row.id)} /></td>\\n              <td>{row.name}</td>\\n              <td>{row.owner}</td>\\n              <td><code>{row.scopes}</code></td>\\n              <td>{row.lastUsed}</td>\\n              <td>{row.expires}</td>\\n              <td><span className={`pill ${row.status}`}>{row.status}</span></td>\\n              <td><button className=\\\"action-btn\\\">⋮</button></td>\\n            </tr>\\n          ))}\\n        </tbody>\\n      </table>\\n\\n      {drawer && (\\n        <div className=\\\"drawer\\\">\\n          <div className=\\\"drawer-header\\\">\\n            <h3>{drawer.name}</h3>\\n            <button onClick={() => setDrawer(null)}>✕</button>\\n          </div>\\n          <div className=\\\"drawer-body\\\">\\n            <p><strong>Owner:</strong> {drawer.owner}</p>\\n            <p><strong>Status:</strong> {drawer.status}</p>\\n            <hr />\\n            <h4>Audit Trail</h4>\\n            <ul><li>Key rotated 2 days ago</li><li>Access granted by Admin</li></ul>\\n          </div>\\n        </div>\\n      )}\\n\\n      {selected.length > 0 && (\\n        <div className=\\\"sticky-bar\\\">\\n          <span>{selected.length} keys selected</span>\\n          <button>Revoke Selected</button>\\n        </div>\\n      )}\\n    </div>\\n  );\\n}\"\n    },\n    {\n      \"path\": \"src/styles.css\",\n      \"content\": \":root { --bg: #f8fafc; --border: #e2e8f0; --primary: #2563eb; }\\nbody { font-family: sans-serif; margin: 0; background: var(--bg); font-size: 13px; }\\n.admin-container { padding: 20px; }\\n.summary-strip { display: flex; gap: 20px; background: white; padding: 15px; border: 1px solid var(--border); margin-bottom: 20px; border-radius: 6px; }\\n.summary-strip div { display: flex; flex-direction: column; }\\n.controls { display: flex; gap: 10px; margin-bottom: 10px; }\\n.key-table { width: 100%; border-collapse: collapse; background: white; }\\n.key-table th, .key-table td { padding: 8px 12px; border: 1px solid var(--border); text-align: left; }\\n.pill { padding: 2px 6px; border-radius: 4px; font-size: 11px; text-transform: uppercase; }\\n.healthy { background: #dcfce7; color: #166534; }\\n.stale { background: #f1f5f9; color: #475569; }\\n.expiring { background: #fef3c7; color: #92400e; }\\n.leaked-suspected { background: #fee2e2; color: #991b1b; }\\n.revoked { background: #000; color: #fff; }\\n.drawer { position: fixed; right: 0; top: 0; width: 350px; height: 100%; background: white; border-left: 1px solid var(--border); padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }\\n.sticky-bar { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #1e293b; color: white; padding: 15px; display: flex; justify-content: space-between; border-radius: 6px; }\\n@media (max-width: 768px) { .key-table { display: block; overflow-x: auto; } }\"\n    }\n  ]\n}",
+        "refusal": null,
+        "reasoning": null,
+        "reasoning_details": [
+          {
+            "type": "reasoning.encrypted",
+            "data": "AY89a188iQuxAPtf9Xea4y4r2Q0UnOg/OG6x7hm57jfHieCeYB4WpKS/S3o25mjioFc=",
+            "format": "google-gemini-v1",
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 711,
+    "completion_tokens": 1773,
+    "total_tokens": 2484,
+    "cost": 0.00283725,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.00283725,
+      "upstream_inference_prompt_cost": 0.00017775,
+      "upstream_inference_completions_cost": 0.0026595
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

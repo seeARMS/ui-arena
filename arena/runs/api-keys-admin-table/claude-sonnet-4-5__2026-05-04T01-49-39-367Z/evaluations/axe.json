@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "id": "axe",
+  "displayName": "Axe",
+  "description": "Runs axe-core accessibility checks through Playwright and records violations by impact.",
+  "categories": [
+    "accessibility"
+  ],
+  "status": "complete",
+  "version": "4.11.4",
+  "startedAt": "2026-05-04T01:51:52.372Z",
+  "completedAt": "2026-05-04T01:51:53.690Z",
+  "durationMs": 1318,
+  "scores": null,
+  "metrics": null,
+  "summary": {
+    "violationCount": 5,
+    "passCount": 24,
+    "incompleteCount": 1,
+    "inapplicableCount": 64,
+    "seriousOrCriticalCount": 2,
+    "impactCounts": {
+      "critical": 1,
+      "serious": 1,
+      "moderate": 2,
+      "minor": 1,
+      "unknown": 0
+    }
+  },
+  "issues": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "nodeCount": 24,
+      "targets": [
+        ".active",
+        "tr:nth-child(1) > .status-cell > .status-pill",
+        "tr:nth-child(2) > .status-cell > .status-pill",
+        "tr:nth-child(3) > .status-cell > .status-pill"
+      ]
+    },
+    {
+      "id": "empty-table-header",
+      "impact": "minor",
+      "help": "Table header text should not be empty",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+      "description": "Ensure table headers have discernible text",
+      "nodeCount": 1,
+      "targets": [
+        "th:nth-child(1)"
+      ]
+    },
+    {
+      "id": "label",
+      "impact": "critical",
+      "help": "Form elements must have labels",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/label?application=playwright",
+      "description": "Ensure every form element has a label",
+      "nodeCount": 27,
+      "targets": [
+        "th:nth-child(1) > input[type=\"checkbox\"]",
+        "tbody > tr:nth-child(1) > .checkbox-col > input[type=\"checkbox\"]",
+        "tr:nth-child(2) > .checkbox-col > input[type=\"checkbox\"]",
+        "tr:nth-child(3) > .checkbox-col > input[type=\"checkbox\"]"
+      ]
+    },
+    {
+      "id": "landmark-one-main",
+      "impact": "moderate",
+      "help": "Document should have one main landmark",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/landmark-one-main?application=playwright",
+      "description": "Ensure the document has a main landmark",
+      "nodeCount": 1,
+      "targets": [
+        "html"
+      ]
+    },
+    {
+      "id": "region",
+      "impact": "moderate",
+      "help": "All page content should be contained by landmarks",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/region?application=playwright",
+      "description": "Ensure all page content is contained by landmarks",
+      "nodeCount": 211,
+      "targets": [
+        ".stats-bar",
+        ".search-input",
+        "thead",
+        "tbody > tr:nth-child(1) > .checkbox-col"
+      ]
+    }
+  ],
+  "artifacts": {
+    "json": "/evaluations/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-49-39-367Z/axe/axe.json"
+  }
+}

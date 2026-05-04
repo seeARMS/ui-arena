@@ -13,12 +13,16 @@ Build:
 - A side drawer that opens with full audit/event detail when a row is clicked.
 - Responsive behavior — degrade gracefully to a stacked list on narrow screens.
 
-Stack: a single self-contained HTML file that boots React 18 in the browser. Use these CDNs (no build step):
+Stack: a compiled React 18 app built by the TasteBench runner with Vite. Return source files only, not HTML. The runner provides React, ReactDOM, the Vite build, index.html, and the root render call.
 
-- https://unpkg.com/react@18/umd/react.production.min.js
-- https://unpkg.com/react-dom@18/umd/react-dom.production.min.js
-- https://unpkg.com/@babel/standalone/babel.min.js for in-browser JSX (`<script type="text/babel" data-presets="react">`)
+Return exactly this JSON shape, with no markdown wrapper:
+{
+  "files": [
+    { "path": "src/App.jsx", "content": "..." },
+    { "path": "src/styles.css", "content": "..." }
+  ]
+}
 
-All state, components, styles, and mock data live in this one file. No external assets, no runtime fetches beyond those CDNs.
+src/App.jsx must export default App. Use normal React imports from "react" for hooks. Put all CSS in src/styles.css. Do not include package.json, index.html, ReactDOM/createRoot code, script tags, CDN URLs, Tailwind CDN, runtime Babel, external assets, or network requests.
 
 Mock at least 25 rows with varied states. Prioritize density and operational confidence — avoid empty whitespace and decorative elements that dilute scanning.

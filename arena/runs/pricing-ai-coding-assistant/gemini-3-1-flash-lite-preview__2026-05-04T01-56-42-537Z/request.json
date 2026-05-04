@@ -1,0 +1,15 @@
+{
+  "model": "google/gemini-3.1-flash-lite-preview",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are participating in UI Arena, a gallery of AI-generated product interface examples.\nReturn exactly one JSON object with a files array. Do not return markdown. Do not wrap it in a code fence.\nThe JSON shape must be {\"files\":[{\"path\":\"src/App.jsx\",\"content\":\"...\"},{\"path\":\"src/styles.css\",\"content\":\"...\"}]}.\nThe runner will compile the files with Vite, React 18, and ReactDOM 18. Do not include index.html, package.json, ReactDOM.render/createRoot calls, external scripts, CDNs, Tailwind CDN, runtime Babel, or package imports other than react.\nsrc/App.jsx must export default App. Put all styling in src/styles.css. Keep all data in the source files. No external network requests.\nDo not include explanations outside the JSON object."
+    },
+    {
+      "role": "user",
+      "content": "Interface prompt: Pricing page for an AI coding assistant\nCategory: pricing-page\n\nDesign and implement a pricing page for an AI coding assistant.\n\nThe product helps developers plan changes, edit code, run tests, and review pull requests with an AI agent. Pricing has to let an individual decide today, give an engineering team a reason to upgrade, and route enterprises to sales.\n\nBuild:\n\n- Three paid plans with realistic prices and concrete usage limits (per-month tokens, parallel agents, indexed repos, context window).\n- A team upgrade path that's specific (shared budgets, audit log, SSO, role-based permissions).\n- Trust signals about source-code privacy, model providers, retention, and SOC 2.\n- An FAQ that answers real buying objections — not filler.\n- Strong visual hierarchy: the recommended plan should be obvious without hiding tradeoffs.\n- Responsive behavior for mobile, tablet, and desktop.\n\nStack: a compiled React 18 app built by the TasteBench runner with Vite. Return source files only, not HTML. The runner provides React, ReactDOM, the Vite build, index.html, and the root render call.\n\nReturn exactly this JSON shape, with no markdown wrapper:\n{\n  \"files\": [\n    { \"path\": \"src/App.jsx\", \"content\": \"...\" },\n    { \"path\": \"src/styles.css\", \"content\": \"...\" }\n  ]\n}\n\nsrc/App.jsx must export default App. Use normal React imports from \"react\" for hooks. Put all CSS in src/styles.css. Do not include package.json, index.html, ReactDOM/createRoot code, script tags, CDN URLs, Tailwind CDN, runtime Babel, external assets, or network requests.\n\nAvoid generic SaaS template energy. Make this feel specific to an AI coding assistant and the engineers who buy it.\nImplementation requirements:\n- Build a production-quality product interface, not a marketing explanation.\n- Use semantic HTML and accessible controls.\n- Make it responsive from mobile to desktop.\n- Include realistic copy, states, and content needed for the interface.\n- Keep it self-contained in React source files that can be compiled by Vite.\n- Use normal React imports, for example `import { useMemo, useState } from \"react\";`."
+    }
+  ],
+  "temperature": 0.2,
+  "max_tokens": 16000
+}

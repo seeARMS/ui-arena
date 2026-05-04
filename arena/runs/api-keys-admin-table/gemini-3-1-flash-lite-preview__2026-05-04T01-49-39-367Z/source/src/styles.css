@@ -1,0 +1,17 @@
+:root { --bg: #f8fafc; --border: #e2e8f0; --primary: #2563eb; }
+body { font-family: sans-serif; margin: 0; background: var(--bg); font-size: 13px; }
+.admin-container { padding: 20px; }
+.summary-strip { display: flex; gap: 20px; background: white; padding: 15px; border: 1px solid var(--border); margin-bottom: 20px; border-radius: 6px; }
+.summary-strip div { display: flex; flex-direction: column; }
+.controls { display: flex; gap: 10px; margin-bottom: 10px; }
+.key-table { width: 100%; border-collapse: collapse; background: white; }
+.key-table th, .key-table td { padding: 8px 12px; border: 1px solid var(--border); text-align: left; }
+.pill { padding: 2px 6px; border-radius: 4px; font-size: 11px; text-transform: uppercase; }
+.healthy { background: #dcfce7; color: #166534; }
+.stale { background: #f1f5f9; color: #475569; }
+.expiring { background: #fef3c7; color: #92400e; }
+.leaked-suspected { background: #fee2e2; color: #991b1b; }
+.revoked { background: #000; color: #fff; }
+.drawer { position: fixed; right: 0; top: 0; width: 350px; height: 100%; background: white; border-left: 1px solid var(--border); padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+.sticky-bar { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #1e293b; color: white; padding: 15px; display: flex; justify-content: space-between; border-radius: 6px; }
+@media (max-width: 768px) { .key-table { display: block; overflow-x: auto; } }

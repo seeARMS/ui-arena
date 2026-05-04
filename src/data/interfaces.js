@@ -55,11 +55,17 @@ export const surfaces = [
 
 export const surfaceById = (id) => surfaces.find((s) => s.id === id);
 
-const REACT_STACK_NOTE = `Stack: a single self-contained HTML file that boots React 18 in the browser. Use these CDNs (no build step):
-- https://unpkg.com/react@18/umd/react.production.min.js
-- https://unpkg.com/react-dom@18/umd/react-dom.production.min.js
-- https://unpkg.com/@babel/standalone/babel.min.js for in-browser JSX (\`<script type="text/babel" data-presets="react">\`)
-All state, components, styles, and mock data live in this one file. No external assets, no runtime fetches beyond those CDNs.`;
+const REACT_STACK_NOTE = `Stack: a compiled React 18 app built by the TasteBench runner with Vite. Return source files only, not HTML. The runner provides React, ReactDOM, the Vite build, index.html, and the root render call.
+
+Return exactly this JSON shape, with no markdown wrapper:
+{
+  "files": [
+    { "path": "src/App.jsx", "content": "..." },
+    { "path": "src/styles.css", "content": "..." }
+  ]
+}
+
+src/App.jsx must export default App. Use normal React imports from "react" for hooks. Put all CSS in src/styles.css. Do not include package.json, index.html, ReactDOM/createRoot code, script tags, CDN URLs, Tailwind CDN, runtime Babel, external assets, or network requests.`;
 
 const HTML_STACK_NOTE = `Stack: a single self-contained HTML file. No external assets, no runtime fetches. System fonts only.`;
 
@@ -83,11 +89,11 @@ Build:
 - Strong visual hierarchy: the recommended plan should be obvious without hiding tradeoffs.
 - Responsive behavior for mobile, tablet, and desktop.
 
-${HTML_STACK_NOTE}
+${REACT_STACK_NOTE}
 
 Avoid generic SaaS template energy. Make this feel specific to an AI coding assistant and the engineers who buy it.`,
     status: "Live · ranked",
-    stack: "HTML",
+    stack: "React",
   },
   {
     number: "02",

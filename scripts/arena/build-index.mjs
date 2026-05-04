@@ -35,6 +35,8 @@ function compactResult(result) {
     artifacts: {
       preview: result.artifacts?.preview ?? null,
       source: result.artifacts?.source ?? null,
+      sourceFormat: result.artifacts?.sourceFormat ?? null,
+      sourceFiles: result.artifacts?.sourceFiles ?? null,
       desktopScreenshot: result.artifacts?.desktopScreenshot ?? null,
       mobileScreenshot: result.artifacts?.mobileScreenshot ?? null,
     },

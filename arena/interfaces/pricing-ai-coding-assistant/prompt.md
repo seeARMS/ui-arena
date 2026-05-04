@@ -11,6 +11,16 @@ Build:
 - Strong visual hierarchy: the recommended plan should be obvious without hiding tradeoffs.
 - Responsive behavior for mobile, tablet, and desktop.
 
-Stack: a single self-contained HTML file. No external assets, no runtime fetches. System fonts only.
+Stack: a compiled React 18 app built by the TasteBench runner with Vite. Return source files only, not HTML. The runner provides React, ReactDOM, the Vite build, index.html, and the root render call.
+
+Return exactly this JSON shape, with no markdown wrapper:
+{
+  "files": [
+    { "path": "src/App.jsx", "content": "..." },
+    { "path": "src/styles.css", "content": "..." }
+  ]
+}
+
+src/App.jsx must export default App. Use normal React imports from "react" for hooks. Put all CSS in src/styles.css. Do not include package.json, index.html, ReactDOM/createRoot code, script tags, CDN URLs, Tailwind CDN, runtime Babel, external assets, or network requests.
 
 Avoid generic SaaS template energy. Make this feel specific to an AI coding assistant and the engineers who buy it.

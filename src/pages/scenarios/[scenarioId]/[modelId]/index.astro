@@ -121,6 +121,8 @@ const axeArtifacts = axe?.artifacts ?? {};
 
 const previewUrl = artifacts.preview;
 const rawSourceUrl = artifacts.source;
+const sourceFormat = artifacts.sourceFormat;
+const sourceFileLabel = sourceFormat === "react-vite" ? `${result.runId}/source.txt` : `${result.runId}/index.html`;
 const desktopShot = artifacts.desktopScreenshot;
 const mobileShot = artifacts.mobileScreenshot;
 const lhReport = lhArtifacts.report;
@@ -165,7 +167,7 @@ const axeIssues = (axe?.issues ?? []).slice(0, 6);
           </div>
           <div class="run-actions">
             <a class="button button-secondary" href={`/scenarios/${result.interfaceId}/`}>← Leaderboard</a>
-            <a class="button button-primary" href={previewUrl} rel="noopener noreferrer">Open raw HTML ↗</a>
+            <a class="button button-primary" href={previewUrl} rel="noopener noreferrer">Open preview ↗</a>
           </div>
         </div>
       </div>
@@ -336,10 +338,10 @@ const axeIssues = (axe?.issues ?? []).slice(0, 6);
             <h2 class="dossier-h">Artifacts</h2>
             <ul class="dossier-artifacts">
               {previewUrl && (
-                <li><a href={previewUrl} rel="noopener noreferrer"><span>Live preview HTML</span><span class="arrow">↗</span></a></li>
+                <li><a href={previewUrl} rel="noopener noreferrer"><span>Live preview</span><span class="arrow">↗</span></a></li>
               )}
               {rawSourceUrl && (
-                <li><a href={rawSourceUrl} rel="noopener noreferrer"><span>Raw source (.html.txt)</span><span class="arrow">↗</span></a></li>
+                <li><a href={rawSourceUrl} rel="noopener noreferrer"><span>{sourceFormat === "react-vite" ? "React source bundle" : "Raw source"}</span><span class="arrow">↗</span></a></li>
               )}
               {desktopShot && (
                 <li><a href={desktopShot} rel="noopener noreferrer"><span>Desktop screenshot</span><span class="arrow">↗</span></a></li>
@@ -362,9 +364,9 @@ const axeIssues = (axe?.issues ?? []).slice(0, 6);
           <div class="run-tabs" role="tablist" aria-label="Run views">
             <button type="button" role="tab" data-tab-target="preview" aria-selected="true">Preview</button>
             <button type="button" role="tab" data-tab-target="source" aria-selected="false">Source</button>
-            <span class="run-tabs-meta">
-              <span class="mono small ellipsis">{result.runId}</span>
-              <a class="run-tabs-open" href={previewUrl} rel="noopener noreferrer" aria-label="Open raw preview">Raw ↗</a>
+              <span class="run-tabs-meta">
+                <span class="mono small ellipsis">{result.runId}</span>
+                <a class="run-tabs-open" href={previewUrl} rel="noopener noreferrer" aria-label="Open preview">Open ↗</a>
             </span>
           </div>
 
@@ -389,7 +391,7 @@ const axeIssues = (axe?.issues ?? []).slice(0, 6);
             <div class="source-editor-shell">
               <div class="source-toolbar">
                 <div class="window-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-                <div class="source-file">{result.runId}/index.html</div>
+                <div class="source-file">{sourceFileLabel}</div>
                 <div class="source-meta">{lines.length} lines · {sizeKb} KB</div>
               </div>
               <pre

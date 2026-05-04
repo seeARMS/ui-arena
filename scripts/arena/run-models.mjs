@@ -1,6 +1,8 @@
-import { mkdir } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdir, rm } from "node:fs/promises";
+import { join, posix } from "node:path";
 import { pathToFileURL } from "node:url";
+
+import { build as viteBuild } from "vite";
 
 import { captureScreenshotsForResult } from "./capture-screenshots.mjs";
 import { evaluateResult } from "./evaluate-results.mjs";
@@ -35,13 +37,26 @@ const PREVIEW_CSP = [
   "form-action 'none'",
   "base-uri 'none'",
 ].join("; ");
+const REACT_APP_CSP = [
+  "default-src 'self' data: blob:",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self' data:",
+  "connect-src 'none'",
+  "media-src 'self' data: blob:",
+  "worker-src 'self' blob:",
+  "object-src 'none'",
+  "form-action 'none'",
+  "base-uri 'none'",
+].join("; ");
 
 const REACT_UMD_SCRIPT = '<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>';
 const REACT_DOM_UMD_SCRIPT = '<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>';
 const BABEL_STANDALONE_SCRIPT = '<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>';
 
 function promptUsesReactRuntime(prompt) {
-  return /React 18/i.test(prompt) || /esm\.sh\/react/i.test(prompt) || /@babel\/standalone/i.test(prompt);
+  return /Stack:[\s\S]*React/i.test(prompt) || /React 18/i.test(prompt) || /src\/App\.jsx/i.test(prompt);
 }
 
 function buildMessages({ interfacePrompt, prompt }) {
@@ -51,15 +66,21 @@ function buildMessages({ interfacePrompt, prompt }) {
       role: "system",
       content: [
         "You are participating in UI Arena, a gallery of AI-generated product interface examples.",
-        "Return exactly one complete static HTML document.",
         usesReactRuntime
-          ? "The scenario may use browser-global React 18 scripts from unpkg plus Babel Standalone. Keep all app code, CSS, data, and assets inside the HTML document."
+          ? "Return exactly one JSON object with a files array. Do not return markdown. Do not wrap it in a code fence."
+          : "Return exactly one complete static HTML document.",
+        usesReactRuntime
+          ? 'The JSON shape must be {"files":[{"path":"src/App.jsx","content":"..."},{"path":"src/styles.css","content":"..."}]}.'
+          : "The output must work by opening index.html directly in a browser.",
+        usesReactRuntime
+          ? "The runner will compile the files with Vite, React 18, and ReactDOM 18. Do not include index.html, package.json, ReactDOM.render/createRoot calls, external scripts, CDNs, Tailwind CDN, runtime Babel, or package imports other than react."
           : "The document must include all CSS and JavaScript inline.",
         usesReactRuntime
-          ? "Do not use external fonts, images, analytics, API calls, or any network requests beyond runtime CDNs needed by the static preview."
+          ? "src/App.jsx must export default App. Put all styling in src/styles.css. Keep all data in the source files. No external network requests."
           : "Do not use external fonts, images, scripts, stylesheets, CDNs, analytics, or network requests.",
-        "The output must work by opening index.html directly in a browser.",
-        "Do not include explanations outside the HTML.",
+        usesReactRuntime
+          ? "Do not include explanations outside the JSON object."
+          : "Do not include explanations outside the HTML.",
       ].join("\n"),
     },
     {
@@ -74,9 +95,11 @@ function buildMessages({ interfacePrompt, prompt }) {
         "- Use semantic HTML and accessible controls.",
         "- Make it responsive from mobile to desktop.",
         "- Include realistic copy, states, and content needed for the interface.",
-        "- Keep it self-contained in one index.html file.",
         usesReactRuntime
-          ? "- If you use JSX, load React globals with unpkg UMD scripts before Babel: react@18/umd/react.production.min.js, react-dom@18/umd/react-dom.production.min.js, then @babel/standalone/babel.min.js."
+          ? "- Keep it self-contained in React source files that can be compiled by Vite."
+          : "- Keep it self-contained in one index.html file.",
+        usesReactRuntime
+          ? "- Use normal React imports, for example `import { useMemo, useState } from \"react\";`."
           : "",
       ].join("\n"),
     },
@@ -122,6 +145,193 @@ function injectPreviewCsp(html) {
   }
 
   return withoutExistingCsp.replace(/<html[^>]*>/i, (match) => `${match}\n<head>\n    ${meta}\n</head>`);
+}
+
+function extractJsonObject(content) {
+  const trimmed = String(content ?? "").trim();
+  const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const candidate = fenced ? fenced[1].trim() : trimmed;
+  const start = candidate.indexOf("{");
+  const end = candidate.lastIndexOf("}");
+
+  if (start === -1 || end === -1 || end <= start) {
+    throw new Error("Model response did not contain a JSON object with generated files.");
+  }
+
+  return JSON.parse(candidate.slice(start, end + 1));
+}
+
+function normalizeGeneratedPath(path) {
+  let normalized = String(path ?? "").trim().replaceAll("\\", "/").replace(/^\.?\//, "");
+
+  if (!normalized.startsWith("src/")) {
+    if (/^(App|styles|data)\.(jsx|js|css|json)$/i.test(normalized)) {
+      normalized = `src/${normalized}`;
+    } else {
+      return null;
+    }
+  }
+
+  normalized = posix.normalize(normalized);
+
+  if (
+    posix.isAbsolute(normalized) ||
+    normalized.startsWith("../") ||
+    normalized.includes("/../") ||
+    !normalized.startsWith("src/")
+  ) {
+    throw new Error(`Unsafe generated file path: ${path}`);
+  }
+
+  if (!/\.(jsx|js|css|json)$/i.test(normalized)) {
+    return null;
+  }
+
+  return normalized;
+}
+
+function ensureAppDefaultExport(content) {
+  if (/\bexport\s+default\b/.test(content)) {
+    return content;
+  }
+
+  if (/\b(function|const|let|var)\s+App\b/.test(content)) {
+    return `${content.trimEnd()}\n\nexport default App;\n`;
+  }
+
+  throw new Error("src/App.jsx must define and export a default App component.");
+}
+
+function normalizeReactAppFiles(content) {
+  const payload = extractJsonObject(content);
+  const rawFiles = Array.isArray(payload.files)
+    ? payload.files
+    : Object.entries(payload).map(([path, fileContent]) => ({ path, content: fileContent }));
+  const byPath = new Map();
+
+  for (const file of rawFiles) {
+    const filePath = normalizeGeneratedPath(file.path);
+
+    if (!filePath) {
+      continue;
+    }
+
+    byPath.set(filePath, String(file.content ?? ""));
+  }
+
+  const appPath = ["src/App.jsx", "src/App.js"].find((path) => byPath.has(path));
+
+  if (!appPath) {
+    throw new Error("Generated React app must include src/App.jsx.");
+  }
+
+  byPath.set(appPath, ensureAppDefaultExport(byPath.get(appPath)));
+
+  if (!byPath.has("src/styles.css")) {
+    byPath.set("src/styles.css", "");
+  }
+
+  return [...byPath.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([path, fileContent]) => ({ path, content: fileContent }));
+}
+
+function reactFilesForDryRun({ interfacePrompt, model }) {
+  return [
+    {
+      path: "src/App.jsx",
+      content: `import { useMemo, useState } from "react";
+
+const rows = Array.from({ length: 25 }, (_, index) => ({
+  id: \`key-\${String(index + 1).padStart(2, "0")}\`,
+  name: ["Production API", "CI deploy", "Analytics sync", "Billing export", "Webhook signer"][index % 5],
+  owner: ["Avery", "Morgan", "Riley", "Jordan", "Casey"][index % 5],
+  scopes: index % 4 === 0 ? "admin:all" : index % 3 === 0 ? "write:data" : "read:data",
+  lastUsed: index % 5 === 0 ? "Never" : \`\${index + 2}h ago\`,
+  expires: index % 4 === 0 ? "This week" : "90d",
+  status: ["healthy", "stale", "expiring", "over-scoped"][index % 4],
+}));
+
+export default function App() {
+  const [filter, setFilter] = useState("all");
+  const visibleRows = useMemo(
+    () => filter === "all" ? rows : rows.filter((row) => row.status === filter),
+    [filter],
+  );
+
+  return (
+    <main className="shell">
+      <header className="header">
+        <div>
+          <p className="eyebrow">Dry run · ${model.displayName}</p>
+          <h1>${interfacePrompt.title}</h1>
+        </div>
+        <button type="button">Rotate selected</button>
+      </header>
+      <section className="metrics" aria-label="API key summary">
+        <strong>25<span>Total keys</span></strong>
+        <strong>18<span>Active</span></strong>
+        <strong>6<span>Over-scoped</span></strong>
+        <strong>3<span>Expiring</span></strong>
+      </section>
+      <div className="toolbar">
+        {["all", "healthy", "stale", "expiring", "over-scoped"].map((item) => (
+          <button key={item} type="button" className={filter === item ? "active" : ""} onClick={() => setFilter(item)}>
+            {item}
+          </button>
+        ))}
+      </div>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Owner</th><th>Scopes</th><th>Last used</th><th>Expires</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          {visibleRows.map((row) => (
+            <tr key={row.id}>
+              <td><strong>{row.name}</strong><span>{row.id}</span></td>
+              <td>{row.owner}</td>
+              <td>{row.scopes}</td>
+              <td>{row.lastUsed}</td>
+              <td>{row.expires}</td>
+              <td><span className={\`pill \${row.status}\`}>{row.status}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </main>
+  );
+}
+`,
+    },
+    {
+      path: "src/styles.css",
+      content: `* { box-sizing: border-box; }
+body { margin: 0; background: #f5f5f0; color: #171713; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+.shell { max-width: 1180px; margin: 0 auto; padding: 32px; }
+.header, .toolbar { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+.eyebrow { margin: 0 0 6px; color: #68685f; text-transform: uppercase; font-size: 12px; letter-spacing: .08em; }
+h1 { margin: 0; font-size: 34px; }
+button { min-height: 36px; border: 1px solid #24241e; border-radius: 6px; background: #fff; padding: 0 12px; font-weight: 700; }
+button.active { background: #24241e; color: #fff; }
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #d7d7cc; margin: 28px 0; background: #fff; }
+.metrics strong { padding: 18px; font-size: 28px; border-right: 1px solid #d7d7cc; }
+.metrics strong:last-child { border-right: 0; }
+.metrics span { display: block; color: #68685f; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+table { width: 100%; margin-top: 16px; border-collapse: collapse; background: #fff; border: 1px solid #d7d7cc; }
+th, td { padding: 12px; border-bottom: 1px solid #e4e4db; text-align: left; font-size: 13px; }
+td span { display: block; color: #68685f; font-size: 12px; }
+.pill { display: inline-block; border-radius: 999px; padding: 3px 8px; background: #eee; color: #171713; }
+.pill.expiring, .pill.over-scoped { background: #ffe7bf; }
+@media (max-width: 760px) { .shell { padding: 18px; } .header, .toolbar { align-items: stretch; flex-direction: column; } .metrics { grid-template-columns: 1fr 1fr; } table { display: block; overflow-x: auto; } }
+`,
+    },
+  ];
+}
+
+function sourceTextForFiles(files) {
+  return files
+    .map((file) => `===== ${file.path} =====\n${file.content.trimEnd()}\n`)
+    .join("\n");
 }
 
 function htmlForDryRun({ interfacePrompt, model }) {
@@ -297,7 +507,7 @@ async function callOpenRouter({ apiKey, interfacePrompt, prompt, model, requestT
   };
 }
 
-async function writeRunArtifacts({ interfacePrompt, runId, requestBody, responseJson, generation, html, result }) {
+async function writeHtmlRunArtifacts({ interfacePrompt, runId, requestBody, responseJson, generation, html, result }) {
   const runDir = join(rootDir, "arena", "runs", interfacePrompt.id, runId);
   const sourceDir = join(runDir, "source");
   const previewDir = join(publicDir, "previews", interfacePrompt.id, runId);
@@ -326,7 +536,96 @@ async function writeRunArtifacts({ interfacePrompt, runId, requestBody, response
   return { resultPath, result };
 }
 
-function buildBaseResult({ interfacePrompt, prompt, model, runId, timestamp, dryRun }) {
+async function writeReactRunArtifacts({ interfacePrompt, runId, requestBody, responseJson, generation, files, result }) {
+  const runDir = join(rootDir, "arena", "runs", interfacePrompt.id, runId);
+  const sourceDir = join(runDir, "source");
+  const previewDir = join(publicDir, "previews", interfacePrompt.id, runId);
+  const publicSourceDir = join(publicDir, "sources", interfacePrompt.id, runId);
+  const resultPath = join(runDir, "result.json");
+  const appPath = files.find((file) => file.path === "src/App.jsx" || file.path === "src/App.js")?.path ?? "src/App.jsx";
+  const appImport = `./${posix.relative("src", appPath)}`;
+  const sourceFiles = [
+    ...files.filter((file) => file.path !== "src/main.jsx" && file.path !== "src/main.js"),
+    {
+      path: "index.html",
+      content: `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="${REACT_APP_CSP}" />
+    <title>${interfacePrompt.title} - ${result.modelDisplayName}</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      path: "src/main.jsx",
+      content: `import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "${appImport}";
+import "./styles.css";
+
+createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);
+`,
+    },
+  ];
+
+  await Promise.all([
+    rm(sourceDir, { recursive: true, force: true }),
+    rm(previewDir, { recursive: true, force: true }),
+    rm(publicSourceDir, { recursive: true, force: true }),
+  ]);
+
+  await Promise.all([
+    writeJson(join(runDir, "request.json"), requestBody),
+    writeJson(join(runDir, "response.raw.json"), responseJson),
+    generation ? writeJson(join(runDir, "generation.openrouter.json"), generation) : Promise.resolve(),
+    ...sourceFiles.map((file) => writeText(join(sourceDir, file.path), file.content)),
+    writeText(join(publicSourceDir, "source.txt"), sourceTextForFiles(sourceFiles)),
+  ]);
+
+  await viteBuild({
+    root: sourceDir,
+    base: "./",
+    logLevel: "warn",
+    esbuild: {
+      jsx: "automatic",
+      jsxImportSource: "react",
+    },
+    build: {
+      outDir: previewDir,
+      emptyOutDir: true,
+      assetsDir: "assets",
+      sourcemap: false,
+      target: "es2020",
+    },
+  });
+
+  result.artifacts = {
+    preview: `${publicUrlFor(previewDir)}/`,
+    source: publicUrlFor(join(publicSourceDir, "source.txt")),
+    localResultPath: toRepoPath(resultPath),
+    localRunPath: toRepoPath(runDir),
+    localSourcePath: toRepoPath(sourceDir),
+    localPreviewPath: toRepoPath(previewDir),
+    sourceFormat: "react-vite",
+    sourceFiles: sourceFiles.map((file) => file.path),
+  };
+
+  await writeJson(resultPath, result);
+  return { resultPath, result };
+}
+
+function buildBaseResult({ interfacePrompt, prompt, model, runId, timestamp, dryRun, artifactType }) {
   return {
     schemaVersion: 1,
     runId,
@@ -344,6 +643,7 @@ function buildBaseResult({ interfacePrompt, prompt, model, runId, timestamp, dry
     completedAt: null,
     request: {
       dryRun,
+      artifactType,
       promptSha256: sha256(prompt),
       params: model.params,
     },
@@ -374,13 +674,15 @@ async function runModel({
   requestTimeoutMs,
 }) {
   const { manifest: interfacePrompt, prompt } = interfaceBundle;
+  const artifactType = promptUsesReactRuntime(prompt) ? "react-vite" : "html";
   const runId = `${model.id}__${safeTimestamp(timestamp)}`;
   const startedMs = performance.now();
-  const result = buildBaseResult({ interfacePrompt, prompt, model, runId, timestamp, dryRun });
+  const result = buildBaseResult({ interfacePrompt, prompt, model, runId, timestamp, dryRun, artifactType });
   let requestBody = {};
   let responseJson = {};
   let generation = null;
   let html;
+  let files;
   let resultPath;
 
   try {
@@ -396,7 +698,12 @@ async function runModel({
         choices: [
           {
             finish_reason: "dry_run",
-            message: { content: htmlForDryRun({ interfacePrompt, model }) },
+            message: {
+              content:
+                artifactType === "react-vite"
+                  ? JSON.stringify({ files: reactFilesForDryRun({ interfacePrompt, model }) }, null, 2)
+                  : htmlForDryRun({ interfacePrompt, model }),
+            },
           },
         ],
         usage: {
@@ -405,7 +712,11 @@ async function runModel({
           total_tokens: 0,
         },
       };
-      html = responseJson.choices[0].message.content;
+      if (artifactType === "react-vite") {
+        files = normalizeReactAppFiles(responseJson.choices[0].message.content);
+      } else {
+        html = responseJson.choices[0].message.content;
+      }
       result.execution.modelStartedAt = timestamp.toISOString();
       result.execution.modelCompletedAt = new Date().toISOString();
       result.execution.modelDurationMs = 0;
@@ -414,7 +725,11 @@ async function runModel({
       requestBody = call.requestBody;
       responseJson = call.responseJson;
       generation = call.generation;
-      html = extractHtml(call.content);
+      if (artifactType === "react-vite") {
+        files = normalizeReactAppFiles(call.content);
+      } else {
+        html = extractHtml(call.content);
+      }
       result.gatewayGenerationId = responseJson.id;
       result.providerName = generation?.provider_name ?? null;
       result.finishReason = call.finishReason;
@@ -425,14 +740,24 @@ async function runModel({
       result.execution.latencyMs = generation?.latency ?? null;
     }
 
-    html = injectPreviewCsp(normalizeReactRuntime(extractHtml(html)));
     result.status = "complete";
     result.completedAt = new Date().toISOString();
     result.execution.completedAt = result.completedAt;
     result.execution.durationMs = Math.round(performance.now() - startedMs);
     result.usage = usageFrom({ responseJson, generation, dryRun });
 
-    const written = await writeRunArtifacts({ interfacePrompt, runId, requestBody, responseJson, generation, html, result });
+    const written =
+      artifactType === "react-vite"
+        ? await writeReactRunArtifacts({ interfacePrompt, runId, requestBody, responseJson, generation, files, result })
+        : await writeHtmlRunArtifacts({
+            interfacePrompt,
+            runId,
+            requestBody,
+            responseJson,
+            generation,
+            html: injectPreviewCsp(normalizeReactRuntime(extractHtml(html))),
+            result,
+          });
     resultPath = written.resultPath;
     let updatedResult = written.result;
 
@@ -474,7 +799,7 @@ async function runModel({
     result.execution.completedAt = result.completedAt;
     result.execution.durationMs = Math.round(performance.now() - startedMs);
     result.error = {
-      phase: html ? "artifact" : "model",
+      phase: html || files ? "artifact" : "model",
       message: error.message,
       stack: error.stack,
     };

@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "id": "lighthouse",
+  "displayName": "Lighthouse",
+  "description": "Runs Lighthouse against the generated preview and records performance and accessibility scores.",
+  "categories": [
+    "performance",
+    "accessibility"
+  ],
+  "status": "complete",
+  "version": "13.2.0",
+  "startedAt": "2026-05-04T01:52:12.511Z",
+  "completedAt": "2026-05-04T01:52:19.891Z",
+  "durationMs": 7379,
+  "scores": {
+    "performance": {
+      "title": "Performance",
+      "score": 0.86,
+      "value": 86
+    },
+    "accessibility": {
+      "title": "Accessibility",
+      "score": 0.85,
+      "value": 85
+    }
+  },
+  "metrics": {
+    "firstContentfulPaint": {
+      "id": "first-contentful-paint",
+      "title": "First Contentful Paint",
+      "displayValue": "1.7 s",
+      "numericValue": 1652.9528,
+      "score": 0.46
+    },
+    "largestContentfulPaint": {
+      "id": "largest-contentful-paint",
+      "title": "Largest Contentful Paint",
+      "displayValue": "1.7 s",
+      "numericValue": 1652.9528,
+      "score": 0.75
+    },
+    "speedIndex": {
+      "id": "speed-index",
+      "title": "Speed Index",
+      "displayValue": "1.7 s",
+      "numericValue": 1652.9528,
+      "score": 0.77
+    },
+    "totalBlockingTime": {
+      "id": "total-blocking-time",
+      "title": "Total Blocking Time",
+      "displayValue": "0 ms",
+      "numericValue": 0,
+      "score": 1
+    },
+    "cumulativeLayoutShift": {
+      "id": "cumulative-layout-shift",
+      "title": "Cumulative Layout Shift",
+      "displayValue": "0",
+      "numericValue": 0,
+      "score": 1
+    }
+  },
+  "summary": {
+    "requestedUrl": "http://127.0.0.1:62408/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/",
+    "finalUrl": "http://127.0.0.1:62408/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/",
+    "fetchTime": "2026-05-04T01:52:15.393Z",
+    "accessibilityIssueCount": 3
+  },
+  "issues": [
+    {
+      "id": "label",
+      "title": "Form elements do not have associated labels",
+      "score": 0,
+      "displayValue": null,
+      "description": "Labels ensure that form controls are announced properly by assistive technologies, like screen readers. [Learn more about form element labels](https://dequeuniversity.com/rules/axe/4.11/label)."
+    },
+    {
+      "id": "landmark-one-main",
+      "title": "Document does not have a main landmark.",
+      "score": 0,
+      "displayValue": null,
+      "description": "One main landmark helps screen reader users navigate a web page. [Learn more about landmarks](https://dequeuniversity.com/rules/axe/4.11/landmark-one-main)."
+    },
+    {
+      "id": "td-has-header",
+      "title": "`<td>` elements in a large `<table>` do not have table headers.",
+      "score": 0,
+      "displayValue": null,
+      "description": "Screen readers have features to make navigating tables easier. Ensuring that `<td>` elements in a large table (3 or more cells in width and height) have an associated table header may improve the experience for screen reader users. [Learn more about table headers](https://dequeuniversity.com/rules/axe/4.11/td-has-header)."
+    }
+  ],
+  "artifacts": {
+    "report": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/lighthouse/report.html",
+    "json": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-49-39-367Z/lighthouse/lhr.json"
+  }
+}
