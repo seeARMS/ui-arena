@@ -1,0 +1,448 @@
+---
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import Header from "../../../../components/Header.astro";
+import Footer from "../../../../components/Footer.astro";
+import { generatedResults } from "../../../../data/generated-results.js";
+import { generatedSources } from "../../../../data/generated-sources.js";
+import { scenarioById } from "../../../../data/interfaces.js";
+
+export async function getStaticPaths() {
+  const latestByScenarioModel = new Map();
+
+  for (const result of generatedResults.filter((item) => item.status === "complete")) {
+    const key = `${result.interfaceId}/${result.modelId}`;
+    const previous = latestByScenarioModel.get(key);
+    const previousTime = Date.parse(previous?.completedAt ?? previous?.createdAt ?? "") || 0;
+    const nextTime = Date.parse(result.completedAt ?? result.createdAt ?? "") || 0;
+
+    if (!previous || nextTime >= previousTime) {
+      latestByScenarioModel.set(key, result);
+    }
+  }
+
+  return [...latestByScenarioModel.values()].map((result) => ({
+      params: {
+        scenarioId: result.interfaceId,
+        modelId: result.modelId,
+      },
+      props: { result },
+    }));
+}
+
+function escapeHtml(value) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function lineClass(value) {
+  const trimmed = value.trim();
+  if (trimmed.startsWith("<!--")) return "is-comment";
+  if (trimmed.startsWith("<style") || trimmed.startsWith("</style") || trimmed.includes("{") || trimmed.includes("}")) return "is-style";
+  if (trimmed.startsWith("<script") || trimmed.startsWith("</script") || trimmed.includes("const ") || trimmed.includes("=>")) return "is-script";
+  if (trimmed.startsWith("<")) return "is-markup";
+  return "";
+}
+
+function formatDate(value) {
+  if (!value) return "—";
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short",
+  }).format(new Date(value));
+}
+
+function formatDuration(ms) {
+  if (typeof ms !== "number") return "—";
+  if (ms < 1000) return `${ms}ms`;
+  return `${(ms / 1000).toFixed(ms < 10000 ? 2 : 1)}s`;
+}
+
+function formatTokens(value) {
+  if (typeof value !== "number") return "—";
+  return new Intl.NumberFormat("en").format(value);
+}
+
+function formatCost(value) {
+  if (typeof value !== "number") return "—";
+  if (value === 0) return "$0";
+  return `$${value.toFixed(value < 0.01 ? 5 : 4)}`;
+}
+
+function scoreTone(value) {
+  if (typeof value !== "number") return "neutral";
+  if (value >= 90) return "good";
+  if (value >= 70) return "warn";
+  return "bad";
+}
+
+const { result } = Astro.props;
+const interfacePrompt = scenarioById(result.interfaceId);
+const source = generatedSources[`${result.interfaceId}/${result.runId}`] ?? "";
+const lines = source.split("\n").map((line, index) => ({
+  number: index + 1,
+  html: escapeHtml(line) || " ",
+  className: lineClass(line),
+}));
+const renderedLines = lines
+  .map(
+    (line) =>
+      `<span class="source-line ${line.className}"><span class="line-number">${line.number}</span><code>${line.html}</code></span>`,
+  )
+  .join("");
+
+const sizeKb = Math.max(1, Math.round((source.length / 1024) * 10) / 10);
+
+const lighthouse = result.evaluations?.lighthouse;
+const axe = result.evaluations?.axe;
+
+const perfValue = lighthouse?.scores?.performance?.value;
+const a11yValue = lighthouse?.scores?.accessibility?.value;
+const violationCount = axe?.summary?.violationCount;
+const seriousCount = axe?.summary?.seriousOrCriticalCount;
+
+const lhMetrics = lighthouse?.metrics ?? {};
+const fcp = lhMetrics.firstContentfulPaint?.displayValue;
+const lcp = lhMetrics.largestContentfulPaint?.displayValue;
+const cls = lhMetrics.cumulativeLayoutShift?.displayValue;
+const tbt = lhMetrics.totalBlockingTime?.displayValue;
+
+const usage = result.usage ?? {};
+const execution = result.execution ?? {};
+const artifacts = result.artifacts ?? {};
+const lhArtifacts = lighthouse?.artifacts ?? {};
+const axeArtifacts = axe?.artifacts ?? {};
+
+const previewUrl = artifacts.preview;
+const rawSourceUrl = artifacts.source;
+const desktopShot = artifacts.desktopScreenshot;
+const mobileShot = artifacts.mobileScreenshot;
+const lhReport = lhArtifacts.report;
+const lhJson = lhArtifacts.json;
+const axeJson = axeArtifacts.json;
+
+const axeIssues = (axe?.issues ?? []).slice(0, 6);
+---
+
+<BaseLayout
+  title={`${result.modelDisplayName} · ${interfacePrompt?.title ?? "Run"} — TasteBench`}
+  description={`Live preview, source, and evaluator results for ${result.modelDisplayName}'s ${interfacePrompt?.title ?? "scenario"}.`}
+  canonicalPath={`/scenarios/${result.interfaceId}/${result.modelId}/`}
+>
+  <Header active="scenarios" />
+
+  <main class="run-page">
+    <section class="page-head run-head">
+      <div class="container">
+        <div class="crumb">
+          <a href="/scenarios/">Scenarios</a>
+          <span>/</span>
+          <a href={`/scenarios/${result.interfaceId}/`}>{interfacePrompt?.number ?? result.interfaceId}</a>
+          <span>/</span>
+          <span>{result.modelDisplayName}</span>
+        </div>
+        <div class="run-head-grid">
+          <div>
+            <h1 class="run-title">{result.modelDisplayName}</h1>
+            <p class="run-subtitle">
+              <span>{interfacePrompt?.title ?? result.interfaceId}</span>
+              <span class="dot">·</span>
+              <span class="mono">{result.gatewayModel ?? result.modelId}</span>
+            </p>
+            <div class="badges run-badges">
+              <span class="state-pill is-generated">Generated</span>
+              <span class="badge">▣ {interfacePrompt?.eyebrow ?? result.interfaceId}</span>
+              <span class="badge">⏱ {formatDuration(execution.durationMs)}</span>
+              <span class="badge">⚖ {sizeKb} KB</span>
+              <span class="badge">▤ {lines.length} lines</span>
+            </div>
+          </div>
+          <div class="run-actions">
+            <a class="button button-secondary" href={`/scenarios/${result.interfaceId}/`}>← Leaderboard</a>
+            <a class="button button-primary" href={previewUrl} rel="noopener noreferrer">Open raw HTML ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="run-shell" data-run-shell data-active-tab="preview">
+      <div class="container run-grid">
+        <aside class="run-dossier" aria-label="Run dossier">
+
+          <div class="dossier-block">
+            <h2 class="dossier-h">Run</h2>
+            <dl class="dossier-list">
+              <div>
+                <dt>Status</dt>
+                <dd><span class="state-pill is-generated">Generated</span></dd>
+              </div>
+              <div>
+                <dt>Run ID</dt>
+                <dd class="mono small ellipsis">{result.runId}</dd>
+              </div>
+              <div>
+                <dt>Created</dt>
+                <dd class="mono small">{formatDate(result.createdAt)}</dd>
+              </div>
+              <div>
+                <dt>Completed</dt>
+                <dd class="mono small">{formatDate(result.completedAt)}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="dossier-block">
+            <h2 class="dossier-h">Model</h2>
+            <div class="dossier-model">
+              <span class="model-swatch" style={`background: ${result.accentSoft ?? "#e2e2dd"};`}></span>
+              <div>
+                <strong>{result.modelDisplayName}</strong>
+                <span class="mono small">{result.family} · {result.providerName ?? result.gateway}</span>
+              </div>
+            </div>
+            <dl class="dossier-list dossier-list-tight">
+              <div>
+                <dt>Gateway</dt>
+                <dd class="mono small">{result.gateway}</dd>
+              </div>
+              <div>
+                <dt>Model id</dt>
+                <dd class="mono small ellipsis">{result.gatewayModel ?? result.modelId}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="dossier-block">
+            <h2 class="dossier-h">Scenario</h2>
+            <div class="dossier-prompt">
+              {interfacePrompt?.prompt ?? interfacePrompt?.summary ?? "—"}
+            </div>
+            <a class="dossier-link" href={`/scenarios/${result.interfaceId}/`}>
+              <span>{interfacePrompt?.number ?? "→"} {interfacePrompt?.title ?? "Scenario"}</span>
+              <span class="arrow">↗</span>
+            </a>
+          </div>
+
+          <div class="dossier-block">
+            <h2 class="dossier-h">Run metrics</h2>
+            <dl class="dossier-table">
+              <div>
+                <dt>Total time</dt>
+                <dd>{formatDuration(execution.durationMs)}</dd>
+              </div>
+              <div>
+                <dt>Model time</dt>
+                <dd>{formatDuration(execution.modelDurationMs)}</dd>
+              </div>
+              <div>
+                <dt>Latency</dt>
+                <dd>{formatDuration(execution.latencyMs)}</dd>
+              </div>
+              <div>
+                <dt>Prompt tokens</dt>
+                <dd>{formatTokens(usage.promptTokens)}</dd>
+              </div>
+              <div>
+                <dt>Completion tokens</dt>
+                <dd>{formatTokens(usage.completionTokens)}</dd>
+              </div>
+              {typeof usage.reasoningTokens === "number" && usage.reasoningTokens > 0 && (
+                <div>
+                  <dt>Reasoning tokens</dt>
+                  <dd>{formatTokens(usage.reasoningTokens)}</dd>
+                </div>
+              )}
+              <div>
+                <dt>Total tokens</dt>
+                <dd>{formatTokens(usage.totalTokens)}</dd>
+              </div>
+              <div class="cost">
+                <dt>Cost</dt>
+                <dd>{formatCost(usage.totalCost)}</dd>
+              </div>
+            </dl>
+          </div>
+
+          {lighthouse && (
+            <div class="dossier-block">
+              <h2 class="dossier-h">Lighthouse</h2>
+              <div class="dossier-scores">
+                <div class={`dossier-score tone-${scoreTone(perfValue)}`}>
+                  <span class="label">Performance</span>
+                  <span class="value">{typeof perfValue === "number" ? perfValue : "—"}</span>
+                  <span class="bar"><i style={`width: ${typeof perfValue === "number" ? perfValue : 0}%`}></i></span>
+                </div>
+                <div class={`dossier-score tone-${scoreTone(a11yValue)}`}>
+                  <span class="label">Accessibility</span>
+                  <span class="value">{typeof a11yValue === "number" ? a11yValue : "—"}</span>
+                  <span class="bar"><i style={`width: ${typeof a11yValue === "number" ? a11yValue : 0}%`}></i></span>
+                </div>
+              </div>
+              {(fcp || lcp || cls || tbt) && (
+                <dl class="dossier-table small-table">
+                  {fcp && <div><dt>FCP</dt><dd>{fcp}</dd></div>}
+                  {lcp && <div><dt>LCP</dt><dd>{lcp}</dd></div>}
+                  {tbt && <div><dt>TBT</dt><dd>{tbt}</dd></div>}
+                  {cls && <div><dt>CLS</dt><dd>{cls}</dd></div>}
+                </dl>
+              )}
+              {lhReport && (
+                <a class="dossier-link" href={lhReport} rel="noopener noreferrer">
+                  <span>Open Lighthouse report</span>
+                  <span class="arrow">↗</span>
+                </a>
+              )}
+            </div>
+          )}
+
+          {axe && (
+            <div class="dossier-block">
+              <h2 class="dossier-h">Axe</h2>
+              <dl class="dossier-table">
+                <div><dt>Violations</dt><dd>{typeof violationCount === "number" ? violationCount : "—"}</dd></div>
+                {typeof seriousCount === "number" && (
+                  <div><dt>Serious / critical</dt><dd>{seriousCount}</dd></div>
+                )}
+                {axe.summary?.passCount !== undefined && (
+                  <div><dt>Passes</dt><dd>{axe.summary.passCount}</dd></div>
+                )}
+              </dl>
+              {axeIssues.length > 0 && (
+                <ul class="dossier-issues">
+                  {axeIssues.map((issue) => (
+                    <li>
+                      <span class={`axe-impact impact-${issue.impact ?? "moderate"}`}>{issue.impact ?? "issue"}</span>
+                      <span class="axe-help">{issue.help ?? issue.id}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {axeJson && (
+                <a class="dossier-link" href={axeJson} rel="noopener noreferrer">
+                  <span>Download axe JSON</span>
+                  <span class="arrow">↗</span>
+                </a>
+              )}
+            </div>
+          )}
+
+          <div class="dossier-block">
+            <h2 class="dossier-h">Artifacts</h2>
+            <ul class="dossier-artifacts">
+              {previewUrl && (
+                <li><a href={previewUrl} rel="noopener noreferrer"><span>Live preview HTML</span><span class="arrow">↗</span></a></li>
+              )}
+              {rawSourceUrl && (
+                <li><a href={rawSourceUrl} rel="noopener noreferrer"><span>Raw source (.html.txt)</span><span class="arrow">↗</span></a></li>
+              )}
+              {desktopShot && (
+                <li><a href={desktopShot} rel="noopener noreferrer"><span>Desktop screenshot</span><span class="arrow">↗</span></a></li>
+              )}
+              {mobileShot && (
+                <li><a href={mobileShot} rel="noopener noreferrer"><span>Mobile screenshot</span><span class="arrow">↗</span></a></li>
+              )}
+              {lhJson && (
+                <li><a href={lhJson} rel="noopener noreferrer"><span>Lighthouse JSON</span><span class="arrow">↗</span></a></li>
+              )}
+              {axeJson && (
+                <li><a href={axeJson} rel="noopener noreferrer"><span>Axe JSON</span><span class="arrow">↗</span></a></li>
+              )}
+            </ul>
+          </div>
+
+        </aside>
+
+        <div class="run-main">
+          <div class="run-tabs" role="tablist" aria-label="Run views">
+            <button type="button" role="tab" data-tab-target="preview" aria-selected="true">Preview</button>
+            <button type="button" role="tab" data-tab-target="source" aria-selected="false">Source</button>
+            <span class="run-tabs-meta">
+              <span class="mono small ellipsis">{result.runId}</span>
+              <a class="run-tabs-open" href={previewUrl} rel="noopener noreferrer" aria-label="Open raw preview">Raw ↗</a>
+            </span>
+          </div>
+
+          <section class="run-pane run-pane-preview" role="tabpanel" data-tab-pane="preview" aria-label="Live preview">
+            <div class="run-preview-shell">
+              <div class="run-preview-bar">
+                <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="run-preview-url mono ellipsis">{previewUrl}</span>
+                <a class="run-preview-newtab" href={previewUrl} rel="noopener noreferrer" aria-label="Open in new tab">↗</a>
+              </div>
+              <iframe
+                src={previewUrl}
+                title={`${result.modelDisplayName} live preview`}
+                sandbox="allow-scripts"
+                loading="lazy"
+                class="run-preview-frame"
+              />
+            </div>
+          </section>
+
+          <section class="run-pane run-pane-source" role="tabpanel" data-tab-pane="source" aria-label="Source code" hidden>
+            <div class="source-editor-shell">
+              <div class="source-toolbar">
+                <div class="window-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                <div class="source-file">{result.runId}/index.html</div>
+                <div class="source-meta">{lines.length} lines · {sizeKb} KB</div>
+              </div>
+              <pre
+                class="source-code"
+                tabindex="0"
+                aria-label={`${result.modelDisplayName} generated source code`}
+                set:html={renderedLines}
+              ></pre>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  const shell = document.querySelector("[data-run-shell]");
+  if (shell) {
+    const tabs = Array.from(shell.querySelectorAll("[data-tab-target]"));
+    const panes = Array.from(shell.querySelectorAll("[data-tab-pane]"));
+
+    function setTab(name, opts = {}) {
+      shell.setAttribute("data-active-tab", name);
+      for (const tab of tabs) {
+        const isActive = tab.dataset.tabTarget === name;
+        tab.setAttribute("aria-selected", String(isActive));
+      }
+      for (const pane of panes) {
+        const isActive = pane.dataset.tabPane === name;
+        if (isActive) pane.removeAttribute("hidden");
+        else pane.setAttribute("hidden", "");
+      }
+      if (opts.updateHash) {
+        const next = name === "preview" ? "" : `#${name}`;
+        if (next !== window.location.hash) {
+          history.replaceState(null, "", `${window.location.pathname}${next}`);
+        }
+      }
+    }
+
+    for (const tab of tabs) {
+      tab.addEventListener("click", () => setTab(tab.dataset.tabTarget, { updateHash: true }));
+    }
+
+    function applyHash() {
+      const hash = window.location.hash.replace("#", "");
+      if (hash === "source" || hash === "preview") setTab(hash);
+    }
+
+    window.addEventListener("hashchange", applyHash);
+    applyHash();
+  }
+</script>

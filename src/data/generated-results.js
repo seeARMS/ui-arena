@@ -1,4 +1,4 @@
-export const generatedAt = "2026-05-03T18:30:15.737Z";
+export const generatedAt = "2026-05-04T01:25:00.568Z";
 export const generatedModelSlots = [
   {
     "id": "gpt-5-2",
@@ -42,6 +42,495 @@ export const generatedModelSlots = [
   }
 ];
 export const generatedResults = [
+  {
+    "schemaVersion": 1,
+    "runId": "gemini-3-1-flash-lite-preview__2026-05-04T01-22-01-002Z",
+    "interfaceId": "api-keys-admin-table",
+    "modelId": "gemini-3-1-flash-lite-preview",
+    "modelDisplayName": "Gemini 3.1 Flash Lite Preview",
+    "family": "Google",
+    "gateway": "openrouter",
+    "gatewayModel": "google/gemini-3.1-flash-lite-preview",
+    "gatewayGenerationId": "gen-1777857882-k7A7KMXsyXUS2Og9TCRX",
+    "providerName": null,
+    "status": "complete",
+    "createdAt": "2026-05-04T01:22:01.002Z",
+    "completedAt": "2026-05-04T01:25:00.568Z",
+    "execution": {
+      "startedAt": "2026-05-04T01:22:01.002Z",
+      "completedAt": "2026-05-04T01:25:00.568Z",
+      "durationMs": 17743,
+      "modelStartedAt": "2026-05-04T01:24:42.825Z",
+      "modelCompletedAt": "2026-05-04T01:24:48.694Z",
+      "modelDurationMs": 5868,
+      "generationTimeMs": null,
+      "latencyMs": null
+    },
+    "usage": {
+      "source": "openrouter:response",
+      "promptTokens": 625,
+      "completionTokens": 1994,
+      "totalTokens": 2619,
+      "nativePromptTokens": null,
+      "nativeCompletionTokens": null,
+      "reasoningTokens": 0,
+      "cachedPromptTokens": 0,
+      "cacheDiscount": null,
+      "totalCost": 0.00314725,
+      "upstreamInferenceCost": 0.00314725,
+      "currency": "USD",
+      "rawResponseUsage": {
+        "prompt_tokens": 625,
+        "completion_tokens": 1994,
+        "total_tokens": 2619,
+        "cost": 0.00314725,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00314725,
+          "upstream_inference_prompt_cost": 0.00015625,
+          "upstream_inference_completions_cost": 0.002991
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "evaluations": {
+      "lighthouse": {
+        "id": "lighthouse",
+        "displayName": "Lighthouse",
+        "status": "complete",
+        "version": "13.2.0",
+        "completedAt": "2026-05-04T01:33:02.844Z",
+        "durationMs": 9699,
+        "scores": {
+          "performance": {
+            "title": "Performance",
+            "score": 0.56,
+            "value": 56
+          },
+          "accessibility": {
+            "title": "Accessibility",
+            "score": 0.85,
+            "value": 85
+          }
+        },
+        "metrics": {
+          "firstContentfulPaint": {
+            "id": "first-contentful-paint",
+            "title": "First Contentful Paint",
+            "displayValue": "6.1 s",
+            "numericValue": 6144.7158,
+            "score": 0
+          },
+          "largestContentfulPaint": {
+            "id": "largest-contentful-paint",
+            "title": "Largest Contentful Paint",
+            "displayValue": "6.1 s",
+            "numericValue": 6144.7158,
+            "score": 0.04
+          },
+          "speedIndex": {
+            "id": "speed-index",
+            "title": "Speed Index",
+            "displayValue": "6.1 s",
+            "numericValue": 6144.7158,
+            "score": 0.01
+          },
+          "totalBlockingTime": {
+            "id": "total-blocking-time",
+            "title": "Total Blocking Time",
+            "displayValue": "0 ms",
+            "numericValue": 0,
+            "score": 1
+          },
+          "cumulativeLayoutShift": {
+            "id": "cumulative-layout-shift",
+            "title": "Cumulative Layout Shift",
+            "displayValue": "0",
+            "numericValue": 0,
+            "score": 1
+          }
+        },
+        "summary": {
+          "requestedUrl": "http://127.0.0.1:57986/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-22-01-002Z/",
+          "finalUrl": "http://127.0.0.1:57986/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-22-01-002Z/",
+          "fetchTime": "2026-05-04T01:32:56.015Z",
+          "accessibilityIssueCount": 2
+        },
+        "issues": [
+          {
+            "id": "label",
+            "title": "Form elements do not have associated labels",
+            "score": 0,
+            "displayValue": null,
+            "description": "Labels ensure that form controls are announced properly by assistive technologies, like screen readers. [Learn more about form element labels](https://dequeuniversity.com/rules/axe/4.11/label)."
+          },
+          {
+            "id": "landmark-one-main",
+            "title": "Document does not have a main landmark.",
+            "score": 0,
+            "displayValue": null,
+            "description": "One main landmark helps screen reader users navigate a web page. [Learn more about landmarks](https://dequeuniversity.com/rules/axe/4.11/landmark-one-main)."
+          }
+        ],
+        "artifacts": {
+          "report": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-22-01-002Z/lighthouse/report.html",
+          "json": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-22-01-002Z/lighthouse/lhr.json"
+        },
+        "error": null
+      },
+      "axe": {
+        "id": "axe",
+        "displayName": "Axe",
+        "status": "complete",
+        "version": "4.11.4",
+        "completedAt": "2026-05-04T01:33:04.811Z",
+        "durationMs": 1965,
+        "scores": null,
+        "metrics": null,
+        "summary": {
+          "violationCount": 4,
+          "passCount": 23,
+          "incompleteCount": 0,
+          "inapplicableCount": 65,
+          "seriousOrCriticalCount": 1,
+          "impactCounts": {
+            "critical": 1,
+            "serious": 0,
+            "moderate": 2,
+            "minor": 1,
+            "unknown": 0
+          }
+        },
+        "issues": [
+          {
+            "id": "empty-table-header",
+            "impact": "minor",
+            "help": "Table header text should not be empty",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+            "description": "Ensure table headers have discernible text",
+            "nodeCount": 1,
+            "targets": [
+              "th:nth-child(1)"
+            ]
+          },
+          {
+            "id": "label",
+            "impact": "critical",
+            "help": "Form elements must have labels",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/label?application=playwright",
+            "description": "Ensure every form element has a label",
+            "nodeCount": 26,
+            "targets": [
+              "th:nth-child(1) > input[type=\"checkbox\"]",
+              ".border-t.border-slate-100.hover\\:bg-slate-50:nth-child(1) > td:nth-child(1) > input[type=\"checkbox\"]",
+              ".border-t.border-slate-100.hover\\:bg-slate-50:nth-child(2) > td:nth-child(1) > input[type=\"checkbox\"]",
+              ".border-t.border-slate-100.hover\\:bg-slate-50:nth-child(3) > td:nth-child(1) > input[type=\"checkbox\"]"
+            ]
+          },
+          {
+            "id": "landmark-one-main",
+            "impact": "moderate",
+            "help": "Document should have one main landmark",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/landmark-one-main?application=playwright",
+            "description": "Ensure the document has a main landmark",
+            "nodeCount": 1,
+            "targets": [
+              "html"
+            ]
+          },
+          {
+            "id": "region",
+            "impact": "moderate",
+            "help": "All page content should be contained by landmarks",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/region?application=playwright",
+            "description": "Ensure all page content is contained by landmarks",
+            "nodeCount": 2,
+            "targets": [
+              ".py-1\\.5",
+              ".overflow-x-auto"
+            ]
+          }
+        ],
+        "artifacts": {
+          "json": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-22-01-002Z/axe/axe.json"
+        },
+        "error": null
+      }
+    },
+    "artifacts": {
+      "preview": "/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-22-01-002Z/",
+      "source": "/sources/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-22-01-002Z/index.html.txt",
+      "desktopScreenshot": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-22-01-002Z__desktop.png",
+      "mobileScreenshot": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T01-22-01-002Z__mobile.png"
+    },
+    "error": null
+  },
+  {
+    "schemaVersion": 1,
+    "runId": "claude-sonnet-4-5__2026-05-04T01-22-01-002Z",
+    "interfaceId": "api-keys-admin-table",
+    "modelId": "claude-sonnet-4-5",
+    "modelDisplayName": "Claude Sonnet 4.5",
+    "family": "Anthropic",
+    "gateway": "openrouter",
+    "gatewayModel": "anthropic/claude-sonnet-4.5",
+    "gatewayGenerationId": "gen-1777857721-RTLCeOwRZE3RJR5x0yUD",
+    "providerName": null,
+    "status": "complete",
+    "createdAt": "2026-05-04T01:22:01.002Z",
+    "completedAt": "2026-05-04T01:24:02.761Z",
+    "execution": {
+      "startedAt": "2026-05-04T01:22:01.002Z",
+      "completedAt": "2026-05-04T01:24:02.761Z",
+      "durationMs": 121756,
+      "modelStartedAt": "2026-05-04T01:22:01.005Z",
+      "modelCompletedAt": "2026-05-04T01:23:50.922Z",
+      "modelDurationMs": 109916,
+      "generationTimeMs": null,
+      "latencyMs": null
+    },
+    "usage": {
+      "source": "openrouter:response",
+      "promptTokens": 671,
+      "completionTokens": 12170,
+      "totalTokens": 12841,
+      "nativePromptTokens": null,
+      "nativeCompletionTokens": null,
+      "reasoningTokens": 0,
+      "cachedPromptTokens": 0,
+      "cacheDiscount": null,
+      "totalCost": 0.184563,
+      "upstreamInferenceCost": 0.184563,
+      "currency": "USD",
+      "rawResponseUsage": {
+        "prompt_tokens": 671,
+        "completion_tokens": 12170,
+        "total_tokens": 12841,
+        "cost": 0.184563,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.184563,
+          "upstream_inference_prompt_cost": 0.002013,
+          "upstream_inference_completions_cost": 0.18255
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "evaluations": {
+      "lighthouse": {
+        "id": "lighthouse",
+        "displayName": "Lighthouse",
+        "status": "complete",
+        "version": "13.2.0",
+        "completedAt": "2026-05-04T01:33:13.696Z",
+        "durationMs": 8884,
+        "scores": {
+          "performance": {
+            "title": "Performance",
+            "score": 0.56,
+            "value": 56
+          },
+          "accessibility": {
+            "title": "Accessibility",
+            "score": 0.77,
+            "value": 77
+          }
+        },
+        "metrics": {
+          "firstContentfulPaint": {
+            "id": "first-contentful-paint",
+            "title": "First Contentful Paint",
+            "displayValue": "5.7 s",
+            "numericValue": 5739.334999999999,
+            "score": 0
+          },
+          "largestContentfulPaint": {
+            "id": "largest-contentful-paint",
+            "title": "Largest Contentful Paint",
+            "displayValue": "5.7 s",
+            "numericValue": 5739.334999999999,
+            "score": 0.05
+          },
+          "speedIndex": {
+            "id": "speed-index",
+            "title": "Speed Index",
+            "displayValue": "5.7 s",
+            "numericValue": 5739.334999999999,
+            "score": 0.01
+          },
+          "totalBlockingTime": {
+            "id": "total-blocking-time",
+            "title": "Total Blocking Time",
+            "displayValue": "0 ms",
+            "numericValue": 0,
+            "score": 1
+          },
+          "cumulativeLayoutShift": {
+            "id": "cumulative-layout-shift",
+            "title": "Cumulative Layout Shift",
+            "displayValue": "0",
+            "numericValue": 0,
+            "score": 1
+          }
+        },
+        "summary": {
+          "requestedUrl": "http://127.0.0.1:57986/previews/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z/",
+          "finalUrl": "http://127.0.0.1:57986/previews/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z/",
+          "fetchTime": "2026-05-04T01:33:07.233Z",
+          "accessibilityIssueCount": 3
+        },
+        "issues": [
+          {
+            "id": "color-contrast",
+            "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+            "score": 0,
+            "displayValue": null,
+            "description": "Low-contrast text is difficult or impossible for many users to read. [Learn how to provide sufficient color contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast)."
+          },
+          {
+            "id": "label",
+            "title": "Form elements do not have associated labels",
+            "score": 0,
+            "displayValue": null,
+            "description": "Labels ensure that form controls are announced properly by assistive technologies, like screen readers. [Learn more about form element labels](https://dequeuniversity.com/rules/axe/4.11/label)."
+          },
+          {
+            "id": "landmark-one-main",
+            "title": "Document does not have a main landmark.",
+            "score": 0,
+            "displayValue": null,
+            "description": "One main landmark helps screen reader users navigate a web page. [Learn more about landmarks](https://dequeuniversity.com/rules/axe/4.11/landmark-one-main)."
+          }
+        ],
+        "artifacts": {
+          "report": "/evaluations/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z/lighthouse/report.html",
+          "json": "/evaluations/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z/lighthouse/lhr.json"
+        },
+        "error": null
+      },
+      "axe": {
+        "id": "axe",
+        "displayName": "Axe",
+        "status": "complete",
+        "version": "4.11.4",
+        "completedAt": "2026-05-04T01:33:15.588Z",
+        "durationMs": 1891,
+        "scores": null,
+        "metrics": null,
+        "summary": {
+          "violationCount": 5,
+          "passCount": 21,
+          "incompleteCount": 1,
+          "inapplicableCount": 67,
+          "seriousOrCriticalCount": 2,
+          "impactCounts": {
+            "critical": 1,
+            "serious": 1,
+            "moderate": 2,
+            "minor": 1,
+            "unknown": 0
+          }
+        },
+        "issues": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "nodeCount": 100,
+            "targets": [
+              ".summary-card:nth-child(1) > .summary-label",
+              ".summary-card:nth-child(2) > .summary-label",
+              ".summary-card:nth-child(3) > .summary-label",
+              ".summary-card:nth-child(4) > .summary-label"
+            ]
+          },
+          {
+            "id": "empty-table-header",
+            "impact": "minor",
+            "help": "Table header text should not be empty",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+            "description": "Ensure table headers have discernible text",
+            "nodeCount": 1,
+            "targets": [
+              "th:nth-child(1)"
+            ]
+          },
+          {
+            "id": "label",
+            "impact": "critical",
+            "help": "Form elements must have labels",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/label?application=playwright",
+            "description": "Ensure every form element has a label",
+            "nodeCount": 29,
+            "targets": [
+              "th:nth-child(1) > .checkbox[type=\"checkbox\"]",
+              "tr:nth-child(1) > td:nth-child(1) > .checkbox[type=\"checkbox\"]",
+              "tr:nth-child(2) > td:nth-child(1) > .checkbox[type=\"checkbox\"]",
+              "tr:nth-child(3) > td:nth-child(1) > .checkbox[type=\"checkbox\"]"
+            ]
+          },
+          {
+            "id": "landmark-one-main",
+            "impact": "moderate",
+            "help": "Document should have one main landmark",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/landmark-one-main?application=playwright",
+            "description": "Ensure the document has a main landmark",
+            "nodeCount": 1,
+            "targets": [
+              "html"
+            ]
+          },
+          {
+            "id": "region",
+            "impact": "moderate",
+            "help": "All page content should be contained by landmarks",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/region?application=playwright",
+            "description": "Ensure all page content is contained by landmarks",
+            "nodeCount": 228,
+            "targets": [
+              ".header",
+              ".summary-strip",
+              ".search-box",
+              "thead"
+            ]
+          }
+        ],
+        "artifacts": {
+          "json": "/evaluations/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z/axe/axe.json"
+        },
+        "error": null
+      }
+    },
+    "artifacts": {
+      "preview": "/previews/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z/",
+      "source": "/sources/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z/index.html.txt",
+      "desktopScreenshot": "/screenshots/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z__desktop.png",
+      "mobileScreenshot": "/screenshots/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z__mobile.png"
+    },
+    "error": null
+  },
   {
     "schemaVersion": 1,
     "runId": "gemini-3-1-flash-lite-preview__2026-05-03T18-30-01-594Z",

@@ -1,10 +1,7 @@
 ---
 const { output, index = 0 } = Astro.props;
 const rowClass = `r${(index % 8) + 1}`;
-const hasPreview = output.previewUrl && output.previewUrl !== "#";
-const hasRawPreview = output.rawPreviewUrl && output.rawPreviewUrl !== "#";
 const hasScreenshot = output.screenshotUrl && output.screenshotUrl !== "#";
-const hasSource = output.sourceUrl && output.sourceUrl !== "#";
 
 const isPending = !!output.pending;
 const isFailed = output.stateLabel === "Failed";
@@ -21,7 +18,6 @@ function toneClass(item) {
 
 const timeStat = output.stats?.find((s) => s.label === "Time");
 const costStat = output.stats?.find((s) => s.label === "Cost");
-const tokenStat = output.stats?.find((s) => s.label === "Completion") ?? output.stats?.find((s) => s.label === "Prompt");
 
 const rankLabel = index + 1;
 const medalClass = !isComplete
@@ -33,9 +29,14 @@ const medalClass = !isComplete
       : index === 2
         ? "bronze"
         : "";
+
+const Tag = isComplete ? "a" : "div";
+const linkProps = isComplete
+  ? { href: output.previewUrl, "aria-label": `Open ${output.model} run details` }
+  : {};
 ---
 
-<div class={`lb-row ${rowClass} ${isPending ? "is-pending" : ""}`}>
+<Tag class={`lb-row ${rowClass} ${isPending ? "is-pending" : ""} ${isComplete ? "is-clickable" : ""}`} {...linkProps}>
   <div class="rank-cell">
     {isComplete ? (
       <span class={`rank-medal ${medalClass}`}>{rankLabel}</span>
@@ -64,18 +65,17 @@ const medalClass = !isComplete
       </div>
       <div class={`score ${toneClass(axeScore)}`}>
         <dt>Axe</dt>
-        <dd>{axeScore ? axeScore.value : "—"}</dd>
+        <dd>{axeScore ? axeScore.value.split(" ")[0] : "—"}</dd>
       </div>
     </dl>
   </div>
 
   <div class="preview-cell">
     <div class="lb-preview">
-      {hasRawPreview ? (
-        <iframe
-          src={output.rawPreviewUrl}
-          title={`${output.model} generated interface preview`}
-          sandbox="allow-scripts"
+      {hasScreenshot ? (
+        <img
+          src={output.screenshotUrl}
+          alt={`${output.model} generated scenario screenshot`}
           loading="lazy"
         />
       ) : (
@@ -96,24 +96,25 @@ const medalClass = !isComplete
   </div>
 
   <div class="run-cell">
-    {isComplete && timeStat ? (
+    {isComplete && (timeStat || costStat) ? (
       <>
-        <span class="primary">{timeStat.value}</span>
-        <span class="secondary">
-          {tokenStat ? `${tokenStat.value} tok` : ""}
-          {costStat && tokenStat ? " · " : ""}
-          {costStat ? costStat.value : ""}
-        </span>
+        {timeStat && (
+          <div class="run-stat">
+            <span class="run-stat-label">Time</span>
+            <span class="run-stat-value">{timeStat.value}</span>
+          </div>
+        )}
+        {costStat && (
+          <div class="run-stat">
+            <span class="run-stat-label">Cost</span>
+            <span class="run-stat-value">{costStat.value}</span>
+          </div>
+        )}
       </>
     ) : isFailed ? (
-      <span class="pending">Run failed</span>
+      <span class="run-cell-empty">Run failed</span>
     ) : (
-      <span class="pending">Not yet run</span>
+      <span class="run-cell-empty">Not yet run</span>
     )}
   </div>
-
-  <div class="actions-cell">
-    <a href={output.previewUrl} aria-disabled={!hasPreview ? "true" : undefined}>Preview ↗</a>
-    <a href={output.sourceUrl} aria-disabled={!hasSource ? "true" : undefined}>Source</a>
-  </div>
-</div>
+</Tag>

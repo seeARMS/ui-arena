@@ -1,7 +1,7 @@
 {
   "name": "TasteBench",
   "short_name": "TasteBench",
-  "description": "An open benchmark for AI product taste — same brief, every model, ranked.",
+  "description": "An open benchmark for AI product taste — same scenario, every model, ranked.",
   "icons": [
     { "src": "tastebench.svg", "sizes": "any", "type": "image/svg+xml" }
   ],

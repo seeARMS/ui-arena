@@ -1,0 +1,15 @@
+{
+  "model": "anthropic/claude-sonnet-4.5",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are participating in UI Arena, a gallery of AI-generated product interface examples.\nReturn exactly one complete static HTML document.\nThe scenario may use only these external runtime scripts: https://esm.sh/react@18, https://esm.sh/react-dom@18/client, and https://unpkg.com/@babel/standalone. Keep all app code, CSS, data, and assets inside the HTML document.\nDo not use external fonts, images, stylesheets, analytics, API calls, or any network requests beyond the listed React/Babel runtime CDNs.\nThe output must work by opening index.html directly in a browser.\nDo not include explanations outside the HTML."
+    },
+    {
+      "role": "user",
+      "content": "Interface prompt: Admin table for managing API keys and permissions\nCategory: admin-table\n\nBuild an admin table for managing API keys and permissions in an engineering workspace.\n\nThe user is a platform engineer auditing key hygiene. They need to see owners, scopes, last-used time, expiry, rotation health, and the keys that are scary right now.\n\nBuild:\n\n- A dense, scannable table (no card layouts) with sortable columns: name, owner, scopes, last used, created, expires, status.\n- A search input plus segmented filters (all / active / stale / expiring / over-scoped).\n- Status pills for healthy / stale / expiring / leaked-suspected / revoked.\n- Row actions in a popover: rotate, revoke, edit scopes, view audit trail.\n- Bulk select with a sticky action bar.\n- A summary header strip: total keys, active, over-scoped, expiring this week.\n- A side drawer that opens with full audit/event detail when a row is clicked.\n- Responsive behavior — degrade gracefully to a stacked list on narrow screens.\n\nStack: a single self-contained HTML file that boots React 18 in the browser. Use these CDNs (no build step):\n\n- https://esm.sh/react@18\n- https://esm.sh/react-dom@18/client\n- https://unpkg.com/@babel/standalone for in-browser JSX (`<script type=\"text/babel\" data-presets=\"react\">`)\n\nAll state, components, styles, and mock data live in this one file. No external assets, no runtime fetches beyond those CDNs.\n\nMock at least 25 rows with varied states. Prioritize density and operational confidence — avoid empty whitespace and decorative elements that dilute scanning.\nImplementation requirements:\n- Build a production-quality product interface, not a marketing explanation.\n- Use semantic HTML and accessible controls.\n- Make it responsive from mobile to desktop.\n- Include realistic copy, states, and content needed for the interface.\n- Keep it self-contained in one index.html file.\n- If you use JSX, load Babel from https://unpkg.com/@babel/standalone and load React/ReactDOM from the exact React CDNs named in the prompt."
+    }
+  ],
+  "temperature": 0.2,
+  "max_tokens": 16000
+}

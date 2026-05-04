@@ -21,18 +21,43 @@ import {
 const OPENROUTER_CHAT_URL = "https://openrouter.ai/api/v1/chat/completions";
 const OPENROUTER_GENERATION_URL = "https://openrouter.ai/api/v1/generation";
 const DEFAULT_INTERFACE = "pricing-ai-coding-assistant";
-const PREVIEW_CSP =
-  "default-src 'none'; img-src data: blob:; media-src data: blob:; font-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; form-action 'none'; base-uri 'none'";
+const PREVIEW_CSP = [
+  "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'",
+  "script-src * data: blob: 'unsafe-inline' 'unsafe-eval'",
+  "style-src * data: blob: 'unsafe-inline'",
+  "img-src * data: blob:",
+  "font-src * data: blob:",
+  "connect-src * data: blob:",
+  "media-src * data: blob:",
+  "worker-src * data: blob:",
+  "frame-src * data: blob:",
+  "object-src 'none'",
+  "form-action 'none'",
+  "base-uri 'none'",
+].join("; ");
+
+const REACT_UMD_SCRIPT = '<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>';
+const REACT_DOM_UMD_SCRIPT = '<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>';
+const BABEL_STANDALONE_SCRIPT = '<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>';
+
+function promptUsesReactRuntime(prompt) {
+  return /React 18/i.test(prompt) || /esm\.sh\/react/i.test(prompt) || /@babel\/standalone/i.test(prompt);
+}
 
 function buildMessages({ interfacePrompt, prompt }) {
+  const usesReactRuntime = promptUsesReactRuntime(prompt);
   return [
     {
       role: "system",
       content: [
         "You are participating in UI Arena, a gallery of AI-generated product interface examples.",
         "Return exactly one complete static HTML document.",
-        "The document must include all CSS and JavaScript inline.",
-        "Do not use external fonts, images, scripts, stylesheets, CDNs, analytics, or network requests.",
+        usesReactRuntime
+          ? "The scenario may use browser-global React 18 scripts from unpkg plus Babel Standalone. Keep all app code, CSS, data, and assets inside the HTML document."
+          : "The document must include all CSS and JavaScript inline.",
+        usesReactRuntime
+          ? "Do not use external fonts, images, analytics, API calls, or any network requests beyond runtime CDNs needed by the static preview."
+          : "Do not use external fonts, images, scripts, stylesheets, CDNs, analytics, or network requests.",
         "The output must work by opening index.html directly in a browser.",
         "Do not include explanations outside the HTML.",
       ].join("\n"),
@@ -50,6 +75,9 @@ function buildMessages({ interfacePrompt, prompt }) {
         "- Make it responsive from mobile to desktop.",
         "- Include realistic copy, states, and content needed for the interface.",
         "- Keep it self-contained in one index.html file.",
+        usesReactRuntime
+          ? "- If you use JSX, load React globals with unpkg UMD scripts before Babel: react@18/umd/react.production.min.js, react-dom@18/umd/react-dom.production.min.js, then @babel/standalone/babel.min.js."
+          : "",
       ].join("\n"),
     },
   ];
@@ -75,18 +103,25 @@ function extractHtml(content) {
   return html.slice(0, end + "</html>".length);
 }
 
+function normalizeReactRuntime(html) {
+  return html
+    .replace(/<script\b[^>]*src=["']https:\/\/esm\.sh\/react@18[^"']*["'][^>]*>\s*<\/script>/gi, REACT_UMD_SCRIPT)
+    .replace(/<script\b[^>]*src=["']https:\/\/esm\.sh\/react-dom@18\/client[^"']*["'][^>]*>\s*<\/script>/gi, REACT_DOM_UMD_SCRIPT)
+    .replace(/<script\b[^>]*src=["']https:\/\/unpkg\.com\/@babel\/standalone(?:\/babel\.min\.js)?["'][^>]*>\s*<\/script>/gi, BABEL_STANDALONE_SCRIPT);
+}
+
 function injectPreviewCsp(html) {
   const meta = `<meta http-equiv="Content-Security-Policy" content="${PREVIEW_CSP}">`;
+  const withoutExistingCsp = html.replace(
+    /<meta\s+[^>]*http-equiv=(["'])Content-Security-Policy\1[^>]*>\s*/gi,
+    "",
+  );
 
-  if (html.includes("http-equiv=\"Content-Security-Policy\"") || html.includes("http-equiv='Content-Security-Policy'")) {
-    return html;
+  if (/<head[^>]*>/i.test(withoutExistingCsp)) {
+    return withoutExistingCsp.replace(/<head[^>]*>/i, (match) => `${match}\n    ${meta}`);
   }
 
-  if (/<head[^>]*>/i.test(html)) {
-    return html.replace(/<head[^>]*>/i, (match) => `${match}\n    ${meta}`);
-  }
-
-  return html.replace(/<html[^>]*>/i, (match) => `${match}\n<head>\n    ${meta}\n</head>`);
+  return withoutExistingCsp.replace(/<html[^>]*>/i, (match) => `${match}\n<head>\n    ${meta}\n</head>`);
 }
 
 function htmlForDryRun({ interfacePrompt, model }) {
@@ -390,7 +425,7 @@ async function runModel({
       result.execution.latencyMs = generation?.latency ?? null;
     }
 
-    html = injectPreviewCsp(extractHtml(html));
+    html = injectPreviewCsp(normalizeReactRuntime(extractHtml(html)));
     result.status = "complete";
     result.completedAt = new Date().toISOString();
     result.execution.completedAt = result.completedAt;

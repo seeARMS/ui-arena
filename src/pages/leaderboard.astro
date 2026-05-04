@@ -1,0 +1,317 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { modelAggregates, benchTotals, surfacesWithCounts } from "../data/interfaces.js";
+
+function formatNumber(value, opts = {}) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  return new Intl.NumberFormat("en", opts).format(value);
+}
+
+function formatScore(value) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  return Math.round(value).toString();
+}
+
+function formatAggregate(value) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  return value.toFixed(1);
+}
+
+function formatDuration(ms) {
+  if (typeof ms !== "number" || Number.isNaN(ms)) return "—";
+  if (ms < 1000) return `${Math.round(ms)}ms`;
+  return `${(ms / 1000).toFixed(ms < 10000 ? 1 : 0)}s`;
+}
+
+function formatCost(value) {
+  if (typeof value !== "number" || value === 0) return "$0";
+  if (value < 0.01) return `$${value.toFixed(5)}`;
+  return `$${value.toFixed(4)}`;
+}
+
+function scoreTone(value) {
+  if (value === null || value === undefined) return "neutral";
+  if (value >= 90) return "good";
+  if (value >= 70) return "warn";
+  return "bad";
+}
+
+function axeTone(value) {
+  if (value === null || value === undefined) return "neutral";
+  if (value === 0) return "good";
+  if (value <= 2) return "warn";
+  return "bad";
+}
+
+const sorted = [...modelAggregates].sort((a, b) => {
+  const av = a.aggregate ?? -Infinity;
+  const bv = b.aggregate ?? -Infinity;
+  return bv - av;
+});
+
+const rows = sorted.map((model, index) => {
+  const isRanked = model.runs > 0;
+  return {
+    ...model,
+    sortKeys: {
+      aggregate: model.aggregate ?? -Infinity,
+      perf: model.avgPerf ?? -Infinity,
+      a11y: model.avgA11y ?? -Infinity,
+      axe: model.avgAxe ?? Infinity,
+      coverage: model.coverage,
+      time: model.avgTime ?? Infinity,
+      cost: model.totalCost,
+      runs: model.runs,
+    },
+    isRanked,
+    initialRank: index + 1,
+  };
+});
+
+const rankedCount = rows.filter((r) => r.isRanked).length;
+---
+
+<BaseLayout
+  title="Leaderboard — TasteBench"
+  description={`Global TasteBench leaderboard ranking ${rows.length} frontier models across every product surface. Sort by aggregate, performance, accessibility, axe violations, speed, or cost.`}
+  canonicalPath="/leaderboard/"
+>
+  <Header active="leaderboard" />
+
+  <main>
+    <section class="page-head">
+      <div class="container">
+        <div class="crumb">
+          <a href="/">TasteBench</a>
+          <span>/</span>
+          <span>Leaderboard</span>
+        </div>
+        <h1>Global leaderboard.</h1>
+        <div class="page-head-grid">
+          <div>
+            <p class="lede">
+              Every frontier model ranked across every scenario on the bench. The aggregate score is 70% accessibility, 30% performance, with a penalty for axe violations — taste leans on accessibility.
+            </p>
+            <div class="badges">
+              <span class="badge">⚙ {rows.length} models</span>
+              <span class="badge">▣ {benchTotals.briefsLive} scenarios</span>
+              <span class="badge">▤ {benchTotals.totalRuns} runs</span>
+              <span class="badge">● {rankedCount} ranked · {rows.length - rankedCount} unbenched</span>
+              <span class="badge">$ {formatCost(benchTotals.totalCost)}</span>
+            </div>
+          </div>
+          <div class="lb-method">
+            <header>
+              <span>Score · v1</span>
+              <a href="/#how-it-works">Method ↗</a>
+            </header>
+            <ul>
+              <li><span class="k">Perf weight</span><span class="v">0.30</span></li>
+              <li><span class="k">A11y weight</span><span class="v">0.70</span></li>
+              <li><span class="k">Axe penalty</span><span class="v">−1.5 / violation</span></li>
+              <li><span class="k">Serious penalty</span><span class="v">−3.0 / each</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="lb-controls">
+          <div class="group">
+            <span class="controls-label">Surface filter</span>
+            <select class="sort-select" disabled aria-label="Surface filter (coming soon)">
+              <option>All surfaces</option>
+              {surfacesWithCounts.map((s) => (
+                <option>{s.label}</option>
+              ))}
+            </select>
+          </div>
+          <div class="group">
+            <span class="controls-label">Sort by</span>
+            <select class="sort-select" data-sort-select aria-label="Sort by">
+              <option value="aggregate">Aggregate score</option>
+              <option value="perf">Performance</option>
+              <option value="a11y">Accessibility</option>
+              <option value="axe">Axe (fewest)</option>
+              <option value="coverage">Coverage</option>
+              <option value="time">Speed</option>
+              <option value="cost">Cost</option>
+              <option value="runs">Runs</option>
+            </select>
+            <button type="button" class="dir-toggle" data-dir-toggle aria-label="Toggle sort direction" data-dir="desc">↓</button>
+          </div>
+        </div>
+
+        <div class="global-leaderboard" data-board>
+          <div class="gl-row gl-head" aria-hidden="true">
+            <button type="button" class="gl-cell gl-rank" data-sort="aggregate">#</button>
+            <button type="button" class="gl-cell gl-model" data-sort="aggregate"><span>Model</span></button>
+            <button type="button" class="gl-cell gl-num" data-sort="aggregate"><span>Score</span></button>
+            <button type="button" class="gl-cell gl-num" data-sort="perf"><span>Perf</span></button>
+            <button type="button" class="gl-cell gl-num" data-sort="a11y"><span>A11y</span></button>
+            <button type="button" class="gl-cell gl-num" data-sort="axe"><span>Axe</span></button>
+            <button type="button" class="gl-cell gl-num" data-sort="coverage"><span>Coverage</span></button>
+            <button type="button" class="gl-cell gl-num" data-sort="time"><span>Speed</span></button>
+            <button type="button" class="gl-cell gl-num" data-sort="cost"><span>Cost</span></button>
+          </div>
+
+          {rows.map((row, index) => {
+            const isComplete = row.isRanked;
+            const medal = !isComplete
+              ? ""
+              : index === 0
+                ? "gold"
+                : index === 1
+                  ? "silver"
+                  : index === 2
+                    ? "bronze"
+                    : "";
+            const dataAttrs = {
+              "data-sort-aggregate": row.sortKeys.aggregate,
+              "data-sort-perf": row.sortKeys.perf,
+              "data-sort-a11y": row.sortKeys.a11y,
+              "data-sort-axe": row.sortKeys.axe,
+              "data-sort-coverage": row.sortKeys.coverage,
+              "data-sort-time": row.sortKeys.time,
+              "data-sort-cost": row.sortKeys.cost,
+              "data-sort-runs": row.sortKeys.runs,
+              "data-ranked": String(isComplete),
+            };
+            return (
+              <div class={`gl-row ${isComplete ? "" : "is-unbenched"}`} {...dataAttrs}>
+                <div class="gl-cell gl-rank">
+                  {isComplete ? (
+                    <span class={`rank-medal ${medal}`}>{index + 1}</span>
+                  ) : (
+                    <span class="rank">—</span>
+                  )}
+                </div>
+                <div class="gl-cell gl-model">
+                  <span class="swatch" style={`background: ${row.accentSoft};`}></span>
+                  <div class="model-name">
+                    <strong>{row.displayName}</strong>
+                    <span>{row.family} · {row.gatewayModel}</span>
+                  </div>
+                </div>
+                <div class="gl-cell gl-num gl-aggregate">
+                  <strong>{formatAggregate(row.aggregate)}</strong>
+                  <span>aggregate</span>
+                </div>
+                <div class={`gl-cell gl-num tone-${scoreTone(row.avgPerf)}`}>
+                  <strong>{formatScore(row.avgPerf)}</strong>
+                  <span>avg</span>
+                </div>
+                <div class={`gl-cell gl-num tone-${scoreTone(row.avgA11y)}`}>
+                  <strong>{formatScore(row.avgA11y)}</strong>
+                  <span>avg</span>
+                </div>
+                <div class={`gl-cell gl-num tone-${axeTone(row.avgAxe)}`}>
+                  <strong>{row.avgAxe === null ? "—" : formatNumber(row.avgAxe, { maximumFractionDigits: 1 })}</strong>
+                  <span>avg</span>
+                </div>
+                <div class="gl-cell gl-num">
+                  <strong>{row.coverage}<small>/{row.coverageTotal}</small></strong>
+                  <span>{row.runs} runs</span>
+                </div>
+                <div class="gl-cell gl-num">
+                  <strong>{formatDuration(row.avgTime)}</strong>
+                  <span>avg time</span>
+                </div>
+                <div class="gl-cell gl-num">
+                  <strong>{formatCost(row.totalCost)}</strong>
+                  <span>total</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <p class="lb-foot">
+          Coverage shows scenarios ranked / scenarios live. As more runs land, ranks shift. Models with no runs sort last regardless of direction.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  const board = document.querySelector("[data-board]");
+  const select = document.querySelector("[data-sort-select]");
+  const dirToggle = document.querySelector("[data-dir-toggle]");
+  const headerButtons = Array.from(document.querySelectorAll(".gl-head [data-sort]"));
+
+  if (board && select && dirToggle) {
+    let sortKey = "aggregate";
+    let dir = "desc";
+
+    function sortRows() {
+      const rows = Array.from(board.querySelectorAll(".gl-row:not(.gl-head)"));
+      const ranked = rows.filter((r) => r.dataset.ranked === "true");
+      const unbenched = rows.filter((r) => r.dataset.ranked !== "true");
+      const sorted = ranked.sort((a, b) => {
+        const av = parseFloat(a.dataset[`sort${sortKey.charAt(0).toUpperCase()}${sortKey.slice(1)}`]);
+        const bv = parseFloat(b.dataset[`sort${sortKey.charAt(0).toUpperCase()}${sortKey.slice(1)}`]);
+        const aSafe = Number.isFinite(av) ? av : (dir === "asc" ? Infinity : -Infinity);
+        const bSafe = Number.isFinite(bv) ? bv : (dir === "asc" ? Infinity : -Infinity);
+        return dir === "asc" ? aSafe - bSafe : bSafe - aSafe;
+      });
+      // re-rank ranked rows
+      sorted.forEach((row, idx) => {
+        const rankCell = row.querySelector(".gl-rank");
+        if (!rankCell) return;
+        rankCell.innerHTML = "";
+        const medal = document.createElement("span");
+        medal.className = `rank-medal ${idx === 0 ? "gold" : idx === 1 ? "silver" : idx === 2 ? "bronze" : ""}`;
+        medal.textContent = String(idx + 1);
+        rankCell.appendChild(medal);
+      });
+      // re-attach in order
+      const fragment = document.createDocumentFragment();
+      [...sorted, ...unbenched].forEach((row) => fragment.appendChild(row));
+      board.appendChild(fragment);
+
+      // update header pressed state
+      headerButtons.forEach((btn) => {
+        btn.setAttribute("aria-pressed", String(btn.dataset.sort === sortKey));
+      });
+      dirToggle.dataset.dir = dir;
+      dirToggle.textContent = dir === "asc" ? "↑" : "↓";
+    }
+
+    select.addEventListener("change", () => {
+      sortKey = select.value;
+      // Sensible default direction per metric
+      const ascByDefault = ["axe", "time", "cost"];
+      dir = ascByDefault.includes(sortKey) ? "asc" : "desc";
+      sortRows();
+    });
+
+    dirToggle.addEventListener("click", () => {
+      dir = dir === "asc" ? "desc" : "asc";
+      sortRows();
+    });
+
+    headerButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const next = btn.dataset.sort;
+        if (next === sortKey) {
+          dir = dir === "asc" ? "desc" : "asc";
+        } else {
+          sortKey = next;
+          const ascByDefault = ["axe", "time", "cost"];
+          dir = ascByDefault.includes(sortKey) ? "asc" : "desc";
+          select.value = sortKey;
+        }
+        sortRows();
+      });
+    });
+
+    sortRows();
+  }
+</script>

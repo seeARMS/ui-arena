@@ -55,7 +55,15 @@ export const surfaces = [
 
 export const surfaceById = (id) => surfaces.find((s) => s.id === id);
 
-const liveBriefs = [
+const REACT_STACK_NOTE = `Stack: a single self-contained HTML file that boots React 18 in the browser. Use these CDNs (no build step):
+- https://unpkg.com/react@18/umd/react.production.min.js
+- https://unpkg.com/react-dom@18/umd/react-dom.production.min.js
+- https://unpkg.com/@babel/standalone/babel.min.js for in-browser JSX (\`<script type="text/babel" data-presets="react">\`)
+All state, components, styles, and mock data live in this one file. No external assets, no runtime fetches beyond those CDNs.`;
+
+const HTML_STACK_NOTE = `Stack: a single self-contained HTML file. No external assets, no runtime fetches. System fonts only.`;
+
+const liveScenarios = [
   {
     number: "01",
     id: "pricing-ai-coding-assistant",
@@ -63,8 +71,21 @@ const liveBriefs = [
     title: "SaaS pricing page",
     eyebrow: "AI coding assistant",
     summary: "Three plans, a team upgrade path, usage limits, trust signals, FAQs.",
-    prompt:
-      "Design and implement a pricing page for an AI coding assistant. It should include three plans, a clear team upgrade path, usage limits, trust signals, FAQs, and responsive behavior.",
+    prompt: `Design and implement a pricing page for an AI coding assistant.
+
+The product helps developers plan changes, edit code, run tests, and review pull requests with an AI agent. Pricing has to let an individual decide today, give an engineering team a reason to upgrade, and route enterprises to sales.
+
+Build:
+- Three paid plans with realistic prices and concrete usage limits (per-month tokens, parallel agents, indexed repos, context window).
+- A team upgrade path that's specific (shared budgets, audit log, SSO, role-based permissions).
+- Trust signals about source-code privacy, model providers, retention, and SOC 2.
+- An FAQ that answers real buying objections — not filler.
+- Strong visual hierarchy: the recommended plan should be obvious without hiding tradeoffs.
+- Responsive behavior for mobile, tablet, and desktop.
+
+${HTML_STACK_NOTE}
+
+Avoid generic SaaS template energy. Make this feel specific to an AI coding assistant and the engineers who buy it.`,
     status: "Live · ranked",
     stack: "HTML",
   },
@@ -75,6 +96,22 @@ const liveBriefs = [
     title: "Newsletter analytics dashboard",
     eyebrow: "Creator analytics",
     summary: "Growth, retention, revenue, and content-level performance for a working creator.",
+    prompt: `Build an analytics dashboard for a newsletter platform — the home screen a working creator opens to figure out what to do next.
+
+The user is a solo creator or a small media team. They want to understand subscriber growth, churn, revenue, traffic sources, and which posts moved the audience. They have ~20 minutes a week to act on this.
+
+Build:
+- A header with publication name, time-range selector (7D / 30D / 90D / All), and a refresh state.
+- A four-tile metric strip (subscribers, paid, revenue, open rate) with deltas vs the previous period.
+- A growth chart and a churn-vs-acquired chart. Render charts with SVG — no external chart libraries.
+- A "recent posts" table with sortable columns (open rate, paid conversions, click-through).
+- An "insights" rail with at least three concrete recommendations the data justifies.
+- Empty states, loading flicker, and at least one disabled filter that hints at depth.
+- Responsive behavior for mobile, tablet, and desktop.
+
+${REACT_STACK_NOTE}
+
+Make this feel like a working operational product, not a decorative mockup. Bake in realistic mock data.`,
     status: "Prompt ready",
     stack: "React",
   },
@@ -85,6 +122,21 @@ const liveBriefs = [
     title: "AI chat with tool approvals",
     eyebrow: "Agent workspace",
     summary: "A chat surface that makes every tool call inspectable before it runs.",
+    prompt: `Build a chat interface where an AI agent runs commands and edits files, but every tool call has to be approved first.
+
+The user is a developer testing an agent. They want to see exactly what's about to happen before it happens, approve fast on the obvious, and reject confidently on the risky.
+
+Build:
+- A two-pane layout: chat on the left, "context inspector" on the right (the inspector shows the file, command, or diff the agent wants to touch).
+- A live conversation with at least: user turn, assistant turn, two tool calls, two tool results, and one nested follow-up.
+- Pending approvals must be visually prominent. Each has approve / reject / inspect (focuses the inspector).
+- A "trust" affordance: allowlist this kind of call for the session.
+- A typing indicator while the agent is "thinking", and a "stop" affordance during a tool call.
+- Responsive behavior — the inspector collapses sensibly on narrow widths.
+
+${REACT_STACK_NOTE}
+
+The interface should create trust without making the workflow slow. Avoid blocking modals for routine approvals; reserve them for destructive ones.`,
     status: "Prompt ready",
     stack: "React",
   },
@@ -95,8 +147,24 @@ const liveBriefs = [
     title: "Route planner",
     eyebrow: "Cycling and running",
     summary: "Distance, elevation, pace, weather, and route comparison on one canvas.",
+    prompt: `Build a route planner for cyclists and runners deciding where to head out.
+
+The user is comparing two or three candidate routes for today. They want distance, elevation, surface (paved/gravel/trail), estimated time at their pace, weather window, and a sense of how busy each option is.
+
+Build:
+- A canvas-style route view (SVG; no map tiles, no remote assets) — show route shapes as stylized polylines on a stylized terrain background.
+- A side rail listing 3 candidate routes with summary stats. Selecting a route highlights it on the canvas.
+- A toggle for cycling vs running that updates the pace estimate.
+- A weather strip (temperature, wind, precip) for the next few hours, with an automatically chosen "best window".
+- An elevation profile for the selected route as an SVG line chart.
+- A "compare" mode that overlays two route stats side by side.
+- Responsive behavior for mobile and desktop.
+
+${REACT_STACK_NOTE}
+
+No external services. Build a self-contained representation that still feels analytical and trustworthy.`,
     status: "Prompt ready",
-    stack: "HTML",
+    stack: "React",
   },
   {
     number: "05",
@@ -105,8 +173,24 @@ const liveBriefs = [
     title: "Billing settings",
     eyebrow: "Team workspace",
     summary: "Seats, invoices, plan changes, payment state, and admin controls in one screen.",
+    prompt: `Build a billing settings page for a SaaS team workspace.
+
+The user is a workspace admin doing a real billing task — adding seats, swapping cards, downgrading, or pulling an invoice for finance. They visit weekly and want efficiency, not delight.
+
+Build:
+- A "current plan" panel: tier, renewal date, monthly cost, included seats, current usage.
+- A seats table: members and their roles, with a way to add seats, remove members, and flag over-permissioned accounts.
+- A payment method block with card brand, last four, and an "update" affordance that opens an inline form (no modal).
+- An invoices table with PDF download icons, status pills, and a search/filter.
+- A "danger zone" for downgrade or cancel with a friction step (typed confirmation).
+- Role-aware UI: non-admin viewers see read-only states with an explanation.
+- Responsive behavior for mobile and desktop.
+
+${REACT_STACK_NOTE}
+
+Optimize for the second-time admin. Inline editing beats modals. Keyboard-first beats mouse-first.`,
     status: "Prompt ready",
-    stack: "HTML",
+    stack: "React",
   },
   {
     number: "06",
@@ -115,8 +199,25 @@ const liveBriefs = [
     title: "Publication onboarding",
     eyebrow: "Creator setup",
     summary: "A focused setup that balances speed, confidence, and sensible defaults.",
+    prompt: `Build a multi-step onboarding flow for a creator starting a new publication.
+
+The creator is on step zero of building an audience. They need to name the publication, pick an audience focus, set a cadence, choose basic branding (color, type), and post a welcome note. They will judge the product by how confident they feel after step three.
+
+Build:
+- A four- or five-step flow with clear progress indication and a way to go back.
+- Step 1 — identity: name, handle (with availability-check feel), short tagline.
+- Step 2 — audience and cadence: who it's for + how often; smart defaults from the audience answer.
+- Step 3 — branding: a small color/type system preview that reacts to choices in real time.
+- Step 4 — first post: title, body (textarea), preview tile, and a "publish welcome" CTA.
+- A persistent live "preview card" rail that updates as the creator fills out the steps.
+- Friendly skip handling: any step beyond identity should be skippable with sane defaults.
+- Responsive behavior for mobile and desktop.
+
+${REACT_STACK_NOTE}
+
+The flow should feel quick but not flimsy. Smart defaults beat clever copy.`,
     status: "Prompt ready",
-    stack: "HTML",
+    stack: "React",
   },
   {
     number: "07",
@@ -125,6 +226,23 @@ const liveBriefs = [
     title: "API keys admin table",
     eyebrow: "Permissions",
     summary: "Dense operational UI: scopes, ownership, rotation state, and audit trail.",
+    prompt: `Build an admin table for managing API keys and permissions in an engineering workspace.
+
+The user is a platform engineer auditing key hygiene. They need to see owners, scopes, last-used time, expiry, rotation health, and the keys that are scary right now.
+
+Build:
+- A dense, scannable table (no card layouts) with sortable columns: name, owner, scopes, last used, created, expires, status.
+- A search input plus segmented filters (all / active / stale / expiring / over-scoped).
+- Status pills for healthy / stale / expiring / leaked-suspected / revoked.
+- Row actions in a popover: rotate, revoke, edit scopes, view audit trail.
+- Bulk select with a sticky action bar.
+- A summary header strip: total keys, active, over-scoped, expiring this week.
+- A side drawer that opens with full audit/event detail when a row is clicked.
+- Responsive behavior — degrade gracefully to a stacked list on narrow screens.
+
+${REACT_STACK_NOTE}
+
+Mock at least 25 rows with varied states. Prioritize density and operational confidence — avoid empty whitespace and decorative elements that dilute scanning.`,
     status: "Prompt ready",
     stack: "React",
   },
@@ -135,6 +253,22 @@ const liveBriefs = [
     title: "Developer tool landing page",
     eyebrow: "Open source",
     summary: "Explain the tool, earn trust, and get a developer to install in under a minute.",
+    prompt: `Build the landing page for an open-source developer tool.
+
+The tool helps developers do something hard or annoying — pick a believable category (e.g., a CLI for migrating between deploy targets, a typed API client generator, a local-first observability runner). Pretend it has 3.4k stars and one paid tier.
+
+Build:
+- Hero with project name, sharp value prop, copyable install command, and primary CTA.
+- A feature grid grounded in real workflow moments — not abstract bullet points.
+- A "how it works" block — three steps with code snippets that look real.
+- Social proof: GitHub stars, contributors count, a quote or two from named-but-fictional developers.
+- A "for teams" upsell strip with a paid tier.
+- Clear paths to docs, GitHub, and Discord.
+- Responsive behavior for mobile and desktop.
+
+${HTML_STACK_NOTE}
+
+Avoid generic startup copy. The page should feel like it was written by an engineer who shipped this.`,
     status: "Prompt ready",
     stack: "HTML",
   },
@@ -145,8 +279,24 @@ const liveBriefs = [
     title: "Habit tracking mobile screen",
     eyebrow: "Daily use",
     summary: "A daily-use mobile screen with progress, streaks, editing, and motivation.",
+    prompt: `Build the today screen of a mobile habit-tracking app.
+
+The user opens this app every morning. They want to see today's habits, tap to complete them, peek at streaks, edit the plan, and feel a small lift — not guilt.
+
+Build:
+- A mobile-shaped canvas (max-width ~430px) centered in the viewport.
+- A header with the date and a streak summary.
+- A "today" list of 5–7 habits with tappable completion controls (rings, checks, or sliders that animate).
+- A progress band that updates as habits complete.
+- An add-habit affordance and an edit/reorder mode.
+- A small "yesterday" recap that shows what slipped without scolding.
+- Smooth ~200ms transitions on completion taps.
+
+${REACT_STACK_NOTE}
+
+The screen must look fine in a desktop browser, but the primary design target is mobile. Tone supports consistency without guilt-tripping.`,
     status: "Prompt ready",
-    stack: "React Native",
+    stack: "React",
   },
   {
     number: "10",
@@ -155,12 +305,28 @@ const liveBriefs = [
     title: "Newsletter workflow builder",
     eyebrow: "Automation",
     summary: "A visual automation surface: triggers, branches, actions, and performance.",
+    prompt: `Build a visual workflow builder for automating newsletter growth.
+
+The user is an operator setting up a sequence: trigger when someone subscribes from a specific source, send a welcome series, branch on engagement, tag, recommend a paid post, and measure conversion to paid.
+
+Build:
+- A canvas with draggable nodes connected by lines. Node types: trigger, action (send email, tag, wait), condition (branch), and goal.
+- A side configuration panel for the selected node with realistic fields (subject line, delay, branching condition, recommendation source).
+- A header with workflow name, status (draft / live), publish/test buttons, and last-edited time.
+- An analytics overlay toggle: each node shows entered, completed, conversion rate.
+- Undo/redo and a "fit to view" affordance.
+- An empty state for a brand-new workflow that teaches the user how to start.
+- Responsive behavior — the canvas should degrade to a structured list on narrow screens.
+
+${REACT_STACK_NOTE}
+
+Use SVG (or absolutely-positioned divs) for the canvas — no flow-chart libraries. Make the automation details visible without cluttering the canvas.`,
     status: "Prompt ready",
     stack: "React",
   },
 ];
 
-const placeholderBriefs = [
+const placeholderScenarios = [
   // Landing
   { surface: "landing", title: "Consumer mobile app landing", eyebrow: "Habit app", summary: "App-store-bound landing with hero device, feature loop, social proof.", stack: "HTML" },
   { surface: "landing", title: "B2B platform landing", eyebrow: "Enterprise SaaS", summary: "Trust, logos, integrations, ROI calculator, demo-request form.", stack: "HTML" },
@@ -201,8 +367,8 @@ const placeholderBriefs = [
   { surface: "chat", title: "Voice assistant playground", eyebrow: "Audio", summary: "Push-to-talk, waveform, transcript, model picker, latency badge.", stack: "React" },
 ];
 
-let placeholderCounter = liveBriefs.length;
-const placeholderItems = placeholderBriefs.map((item) => {
+let placeholderCounter = liveScenarios.length;
+const placeholderItems = placeholderScenarios.map((item) => {
   placeholderCounter += 1;
   const slugSource = (item.title ?? `placeholder-${placeholderCounter}`)
     .toLowerCase()
@@ -215,36 +381,40 @@ const placeholderItems = placeholderBriefs.map((item) => {
     title: item.title,
     eyebrow: item.eyebrow,
     summary: item.summary,
-    status: "Brief in queue",
+    status: "Scenario in queue",
     stack: item.stack,
     placeholder: true,
   };
 });
 
-export const interfacePrompts = liveBriefs.map((item) => ({
+export const scenarioPrompts = liveScenarios.map((item) => ({
   ...item,
-  href: `/interfaces/${item.id}/`,
+  href: `/scenarios/${item.id}/`,
 }));
 
-export const allBriefs = [
-  ...interfacePrompts,
+export const interfacePrompts = scenarioPrompts;
+
+export const allScenarios = [
+  ...scenarioPrompts,
   ...placeholderItems.map((item) => ({ ...item, href: null })),
 ];
 
-export function briefsForSurface(surfaceId) {
-  return allBriefs.filter((brief) => brief.surface === surfaceId);
+export const allBriefs = allScenarios;
+
+export function scenariosForSurface(surfaceId) {
+  return allScenarios.filter((scenario) => scenario.surface === surfaceId);
 }
+
+export const briefsForSurface = scenariosForSurface;
 
 export const surfacesWithCounts = surfaces.map((surface) => ({
   ...surface,
-  count: briefsForSurface(surface.id).length,
-  liveCount: briefsForSurface(surface.id).filter((b) => !b.placeholder).length,
+  count: scenariosForSurface(surface.id).length,
+  liveCount: scenariosForSurface(surface.id).filter((b) => !b.placeholder).length,
 }));
 
 export const pricingInterface = {
-  ...interfacePrompts[0],
-  prompt:
-    "Design and implement a pricing page for an AI coding assistant. It should include three plans, a clear team upgrade path, usage limits, trust signals, FAQs, and responsive behavior.",
+  ...scenarioPrompts[0],
 };
 
 const modelSlots = generatedModelSlots.length
@@ -261,13 +431,23 @@ const modelSlots = generatedModelSlots.length
     ];
 
 export function interfaceById(interfaceId) {
-  return interfacePrompts.find((item) => item.id === interfaceId);
+  return scenarioPrompts.find((item) => item.id === interfaceId);
 }
+
+export const scenarioById = interfaceById;
 
 function latestResultFor(modelId, interfaceId) {
   return generatedResults
     .filter((result) => result.modelId === modelId && result.interfaceId === interfaceId)
     .sort((a, b) => String(b.completedAt ?? b.createdAt).localeCompare(String(a.completedAt ?? a.createdAt)))[0];
+}
+
+export function latestResultForScenarioModel(scenarioId, modelId) {
+  return latestResultFor(modelId, scenarioId);
+}
+
+export function resultPathFor(result) {
+  return result ? `/scenarios/${result.interfaceId}/${result.modelId}/` : "#";
 }
 
 function formatDate(value) {
@@ -461,9 +641,9 @@ export function outputsForInterface(interfaceId) {
           : `Placeholder for ${slot.gatewayModel}. Run this slot with npm run arena:run -- --interface ${interfaceId} --models ${slot.id}.`,
       accent: slot.accent,
       accentSoft: slot.accentSoft,
-      runUrl: result ? `/interfaces/${interfaceId}/${result.runId}/` : "#",
-      previewUrl: result ? `/interfaces/${interfaceId}/${result.runId}/` : "#",
-      sourceUrl: result ? `/interfaces/${interfaceId}/${result.runId}/#source` : "#",
+      runUrl: resultPathFor(result),
+      previewUrl: resultPathFor(result),
+      sourceUrl: result ? `${resultPathFor(result)}#source` : "#",
       rawPreviewUrl: result?.artifacts?.preview ?? "#",
       screenshotUrl: result?.artifacts?.desktopScreenshot ?? "#",
       rawSourceUrl: result?.artifacts?.source ?? "#",

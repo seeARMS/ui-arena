@@ -1,32 +1,30 @@
 ---
-import BaseLayout from "../../../layouts/BaseLayout.astro";
-import Header from "../../../components/Header.astro";
-import Footer from "../../../components/Footer.astro";
-import InterfaceComparison from "../../../components/InterfaceComparison.astro";
-import { interfacePrompts, outputsForInterface } from "../../../data/interfaces.js";
+import { interfacePrompts } from "../../../data/interfaces.js";
 
 export async function getStaticPaths() {
   return interfacePrompts.map((item) => ({
     params: { interfaceId: item.id },
-    props: {
-      interfacePrompt: {
-        ...item,
-        prompt: item.prompt ?? item.summary,
-      },
-    },
+    props: { destination: `/scenarios/${item.id}/` },
   }));
 }
 
-const { interfacePrompt } = Astro.props;
-const outputs = outputsForInterface(interfacePrompt.id);
+const { destination } = Astro.props;
 ---
 
-<BaseLayout
-  title={`${interfacePrompt.title} - UI Arena`}
-  description={`Compare AI model outputs for the ${interfacePrompt.title} interface prompt.`}
-  canonicalPath={`/interfaces/${interfacePrompt.id}/`}
->
-  <Header active="interfaces" />
-  <InterfaceComparison interfacePrompt={interfacePrompt} outputs={outputs} />
-  <Footer />
-</BaseLayout>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0; url=${destination}`} />
+    <link rel="canonical" href={destination} />
+    <title>Redirecting to Scenario</title>
+    <script define:vars={{ destination }}>
+      const target = new URL(destination, window.location.origin);
+      target.hash = window.location.hash;
+      window.location.replace(target);
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to <a href={destination}>the scenario</a>.</p>
+  </body>
+</html>

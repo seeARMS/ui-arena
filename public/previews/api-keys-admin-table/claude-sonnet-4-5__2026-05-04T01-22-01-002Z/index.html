@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; script-src * data: blob: 'unsafe-inline' 'unsafe-eval'; style-src * data: blob: 'unsafe-inline'; img-src * data: blob:; font-src * data: blob:; connect-src * data: blob:; media-src * data: blob:; worker-src * data: blob:; frame-src * data: blob:; object-src 'none'; form-action 'none'; base-uri 'none'">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Key Management - Admin Console</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-primary: #0a0a0b;
+  --bg-secondary: #141416;
+  --bg-tertiary: #1c1c1f;
+  --bg-hover: #232327;
+  --border: #2a2a2e;
+  --text-primary: #e8e8ea;
+  --text-secondary: #a0a0a8;
+  --text-tertiary: #6e6e76;
+  --accent-blue: #3b82f6;
+  --accent-green: #10b981;
+  --accent-yellow: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-purple: #8b5cf6;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+}
+
+.header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.header p {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.summary-value.warning {
+  color: var(--accent-yellow);
+}
+
+.summary-value.danger {
+  color: var(--accent-red);
+}
+
+.controls {
+  padding: 20px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+}
+
+.search-box {
+  flex: 1;
+  min-width: 240px;
+  position: relative;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-tertiary);
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.filter-tab {
+  padding: 6px 14px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.filter-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.filter-tab.active {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.table-container {
+  flex: 1;
+  overflow-x: auto;
+  padding: 0 24px 24px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table thead {
+  position: sticky;
+  top: 0;
+  background: var(--bg-secondary);
+  z-index: 10;
+}
+
+.table th {
+  text-align: left;
+  padding: 12px 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.table th:hover {
+  color: var(--text-primary);
+}
+
+.table th.sortable {
+  position: relative;
+  padding-right: 24px;
+}
+
+.sort-indicator {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+}
+
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  transition: background 0.1s;
+  cursor: pointer;
+}
+
+.table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.table tbody tr.selected {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent-blue);
+}
+
+.key-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.key-id {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: 'Courier New', monospace;
+}
+
+.owner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+}
+
+.scopes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 200px;
+}
+
+.scope-tag {
+  padding: 2px 6px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.scope-tag.danger {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-pill::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-pill.healthy {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-green);
+}
+
+.status-pill.healthy::before {
+  background: var(--accent-green);
+}
+
+.status-pill.stale {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--accent-yellow);
+}
+
+.status-pill.stale::before {
+  background: var(--accent-yellow);
+}
+
+.status-pill.expiring {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--accent-yellow);
+}
+
+.status-pill.expiring::before {
+  background: var(--accent-yellow);
+}
+
+.status-pill.leaked-suspected {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--accent-red);
+}
+
+.status-pill.leaked-suspected::before {
+  background: var(--accent-red);
+}
+
+.status-pill.revoked {
+  background: rgba(110, 110, 118, 0.1);
+  color: var(--text-tertiary);
+}
+
+.status-pill.revoked::before {
+  background: var(--text-tertiary);
+}
+
+.actions-cell {
+  position: relative;
+}
+
+.actions-btn {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+
+.actions-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-tertiary);
+  color: var(--text-primary);
+}
+
+.actions-popover {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  min-width: 180px;
+}
+
+.actions-popover button {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.1s;
+}
+
+.actions-popover button:hover {
+  background: var(--bg-hover);
+}
+
+.actions-popover button:first-child {
+  border-radius: 6px 6px 0 0;
+}
+
+.actions-popover button:last-child {
+  border-radius: 0 0 6px 6px;
+}
+
+.actions-popover button.danger {
+  color: var(--accent-red);
+}
+
+.bulk-actions-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.bulk-actions-bar .count {
+  font-weight: 600;
+  color: var(--accent-blue);
+}
+
+.bulk-actions-bar button {
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.bulk-actions-bar button:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-tertiary);
+}
+
+.bulk-actions-bar button.danger {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+  color: white;
+}
+
+.bulk-actions-bar button.danger:hover {
+  background: #dc2626;
+}
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.drawer {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 600px;
+  max-width: 90vw;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5);
+  z-index: 2001;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.25s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.drawer-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.drawer-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.drawer-header .key-id {
+  font-size: 12px;
+}
+
+.drawer-close {
+  padding: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.drawer-close:hover {
+  color: var(--text-primary);
+}
+
+.drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.drawer-section {
+  margin-bottom: 32px;
+}
+
+.drawer-section h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.detail-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.detail-value {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.audit-log {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.audit-entry {
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.audit-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.audit-action {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.audit-time {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.audit-details {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--text-tertiary);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+@media (max-width: 1024px) {
+  .table-container {
+    display: none;
+  }
+  
+  .mobile-list {
+    display: block;
+    padding: 0 16px 16px;
+  }
+  
+  .mobile-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .mobile-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  
+  .mobile-card-body {
+    display: grid;
+    gap: 12px;
+    font-size: 13px;
+  }
+  
+  .mobile-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .mobile-label {
+    color: var(--text-tertiary);
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .mobile-list {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .summary-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-box {
+    width: 100%;
+  }
+  
+  .filter-tabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  .drawer {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useMemo, useEffect } = React;
+
+// Mock data generator
+const generateMockData = () => {
+  const names = [
+    'Production API', 'Staging Deploy', 'CI/CD Pipeline', 'Analytics Service',
+    'Payment Gateway', 'Auth Service', 'Data Sync', 'Webhook Handler',
+    'Mobile App', 'Admin Dashboard', 'Monitoring Bot', 'Backup Service',
+    'Email Service', 'SMS Gateway', 'Search Index', 'Cache Warmer',
+    'Log Aggregator', 'Metrics Collector', 'CDN Purge', 'Database Migration',
+    'Test Runner', 'Dev Environment', 'QA Automation', 'Load Balancer',
+    'API Gateway', 'Legacy Integration', 'Partner API', 'Internal Tools'
+  ];
+  
+  const owners = [
+    { name: 'Sarah Chen', email: 'sarah@company.com' },
+    { name: 'Mike Johnson', email: 'mike@company.com' },
+    { name: 'Alex Kumar', email: 'alex@company.com' },
+    { name: 'Emma Wilson', email: 'emma@company.com' },
+    { name: 'David Park', email: 'david@company.com' },
+    { name: 'Lisa Anderson', email: 'lisa@company.com' },
+    { name: 'Tom Martinez', email: 'tom@company.com' },
+    { name: 'Rachel Green', email: 'rachel@company.com' }
+  ];
+  
+  const scopeOptions = [
+    'read:users', 'write:users', 'read:orders', 'write:orders',
+    'read:products', 'write:products', 'admin:all', 'delete:resources',
+    'read:analytics', 'write:analytics', 'read:logs', 'manage:keys'
+  ];
+  
+  const statuses = ['healthy', 'stale', 'expiring', 'leaked-suspected', 'revoked'];
+  
+  return Array.from({ length: 28 }, (_, i) => {
+    const created = new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000);
+    const lastUsed = Math.random() > 0.2 
+      ? new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000)
+      : null;
+    const expires = Math.random() > 0.3
+      ? new Date(Date.now() + (Math.random() * 180 - 30) * 24 * 60 * 60 * 1000)
+      : null;
+    
+    let status = 'healthy';
+    if (Math.random() > 0.85) status = 'leaked-suspected';
+    else if (Math.random() > 0.8) status = 'revoked';
+    else if (expires && expires < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)) status = 'expiring';
+    else if (!lastUsed || lastUsed < new Date(Date.now() - 60 * 24 * 60 * 60 * 1000)) status = 'stale';
+    
+    const numScopes = Math.floor(Math.random() * 5) + 1;
+    const scopes = Array.from({ length: numScopes }, () => 
+      scopeOptions[Math.floor(Math.random() * scopeOptions.length)]
+    ).filter((v, i, a) => a.indexOf(v) === i);
+    
+    const hasOverScopes = scopes.includes('admin:all') || scopes.includes('delete:resources');
+    
+    return {
+      id: `key_${Math.random().toString(36).substr(2, 16)}`,
+      name: names[i % names.length] + (i >= names.length ? ` ${Math.floor(i / names.length) + 1}` : ''),
+      owner: owners[Math.floor(Math.random() * owners.length)],
+      scopes,
+      hasOverScopes,
+      lastUsed,
+      created,
+      expires,
+      status
+    };
+  });
+};
+
+const formatDate = (date) => {
+  if (!date) return 'Never';
+  const now = new Date();
+  const diff = now - date;
+  const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+  
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Yesterday';
+  if (days < 7) return `${days}d ago`;
+  if (days < 30) return `${Math.floor(days / 7)}w ago`;
+  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+  return `${Math.floor(days / 365)}y ago`;
+};
+
+const formatDateFull = (date) => {
+  if (!date) return 'Never';
+  return date.toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+const getInitials = (name) => {
+  return name.split(' ').map(n => n[0]).join('').toUpperCase();
+};
+
+function App() {
+  const [data] = useState(generateMockData());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterTab, setFilterTab] = useState('all');
+  const [sortColumn, setSortColumn] = useState('lastUsed');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [selectedRows, setSelectedRows] = useState(new Set());
+  const [openActionsId, setOpenActionsId] = useState(null);
+  const [drawerKey, setDrawerKey] = useState(null);
+  
+  const filteredData = useMemo(() => {
+    let filtered = data;
+    
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(item => 
+        item.name.toLowerCase().includes(query) ||
+        item.owner.name.toLowerCase().includes(query) ||
+        item.owner.email.toLowerCase().includes(query) ||
+        item.id.toLowerCase().includes(query) ||
+        item.scopes.some(s => s.toLowerCase().includes(query))
+      );
+    }
+    
+    // Tab filter
+    if (filterTab !== 'all') {
+      filtered = filtered.filter(item => {
+        switch (filterTab) {
+          case 'active':
+            return item.status === 'healthy';
+          case 'stale':
+            return item.status === 'stale';
+          case 'expiring':
+            return item.status === 'expiring';
+          case 'over-scoped':
+            return item.hasOverScopes;
+          default:
+            return true;
+        }
+      });
+    }
+    
+    // Sort
+    filtered.sort((a, b) => {
+      let aVal, bVal;
+      
+      switch (sortColumn) {
+        case 'name':
+          aVal = a.name.toLowerCase();
+          bVal = b.name.toLowerCase();
+          break;
+        case 'owner':
+          aVal = a.owner.name.toLowerCase();
+          bVal = b.owner.name.toLowerCase();
+          break;
+        case 'lastUsed':
+          aVal = a.lastUsed ? a.lastUsed.getTime() : 0;
+          bVal = b.lastUsed ? b.lastUsed.getTime() : 0;
+          break;
+        case 'created':
+          aVal = a.created.getTime();
+          bVal = b.created.getTime();
+          break;
+        case 'expires':
+          aVal = a.expires ? a.expires.getTime() : Infinity;
+          bVal = b.expires ? b.expires.getTime() : Infinity;
+          break;
+        case 'status':
+          aVal = a.status;
+          bVal = b.status;
+          break;
+        default:
+          return 0;
+      }
+      
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+    
+    return filtered;
+  }, [data, searchQuery, filterTab, sortColumn, sortDirection]);
+  
+  const summary = useMemo(() => {
+    const total = data.length;
+    const active = data.filter(d => d.status === 'healthy').length;
+    const overScoped = data.filter(d => d.hasOverScopes).length;
+    const expiringThisWeek = data.filter(d => 
+      d.expires && d.expires < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    ).length;
+    
+    return { total, active, overScoped, expiringThisWeek };
+  }, [data]);
+  
+  const handleSort = (column) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('desc');
+    }
+  };
+  
+  const toggleRowSelection = (id) => {
+    const newSelected = new Set(selectedRows);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedRows(newSelected);
+  };
+  
+  const toggleSelectAll = () => {
+    if (selectedRows.size === filteredData.length) {
+      setSelectedRows(new Set());
+    } else {
+      setSelectedRows(new Set(filteredData.map(d => d.id)));
+    }
+  };
+  
+  const handleAction = (action, id) => {
+    console.log(`Action: ${action} on ${id}`);
+    setOpenActionsId(null);
+  };
+  
+  const handleBulkAction = (action) => {
+    console.log(`Bulk action: ${action} on ${selectedRows.size} items`);
+    setSelectedRows(new Set());
+  };
+  
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (openActionsId && !e.target.closest('.actions-cell')) {
+        setOpenActionsId(null);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [openActionsId]);
+  
+  const drawerData = drawerKey ? data.find(d => d.id === drawerKey) : null;
+  
+  return (
+    <div className="app">
+      <div className="header">
+        <h1>API Key Management</h1>
+        <p>Monitor and manage API keys across your engineering workspace</p>
+      </div>
+      
+      <div className="summary-strip">
+        <div className="summary-card">
+          <div className="summary-label">Total Keys</div>
+          <div className="summary-value">{summary.total}</div>
+        </div>
+        <div className="summary-card">
+          <div className="summary-label">Active</div>
+          <div className="summary-value">{summary.active}</div>
+        </div>
+        <div className="summary-card">
+          <div className="summary-label">Over-Scoped</div>
+          <div className="summary-value warning">{summary.overScoped}</div>
+        </div>
+        <div className="summary-card">
+          <div className="summary-label">Expiring This Week</div>
+          <div className="summary-value danger">{summary.expiringThisWeek}</div>
+        </div>
+      </div>
+      
+      <div className="controls">
+        <div className="search-box">
+          <span className="search-icon">🔍</span>
+          <input 
+            type="text" 
+            placeholder="Search keys, owners, scopes..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        
+        <div className="filter-tabs">
+          <button 
+            className={`filter-tab ${filterTab === 'all' ? 'active' : ''}`}
+            onClick={() => setFilterTab('all')}
+          >
+            All
+          </button>
+          <button 
+            className={`filter-tab ${filterTab === 'active' ? 'active' : ''}`}
+            onClick={() => setFilterTab('active')}
+          >
+            Active
+          </button>
+          <button 
+            className={`filter-tab ${filterTab === 'stale' ? 'active' : ''}`}
+            onClick={() => setFilterTab('stale')}
+          >
+            Stale
+          </button>
+          <button 
+            className={`filter-tab ${filterTab === 'expiring' ? 'active' : ''}`}
+            onClick={() => setFilterTab('expiring')}
+          >
+            Expiring
+          </button>
+          <button 
+            className={`filter-tab ${filterTab === 'over-scoped' ? 'active' : ''}`}
+            onClick={() => setFilterTab('over-scoped')}
+          >
+            Over-Scoped
+          </button>
+        </div>
+      </div>
+      
+      <div className="table-container">
+        <table className="table">
+          <thead>
+            <tr>
+              <th style={{ width: '40px' }}>
+                <input 
+                  type="checkbox" 
+                  className="checkbox"
+                  checked={selectedRows.size === filteredData.length && filteredData.length > 0}
+                  onChange={toggleSelectAll}
+                />
+              </th>
+              <th className="sortable" onClick={() => handleSort('name')}>
+                Name
+                {sortColumn === 'name' && (
+                  <span className="sort-indicator">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                )}
+              </th>
+              <th className="sortable" onClick={() => handleSort('owner')}>
+                Owner
+                {sortColumn === 'owner' && (
+                  <span className="sort-indicator">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                )}
+              </th>
+              <th>Scopes</th>
+              <th className="sortable" onClick={() => handleSort('lastUsed')}>
+                Last Used
+                {sortColumn === 'lastUsed' && (
+                  <span className="sort-indicator">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                )}
+              </th>
+              <th className="sortable" onClick={() => handleSort('created')}>
+                Created
+                {sortColumn === 'created' && (
+                  <span className="sort-indicator">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                )}
+              </th>
+              <th className="sortable" onClick={() => handleSort('expires')}>
+                Expires
+                {sortColumn === 'expires' && (
+                  <span className="sort-indicator">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                )}
+              </th>
+              <th className="sortable" onClick={() => handleSort('status')}>
+                Status
+                {sortColumn === 'status' && (
+                  <span className="sort-indicator">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                )}
+              </th>
+              <th style={{ width: '80px' }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredData.map(item => (
+              <tr 
+                key={item.id}
+                className={selectedRows.has(item.id) ? 'selected' : ''}
+                onClick={(e) => {
+                  if (!e.target.closest('.checkbox') && !e.target.closest('.actions-cell')) {
+                    setDrawerKey(item.id);
+                  }
+                }}
+              >
+                <td onClick={(e) => e.stopPropagation()}>
+                  <input 
+                    type="checkbox" 
+                    className="checkbox"
+                    checked={selectedRows.has(item.id)}
+                    onChange={() => toggleRowSelection(item.id)}
+                  />
+                </td>
+                <td>
+                  <span className="key-name">{item.name}</span>
+                  <span className="key-id">{item.id}</span>
+                </td>
+                <td>
+                  <div className="owner">
+                    <div className="avatar">{getInitials(item.owner.name)}</div>
+                    <div>
+                      <div style={{ fontSize: '13px' }}>{item.owner.name}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
+                        {item.owner.email}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div className="scopes">
+                    {item.scopes.slice(0, 3).map(scope => (
+                      <span 
+                        key={scope} 
+                        className={`scope-tag ${
+                          scope === 'admin:all' || scope === 'delete:resources' ? 'danger' : ''
+                        }`}
+                      >
+                        {scope}
+                      </span>
+                    ))}
+                    {item.scopes.length > 3 && (
+                      <span className="scope-tag">+{item.scopes.length - 3}</span>
+                    )}
+                  </div>
+                </td>
+                <td>{formatDate(item.lastUsed)}</td>
+                <td>{formatDate(item.created)}</td>
+                <td>{item.expires ? formatDate(item.expires) : 'Never'}</td>
+                <td>
+                  <span className={`status-pill ${item.status}`}>
+                    {item.status === 'leaked-suspected' ? 'Leaked?' : 
+                     item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                  </span>
+                </td>
+                <td className="actions-cell" onClick={(e) => e.stopPropagation()}>
+                  <button 
+                    className="actions-btn"
+                    onClick={() => setOpenActionsId(openActionsId === item.id ? null : item.id)}
+                  >
+                    ⋯
+                  </button>
+                  {openActionsId === item.id && (
+                    <div className="actions-popover">
+                      <button onClick={() => handleAction('rotate', item.id)}>🔄 Rotate Key</button>
+                      <button onClick={() => handleAction('edit', item.id)}>✏️ Edit Scopes</button>
+                      <button onClick={() => handleAction('audit', item.id)}>📋 View Audit Trail</button>
+                      <button className="danger" onClick={() => handleAction('revoke', item.id)}>
+                        🚫 Revoke Key
+                      </button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        
+        {filteredData.length === 0 && (
+          <div className="empty-state">
+            <div className="empty-state-icon">🔍</div>
+            <div>No keys found matching your filters</div>
+          </div>
+        )}
+      </div>
+      
+      <div className="mobile-list">
+        {filteredData.map(item => (
+          <div key={item.id} className="mobile-card" onClick={() => setDrawerKey(item.id)}>
+            <div className="mobile-card-header">
+              <div>
+                <div className="key-name">{item.name}</div>
+                <div className="key-id">{item.id}</div>
+              </div>
+              <span className={`status-pill ${item.status}`}>
+                {item.status === 'leaked-suspected' ? 'Leaked?' : 
+                 item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+              </span>
+            </div>
+            <div className="mobile-card-body">
+              <div className="mobile-row">
+                <span className="mobile-label">Owner</span>
+                <span>{item.owner.name}</span>
+              </div>
+              <div className="mobile-row">
+                <span className="mobile-label">Last Used</span>
+                <span>{formatDate(item.lastUsed)}</span>
+              </div>
+              <div className="mobile-row">
+                <span className="mobile-label">Expires</span>
+                <span>{item.expires ? formatDate(item.expires) : 'Never'}</span>
+              </div>
+              <div>
+                <div className="mobile-label" style={{ marginBottom: '6px' }}>Scopes</div>
+                <div className="scopes">
+                  {item.scopes.map(scope => (
+                    <span 
+                      key={scope} 
+                      className={`scope-tag ${
+                        scope === 'admin:all' || scope === 'delete:resources' ? 'danger' : ''
+                      }`}
+                    >
+                      {scope}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        
+        {filteredData.length === 0 && (
+          <div className="empty-state">
+            <div className="empty-state-icon">🔍</div>
+            <div>No keys found matching your filters</div>
+          </div>
+        )}
+      </div>
+      
+      {selectedRows.size > 0 && (
+        <div className="bulk-actions-bar">
+          <span className="count">{selectedRows.size} selected</span>
+          <button onClick={() => handleBulkAction('rotate')}>Rotate</button>
+          <button onClick={() => handleBulkAction('edit')}>Edit Scopes</button>
+          <button className="danger" onClick={() => handleBulkAction('revoke')}>Revoke</button>
+        </div>
+      )}
+      
+      {drawerData && (
+        <>
+          <div className="drawer-overlay" onClick={() => setDrawerKey(null)} />
+          <div className="drawer">
+            <div className="drawer-header">
+              <div>
+                <h2>{drawerData.name}</h2>
+                <div className="key-id">{drawerData.id}</div>
+              </div>
+              <button className="drawer-close" onClick={() => setDrawerKey(null)}>×</button>
+            </div>
+            <div className="drawer-content">
+              <div className="drawer-section">
+                <h3>Details</h3>
+                <div className="detail-grid">
+                  <div className="detail-item">
+                    <div className="detail-label">Status</div>
+                    <div className="detail-value">
+                      <span className={`status-pill ${drawerData.status}`}>
+                        {drawerData.status === 'leaked-suspected' ? 'Leaked?' : 
+                         drawerData.status.charAt(0).toUpperCase() + drawerData.status.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="detail-item">
+                    <div className="detail-label">Owner</div>
+                    <div className="detail-value">
+                      <div>{drawerData.owner.name}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                        {drawerData.owner.email}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="detail-item">
+                    <div className="detail-label">Created</div>
+                    <div className="detail-value">{formatDateFull(drawerData.created)}</div>
+                  </div>
+                  <div className="detail-item">
+                    <div className="detail-label">Last Used</div>
+                    <div className="detail-value">{formatDateFull(drawerData.lastUsed)}</div>
+                  </div>
+                  <div className="detail-item">
+                    <div className="detail-label">Expires</div>
+                    <div className="detail-value">
+                      {drawerData.expires ? formatDateFull(drawerData.expires) : 'Never'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="drawer-section">
+                <h3>Scopes ({drawerData.scopes.length})</h3>
+                <div className="scopes">
+                  {drawerData.scopes.map(scope => (
+                    <span 
+                      key={scope} 
+                      className={`scope-tag ${
+                        scope === 'admin:all' || scope === 'delete:resources' ? 'danger' : ''
+                      }`}
+                    >
+                      {scope}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="drawer-section">
+                <h3>Audit Trail</h3>
+                <div className="audit-log">
+                  <div className="audit-entry">
+                    <div className="audit-entry-header">
+                      <div className="audit-action">Key created</div>
+                      <div className="audit-time">{formatDateFull(drawerData.created)}</div>
+                    </div>
+                    <div className="audit-details">
+                      Created by {drawerData.owner.name} with {drawerData.scopes.length} scopes
+                    </div>
+                  </div>
+                  
+                  {drawerData.lastUsed && (
+                    <div className="audit-entry">
+                      <div className="audit-entry-header">
+                        <div className="audit-action">API request</div>
+                        <div className="audit-time">{formatDateFull(drawerData.lastUsed)}</div>
+                      </div>
+                      <div className="audit-details">
+                        Used for authenticated request from 203.0.113.42
+                      </div>
+                    </div>
+                  )}
+                  
+                  {drawerData.status === 'leaked-suspected' && (
+                    <div className="audit-entry">
+                      <div className="audit-entry-header">
+                        <div className="audit-action" style={{ color: 'var(--accent-red)' }}>
+                          Security alert
+                        </div>
+                        <div className="audit-time">2 hours ago</div>
+                      </div>
+                      <div className="audit-details">
+                        Key detected in public GitHub repository. Immediate rotation recommended.
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="audit-entry">
+                    <div className="audit-entry-header">
+                      <div className="audit-action">Scopes updated</div>
+                      <div className="audit-time">14 days ago</div>
+                    </div>
+                    <div className="audit-details">
+                      Scopes modified by {drawerData.owner.name}. Added: read:analytics
+                    </div>
+                  </div>
+                  
+                  <div className="audit-entry">
+                    <div className="audit-entry-header">
+                      <div className="audit-action">Key rotated</div>
+                      <div className="audit-time">45 days ago</div>
+                    </div>
+                    <div className="audit-details">
+                      Key rotated as part of quarterly security review
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>

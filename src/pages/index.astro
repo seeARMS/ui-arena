@@ -27,14 +27,14 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
           <p class="eyebrow">Open benchmark · Product taste</p>
           <h1>Benchmarking AI <em>taste.</em></h1>
           <p class="lede">
-            TasteBench gives the same product brief to every frontier model — landing pages today, React dashboards and full apps next — then ships the working build, the source, and the scores. Side by side. Same prompt. Every model. No vibes.
+            TasteBench gives the same product scenario to every frontier model — landing pages today, React dashboards and full apps next — then ships the working build, the source, and the scores. Side by side. Same prompt. Every model. No vibes.
           </p>
           <div class="hero-actions">
-            <a class="button button-primary" href="/interfaces/pricing-ai-coding-assistant/">
+            <a class="button button-primary" href="/scenarios/pricing-ai-coding-assistant/">
               Open the pricing leaderboard →
             </a>
-            <a class="button button-secondary" href="/interfaces/">
-              Browse {interfacePrompts.length} briefs
+            <a class="button button-secondary" href="/scenarios/">
+              Browse {interfacePrompts.length} scenarios
             </a>
           </div>
         </div>
@@ -46,7 +46,7 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
             </div>
             <dl>
               <div>
-                <dt>Briefs</dt>
+                <dt>Scenarios</dt>
                 <dd>{interfacePrompts.length}<small>concrete prompts</small></dd>
               </div>
               <div>
@@ -72,7 +72,7 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
         <div class="metric-strip">
           <div>
             <strong>{interfacePrompts.length}</strong>
-            <span>Product briefs</span>
+            <span>Product scenarios</span>
           </div>
           <div>
             <strong>{pricingOutputs.length}</strong>
@@ -96,14 +96,14 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
           <div>
             <p class="eyebrow">Method</p>
             <h2>How a run works.</h2>
-            <p>One brief, every model, scored on the same machine. The point isn't to crown a winner — it's to make taste legible.</p>
+            <p>One scenario, every model, scored on the same machine. The point isn't to crown a winner — it's to make taste legible.</p>
           </div>
           <a class="text-link" href="https://github.com/colinarms/tastebench" rel="noopener noreferrer">Read the source ↗</a>
         </div>
 
         <div class="pipeline-list">
           <div>
-            <div class="num">01 · Brief</div>
+            <div class="num">01 · Scenario</div>
             <strong>One concrete product.</strong>
             <p>A pricing page, a creator dashboard, an onboarding flow — specified tightly enough that "good" is verifiable, but open enough for every model to pick its own approach.</p>
           </div>
@@ -130,11 +130,11 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
       <div class="container">
         <div class="section-header">
           <div>
-            <p class="eyebrow">Featured brief</p>
+            <p class="eyebrow">Featured scenario</p>
             <h2>SaaS pricing page · AI coding assistant.</h2>
             <p>Three plans, a team upgrade path, usage limits, FAQs, responsive behavior. {pricingOutputs.length} models took a swing.</p>
           </div>
-          <a class="text-link" href="/interfaces/pricing-ai-coding-assistant/">Open full leaderboard →</a>
+          <a class="text-link" href="/scenarios/pricing-ai-coding-assistant/">Open full leaderboard →</a>
         </div>
 
         <div class="leaderboard">
@@ -144,7 +144,6 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
             <div>Scores</div>
             <div>Preview</div>
             <div>Run</div>
-            <div>Open</div>
           </div>
           {featuredSorted.slice(0, 5).map((output, index) => {
             const rowClass = `r${(index % 8) + 1}`;
@@ -156,14 +155,15 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
             const axeScore = output.evaluations.find((e) => e.label === "Axe");
             const timeStat = output.stats?.find((s) => s.label === "Time");
             const costStat = output.stats?.find((s) => s.label === "Cost");
-            const tokenStat = output.stats?.find((s) => s.label === "Completion") ?? output.stats?.find((s) => s.label === "Prompt");
             const tone = (item) => !item ? "pending" : item.tone === "good" ? "good" : item.tone === "warn" ? "warn" : item.tone === "bad" ? "bad" : "neutral";
             const medal = !isComplete ? "" : index === 0 ? "gold" : index === 1 ? "silver" : index === 2 ? "bronze" : "";
-            const hasPreview = output.previewUrl && output.previewUrl !== "#";
-            const hasRawPreview = output.rawPreviewUrl && output.rawPreviewUrl !== "#";
-            const hasSource = output.sourceUrl && output.sourceUrl !== "#";
+            const hasScreenshot = output.screenshotUrl && output.screenshotUrl !== "#";
+            const RowTag = isComplete ? "a" : "div";
+            const rowProps = isComplete
+              ? { href: output.previewUrl, "aria-label": `Open ${output.model} run details` }
+              : {};
             return (
-              <div class={`lb-row ${rowClass} ${isPending ? "is-pending" : ""}`}>
+              <RowTag class={`lb-row ${rowClass} ${isPending ? "is-pending" : ""} ${isComplete ? "is-clickable" : ""}`} {...rowProps}>
                 <div class="rank-cell">
                   {isComplete ? (
                     <span class={`rank-medal ${medal}`}>{index + 1}</span>
@@ -190,17 +190,16 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
                     </div>
                     <div class={`score ${tone(axeScore)}`}>
                       <dt>Axe</dt>
-                      <dd>{axeScore ? axeScore.value : "—"}</dd>
+                      <dd>{axeScore ? axeScore.value.split(" ")[0] : "—"}</dd>
                     </div>
                   </dl>
                 </div>
                 <div class="preview-cell">
                   <div class="lb-preview">
-                    {hasRawPreview ? (
-                      <iframe
-                        src={output.rawPreviewUrl}
-                        title={`${output.model} pricing page preview`}
-                        sandbox="allow-scripts"
+                    {hasScreenshot ? (
+                      <img
+                        src={output.screenshotUrl}
+                        alt={`${output.model} pricing page screenshot`}
                         loading="lazy"
                       />
                     ) : (
@@ -216,41 +215,43 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
                   </div>
                 </div>
                 <div class="run-cell">
-                  {isComplete && timeStat ? (
+                  {isComplete && (timeStat || costStat) ? (
                     <>
-                      <span class="primary">{timeStat.value}</span>
-                      <span class="secondary">
-                        {tokenStat ? `${tokenStat.value} tok` : ""}
-                        {costStat && tokenStat ? " · " : ""}
-                        {costStat ? costStat.value : ""}
-                      </span>
+                      {timeStat && (
+                        <div class="run-stat">
+                          <span class="run-stat-label">Time</span>
+                          <span class="run-stat-value">{timeStat.value}</span>
+                        </div>
+                      )}
+                      {costStat && (
+                        <div class="run-stat">
+                          <span class="run-stat-label">Cost</span>
+                          <span class="run-stat-value">{costStat.value}</span>
+                        </div>
+                      )}
                     </>
                   ) : isFailed ? (
-                    <span class="pending">Run failed</span>
+                    <span class="run-cell-empty">Run failed</span>
                   ) : (
-                    <span class="pending">Not yet run</span>
+                    <span class="run-cell-empty">Not yet run</span>
                   )}
                 </div>
-                <div class="actions-cell">
-                  <a href={output.previewUrl} aria-disabled={!hasPreview ? "true" : undefined}>Preview ↗</a>
-                  <a href={output.sourceUrl} aria-disabled={!hasSource ? "true" : undefined}>Source</a>
-                </div>
-              </div>
+              </RowTag>
             );
           })}
         </div>
       </div>
     </section>
 
-    <section class="section" id="briefs">
+    <section class="section" id="scenarios">
       <div class="container">
         <div class="section-header">
           <div>
-            <p class="eyebrow">Briefs</p>
-            <h2>{interfacePrompts.length} product briefs. Pick a fight.</h2>
-            <p>Each brief is a concrete product surface — landing pages, dashboards, settings, onboarding. Click in to see how every model built it.</p>
+            <p class="eyebrow">Scenarios</p>
+            <h2>{interfacePrompts.length} product scenarios. Pick a fight.</h2>
+            <p>Each scenario is a concrete product surface — landing pages, dashboards, settings, onboarding. Click in to see how every model built it.</p>
           </div>
-          <a class="text-link" href="/interfaces/">View all briefs →</a>
+          <a class="text-link" href="/scenarios/">View all scenarios →</a>
         </div>
 
         <div class="interface-grid">
@@ -279,7 +280,7 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
               Model demos cherry-pick. TasteBench doesn't.
             </h2>
             <p style="color: var(--ink-soft); font-size: 16px; line-height: 1.6; margin-bottom: 12px;">
-              Every model lab ships its best example. TasteBench fixes the brief, runs the same prompt across the lineup, and publishes everything — including the builds that look bad.
+              Every model lab ships its best example. TasteBench fixes the scenario, runs the same prompt across the lineup, and publishes everything — including the builds that look bad.
             </p>
             <p style="color: var(--ink-soft); font-size: 16px; line-height: 1.6;">
               The point isn't a verdict. It's the patterns: which model writes accessible markup by default, which one over-engineers the gradient, which one ships 240 lines that beat Sonnet's 412.
@@ -287,10 +288,10 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
           </div>
           <div class="prompt-box" style="margin-top: 12px;">
             <header>
-              <span>Sample brief · pricing-ai-coding-assistant</span>
-              <a href="/interfaces/pricing-ai-coding-assistant/">Open ↗</a>
+              <span>Sample scenario · pricing-ai-coding-assistant</span>
+              <a href="/scenarios/pricing-ai-coding-assistant/">Open ↗</a>
             </header>
-            <div>{pricingInterface.prompt}</div>
+            <div class="prompt-text">{pricingInterface.prompt}</div>
           </div>
         </div>
       </div>

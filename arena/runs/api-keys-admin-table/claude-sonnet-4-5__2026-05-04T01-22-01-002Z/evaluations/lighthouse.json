@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "id": "lighthouse",
+  "displayName": "Lighthouse",
+  "description": "Runs Lighthouse against the generated preview and records performance and accessibility scores.",
+  "categories": [
+    "performance",
+    "accessibility"
+  ],
+  "status": "complete",
+  "version": "13.2.0",
+  "startedAt": "2026-05-04T01:33:04.812Z",
+  "completedAt": "2026-05-04T01:33:13.696Z",
+  "durationMs": 8884,
+  "scores": {
+    "performance": {
+      "title": "Performance",
+      "score": 0.56,
+      "value": 56
+    },
+    "accessibility": {
+      "title": "Accessibility",
+      "score": 0.77,
+      "value": 77
+    }
+  },
+  "metrics": {
+    "firstContentfulPaint": {
+      "id": "first-contentful-paint",
+      "title": "First Contentful Paint",
+      "displayValue": "5.7 s",
+      "numericValue": 5739.334999999999,
+      "score": 0
+    },
+    "largestContentfulPaint": {
+      "id": "largest-contentful-paint",
+      "title": "Largest Contentful Paint",
+      "displayValue": "5.7 s",
+      "numericValue": 5739.334999999999,
+      "score": 0.05
+    },
+    "speedIndex": {
+      "id": "speed-index",
+      "title": "Speed Index",
+      "displayValue": "5.7 s",
+      "numericValue": 5739.334999999999,
+      "score": 0.01
+    },
+    "totalBlockingTime": {
+      "id": "total-blocking-time",
+      "title": "Total Blocking Time",
+      "displayValue": "0 ms",
+      "numericValue": 0,
+      "score": 1
+    },
+    "cumulativeLayoutShift": {
+      "id": "cumulative-layout-shift",
+      "title": "Cumulative Layout Shift",
+      "displayValue": "0",
+      "numericValue": 0,
+      "score": 1
+    }
+  },
+  "summary": {
+    "requestedUrl": "http://127.0.0.1:57986/previews/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z/",
+    "finalUrl": "http://127.0.0.1:57986/previews/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z/",
+    "fetchTime": "2026-05-04T01:33:07.233Z",
+    "accessibilityIssueCount": 3
+  },
+  "issues": [
+    {
+      "id": "color-contrast",
+      "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+      "score": 0,
+      "displayValue": null,
+      "description": "Low-contrast text is difficult or impossible for many users to read. [Learn how to provide sufficient color contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast)."
+    },
+    {
+      "id": "label",
+      "title": "Form elements do not have associated labels",
+      "score": 0,
+      "displayValue": null,
+      "description": "Labels ensure that form controls are announced properly by assistive technologies, like screen readers. [Learn more about form element labels](https://dequeuniversity.com/rules/axe/4.11/label)."
+    },
+    {
+      "id": "landmark-one-main",
+      "title": "Document does not have a main landmark.",
+      "score": 0,
+      "displayValue": null,
+      "description": "One main landmark helps screen reader users navigate a web page. [Learn more about landmarks](https://dequeuniversity.com/rules/axe/4.11/landmark-one-main)."
+    }
+  ],
+  "artifacts": {
+    "report": "/evaluations/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z/lighthouse/report.html",
+    "json": "/evaluations/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T01-22-01-002Z/lighthouse/lhr.json"
+  }
+}

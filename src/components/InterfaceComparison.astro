@@ -26,7 +26,7 @@ const lastRun = outputs
   <section class="page-head">
     <div class="container">
       <div class="crumb">
-        <a href="/interfaces/">Briefs</a>
+        <a href="/scenarios/">Scenarios</a>
         <span>/</span>
         <span>{interfacePrompt.number}</span>
       </div>
@@ -35,7 +35,7 @@ const lastRun = outputs
       <div class="page-head-grid">
         <div>
           <p class="lede">
-            {outputs.length} models received the same brief. Below: a leaderboard of their builds, ranked by aggregate of Lighthouse performance and accessibility.
+            {outputs.length} models received the same scenario. Below: a leaderboard of their builds, ranked by aggregate of Lighthouse performance and accessibility.
           </p>
           <div class="badges">
             <span class="badge">▣ {interfacePrompt.eyebrow}</span>
@@ -46,12 +46,31 @@ const lastRun = outputs
             {interfacePrompt.stack && <span class="badge">⌗ {interfacePrompt.stack}</span>}
           </div>
         </div>
-        <div class="prompt-box">
+        <div class="prompt-box" data-prompt-box data-expanded="false">
           <header>
             <span>Prompt · v1</span>
-            <a href={`/interfaces/${interfacePrompt.id}/`} aria-label="Permalink to prompt">Copy</a>
+            <div class="prompt-actions">
+              <button
+                type="button"
+                class="prompt-copy"
+                data-prompt-toggle
+                aria-expanded="false"
+                aria-label="Expand prompt"
+              >
+                <span data-toggle-label>Expand</span>
+              </button>
+              <button
+                type="button"
+                class="prompt-copy"
+                data-copy-prompt
+                data-prompt={interfacePrompt.prompt}
+                aria-label="Copy prompt to clipboard"
+              >
+                <span data-copy-label>Copy</span>
+              </button>
+            </div>
           </header>
-          <div>{interfacePrompt.prompt}</div>
+          <div class="prompt-text" data-prompt-text>{interfacePrompt.prompt}</div>
         </div>
       </div>
     </div>
@@ -86,7 +105,6 @@ const lastRun = outputs
           <div>Scores</div>
           <div>Preview</div>
           <div>Run</div>
-          <div>Open</div>
         </div>
         {sorted.map((output, index) => (
           <PricingOutputCard
@@ -114,6 +132,58 @@ const lastRun = outputs
   for (const button of buttons) {
     button.addEventListener("click", () => {
       setView(button.dataset.viewOption ?? "leaderboard");
+    });
+  }
+
+  const promptBox = document.querySelector("[data-prompt-box]");
+  const promptToggle = promptBox?.querySelector("[data-prompt-toggle]");
+  if (promptBox && promptToggle) {
+    const labelEl = promptToggle.querySelector("[data-toggle-label]");
+    promptToggle.addEventListener("click", () => {
+      const expanded = promptBox.getAttribute("data-expanded") === "true";
+      const next = !expanded;
+      promptBox.setAttribute("data-expanded", String(next));
+      promptToggle.setAttribute("aria-expanded", String(next));
+      promptToggle.setAttribute("aria-label", next ? "Collapse prompt" : "Expand prompt");
+      if (labelEl) labelEl.textContent = next ? "Collapse" : "Expand";
+    });
+  }
+
+  const copyButton = document.querySelector("[data-copy-prompt]");
+  if (copyButton) {
+    const labelEl = copyButton.querySelector("[data-copy-label]");
+    const promptText = copyButton.dataset.prompt ?? "";
+    let resetTimer;
+
+    const flash = (text) => {
+      if (!labelEl) return;
+      const original = "Copy";
+      labelEl.textContent = text;
+      window.clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(() => {
+        labelEl.textContent = original;
+      }, 1400);
+    };
+
+    copyButton.addEventListener("click", async () => {
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(promptText);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = promptText;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "absolute";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+        }
+        flash("Copied");
+      } catch {
+        flash("Press ⌘C");
+      }
     });
   }
 </script>

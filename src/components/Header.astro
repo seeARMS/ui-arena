@@ -15,12 +15,12 @@ const { active = "home" } = Astro.props;
     </a>
     <div class="nav-search" aria-hidden="true">
       <span>⌕</span>
-      <span>Find a brief or a model…</span>
+      <span>Find a scenario or a model…</span>
       <kbd>⌘K</kbd>
     </div>
     <nav class="site-nav" aria-label="Primary navigation">
-      <a href="/interfaces/" aria-current={active === "interfaces" ? "page" : undefined}>Briefs</a>
-      <a href="/#how-it-works">Method</a>
+      <a href="/leaderboard/" aria-current={active === "leaderboard" ? "page" : undefined}>Leaderboard</a>
+      <a href="/scenarios/" aria-current={active === "scenarios" ? "page" : undefined}>Scenarios</a>
       <a href="https://github.com/colinarms/tastebench" rel="noopener noreferrer">GitHub</a>
     </nav>
   </div>

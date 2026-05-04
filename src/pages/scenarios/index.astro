@@ -1,0 +1,189 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { surfacesWithCounts, allScenarios, scenariosForSurface, interfacePrompts, pricingOutputs } from "../../data/interfaces.js";
+
+const modelCount = pricingOutputs.length;
+const totalLive = interfacePrompts.length;
+const totalScenarios = allScenarios.length;
+const defaultSurface = surfacesWithCounts[0]?.id ?? "landing";
+---
+
+<BaseLayout
+  title="Scenarios — TasteBench"
+  description={`The TasteBench gallery: ${totalScenarios} product scenarios across ${surfacesWithCounts.length} surfaces, each ranked across the frontier model lineup.`}
+  canonicalPath="/scenarios/"
+>
+  <Header active="scenarios" />
+
+  <main>
+    <section class="page-head">
+      <div class="container">
+        <div class="crumb">
+          <a href="/">TasteBench</a>
+          <span>/</span>
+          <span>Scenarios</span>
+        </div>
+        <h1>Pick a surface. Watch every model swing.</h1>
+        <div class="page-head-grid">
+          <div>
+            <p class="lede">
+              {totalScenarios} product scenarios across {surfacesWithCounts.length} surfaces. Each one is concrete — a landing page, a dashboard, a login screen — run through the frontier lineup and ranked.
+            </p>
+            <div class="badges">
+              <span class="badge">▣ {totalLive} live · {totalScenarios - totalLive} queued</span>
+              <span class="badge">⚙ {modelCount} models</span>
+              <span class="badge">⌗ HTML · React · Native</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="briefs-section" data-briefs-shell data-active-surface={defaultSurface}>
+      <div class="container briefs-grid">
+        <aside class="briefs-filter" aria-label="Filter by product surface">
+          <div class="filter-head">
+            <span class="filter-h">Browse by surface</span>
+          </div>
+          <ul class="filter-list">
+            {surfacesWithCounts.map((surface) => (
+              <li>
+                <button
+                  type="button"
+                  class="filter-item"
+                  data-surface={surface.id}
+                  aria-pressed={surface.id === defaultSurface ? "true" : "false"}
+                >
+                  <span class="filter-label">{surface.label}</span>
+                  <span class="filter-count">
+                    {surface.liveCount > 0 ? (
+                      <>
+                        <em>{surface.liveCount}</em>
+                        <span>/{surface.count}</span>
+                      </>
+                    ) : (
+                      <span>{surface.count}</span>
+                    )}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div class="filter-foot">
+            <p>
+              <strong>{totalLive}</strong> scenarios are live and ranked. The rest are in the queue. Each row in the count is <em>live</em> / <span>total</span>.
+            </p>
+          </div>
+        </aside>
+
+        <div class="briefs-main">
+          {surfacesWithCounts.map((surface) => {
+            const scenarios = scenariosForSurface(surface.id);
+            const liveCount = scenarios.filter((b) => !b.placeholder).length;
+            return (
+              <section
+                class="surface-pane"
+                data-surface-pane={surface.id}
+                hidden={surface.id !== defaultSurface}
+                aria-labelledby={`surface-${surface.id}-h`}
+              >
+                <header class="surface-head">
+                  <p class="eyebrow">Surface · {surface.id}</p>
+                  <h2 id={`surface-${surface.id}-h`}>{surface.label}</h2>
+                  <p class="surface-desc">{surface.description}</p>
+                  <div class="surface-meta">
+                    <span class="badge">▣ {scenarios.length} {scenarios.length === 1 ? "scenario" : "scenarios"}</span>
+                    <span class="badge">● {liveCount} ranked</span>
+                    <span class="badge">○ {scenarios.length - liveCount} queued</span>
+                  </div>
+                </header>
+
+                <div class="brief-grid">
+                  {scenarios.map((scenario) => {
+                    const isLive = !scenario.placeholder;
+                    const Tag = isLive ? "a" : "div";
+                    const props = isLive ? { href: scenario.href } : { "aria-disabled": "true" };
+                    return (
+                      <Tag class={`brief-card ${isLive ? "is-live" : "is-queued"}`} {...props}>
+                        <div class="brief-card-thumb" aria-hidden="true">
+                          <div class="thumb-bar"><i></i><i></i><i></i></div>
+                          <div class={`thumb-art surface-art-${surface.id}`}></div>
+                        </div>
+                        <div class="brief-card-body">
+                          <div class="brief-card-meta">
+                            <span class="num">{scenario.number}</span>
+                            <span class="brief-stack">{scenario.stack}</span>
+                          </div>
+                          <p class="brief-eyebrow">{scenario.eyebrow}</p>
+                          <h3>{scenario.title}</h3>
+                          <p class="brief-summary">{scenario.summary}</p>
+                          <div class="brief-card-foot">
+                            <span class={`brief-state ${isLive && scenario.status === "Live · ranked" ? "is-ranked" : isLive ? "is-ready" : "is-queued"}`}>
+                              {scenario.status}
+                            </span>
+                            <span class="arrow">{isLive ? "↗" : "·"}</span>
+                          </div>
+                        </div>
+                      </Tag>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  const shell = document.querySelector("[data-briefs-shell]");
+  if (shell) {
+    const buttons = Array.from(shell.querySelectorAll("[data-surface]"));
+    const panes = Array.from(shell.querySelectorAll("[data-surface-pane]"));
+
+    function setSurface(id, opts = {}) {
+      shell.setAttribute("data-active-surface", id);
+      for (const button of buttons) {
+        button.setAttribute("aria-pressed", String(button.dataset.surface === id));
+      }
+      for (const pane of panes) {
+        if (pane.dataset.surfacePane === id) {
+          pane.removeAttribute("hidden");
+        } else {
+          pane.setAttribute("hidden", "");
+        }
+      }
+      if (opts.updateHash) {
+        const next = `#${id}`;
+        if (next !== window.location.hash) {
+          history.replaceState(null, "", `${window.location.pathname}${next}`);
+        }
+      }
+      if (opts.scroll) {
+        shell.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    for (const button of buttons) {
+      button.addEventListener("click", () => {
+        setSurface(button.dataset.surface, { updateHash: true });
+      });
+    }
+
+    function applyHash() {
+      const hash = window.location.hash.replace("#", "");
+      if (hash && buttons.some((b) => b.dataset.surface === hash)) {
+        setSurface(hash);
+      }
+    }
+
+    window.addEventListener("hashchange", applyHash);
+    applyHash();
+  }
+</script>

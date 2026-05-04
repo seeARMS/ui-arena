@@ -2,6 +2,7 @@ import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { startPublicPreviewServer } from "./evaluate-results.mjs";
 import {
   fileExists,
   loadResultManifests,
@@ -17,10 +18,12 @@ const VIEWPORTS = [
   { key: "mobile", width: 390, height: 844 },
 ];
 
-export async function captureScreenshotsForResult(resultPath, result) {
+export async function captureScreenshotsForResult(resultPath, result, serverContext = null) {
   const { chromium } = await import("playwright");
   const browser = await chromium.launch();
   const updated = structuredClone(result);
+  const ownedServer = serverContext ? null : await startPublicPreviewServer();
+  const server = serverContext ?? ownedServer;
 
   try {
     const previewPath = join(rootDir, updated.artifacts.localPreviewPath, "index.html");
@@ -38,9 +41,10 @@ export async function captureScreenshotsForResult(resultPath, result) {
       });
       const interfaceId = updated.interfaceId;
       const screenshotPath = join(publicDir, "screenshots", interfaceId, `${updated.runId}__${viewport.key}.png`);
+      const targetUrl = `${server.origin}${updated.artifacts.preview}`;
 
       await mkdir(join(publicDir, "screenshots", interfaceId), { recursive: true });
-      await page.goto(pathToFileURL(previewPath).href, {
+      await page.goto(targetUrl, {
         waitUntil: "networkidle",
         timeout: 20000,
       });
@@ -57,6 +61,9 @@ export async function captureScreenshotsForResult(resultPath, result) {
     }
   } finally {
     await browser.close();
+    if (ownedServer) {
+      await ownedServer.close();
+    }
   }
 
   await writeJson(resultPath, updated);
