@@ -2,13 +2,41 @@
   "gateway": "openrouter",
   "models": [
     {
-      "id": "gpt-5-2",
-      "displayName": "GPT-5.2",
+      "id": "gpt-5-5",
+      "displayName": "GPT-5.5",
       "family": "OpenAI",
       "adapter": "openrouter",
-      "model": "openai/gpt-5.2",
+      "model": "openai/gpt-5.5",
       "accent": "#e04f2f",
       "accentSoft": "#f7d9cd",
+      "enabled": true,
+      "params": {
+        "temperature": 0.2,
+        "max_tokens": 16000
+      }
+    },
+    {
+      "id": "claude-opus-4-6",
+      "displayName": "Claude Opus 4.6",
+      "family": "Anthropic",
+      "adapter": "openrouter",
+      "model": "anthropic/claude-opus-4.6",
+      "accent": "#8b4f28",
+      "accentSoft": "#eddacb",
+      "enabled": true,
+      "params": {
+        "temperature": 0.2,
+        "max_tokens": 16000
+      }
+    },
+    {
+      "id": "claude-opus-4-5",
+      "displayName": "Claude Opus 4.5",
+      "family": "Anthropic",
+      "adapter": "openrouter",
+      "model": "anthropic/claude-opus-4.5",
+      "accent": "#5a4c8f",
+      "accentSoft": "#dfd9f0",
       "enabled": true,
       "params": {
         "temperature": 0.2,

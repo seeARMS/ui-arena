@@ -402,7 +402,7 @@ function buildMarkup() {
                 medal: PALETTE.swatches[0],
               }),
               leaderboardRow({
-                rank: 3, model: "GPT-5.2", family: "OpenAI / gpt-5-2",
+                rank: 3, model: "GPT-5.5", family: "OpenAI / gpt-5-5",
                 swatch: PALETTE.swatches[1],
                 perf: "92", a11y: "88", axe: "2",
                 medal: PALETTE.swatches[1],

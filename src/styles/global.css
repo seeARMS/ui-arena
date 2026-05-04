@@ -2493,9 +2493,67 @@ a.lb-row.is-clickable:focus-visible {
   letter-spacing: 0.08em;
 }
 
+.source-workspace {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  min-height: min(76vh, 980px);
+}
+
+.source-filetree {
+  overflow: auto;
+  max-height: min(76vh, 980px);
+  border-right: 1px solid #1f1f24;
+  background: #111115;
+}
+
+.source-filetree button {
+  appearance: none;
+  width: 100%;
+  display: grid;
+  gap: 5px;
+  border: 0;
+  border-bottom: 1px solid #1f1f24;
+  background: transparent;
+  color: rgba(255,255,255,0.68);
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.source-filetree button:hover {
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.9);
+}
+
+.source-filetree button[aria-selected="true"] {
+  background: #f0eee5;
+  color: #15130f;
+}
+
+.source-filetree-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 12px/1.2 "JetBrains Mono", monospace;
+}
+
+.source-filetree-meta {
+  font: 500 10px/1 "JetBrains Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: inherit;
+  opacity: 0.58;
+}
+
+.source-code-column {
+  min-width: 0;
+  background: #0e0e10;
+}
+
 .source-code {
   overflow: auto;
   max-height: min(76vh, 980px);
+  height: 100%;
   margin: 0;
   padding: 14px 0 18px;
   background: #0e0e10;
@@ -2505,6 +2563,8 @@ a.lb-row.is-clickable:focus-visible {
   line-height: 1.7;
   tab-size: 2;
 }
+
+.source-code[hidden] { display: none; }
 
 .source-line {
   display: grid;
@@ -2638,5 +2698,13 @@ a.lb-row.is-clickable:focus-visible {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+  .source-workspace {
+    grid-template-columns: 1fr;
+  }
+  .source-filetree {
+    max-height: 210px;
+    border-right: 0;
+    border-bottom: 1px solid #1f1f24;
   }
 }

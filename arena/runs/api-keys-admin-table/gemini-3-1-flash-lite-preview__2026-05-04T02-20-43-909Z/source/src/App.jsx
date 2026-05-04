@@ -1,0 +1,121 @@
+import React, { useState, useMemo } from 'react';
+import { Search, MoreVertical, X, ShieldAlert, Clock, Key, Trash2, RefreshCw, Edit3 } from 'lucide-react';
+import { clsx } from 'clsx';
+
+const MOCK_DATA = Array.from({ length: 25 }).map((_, i) => ({
+  id: `key-${i}`,
+  name: `Key-${1000 + i}`,
+  owner: ['Alice', 'Bob', 'Charlie', 'Dave', 'Eve'][i % 5],
+  scopes: i % 3 === 0 ? ['read', 'write', 'admin'] : ['read'],
+  lastUsed: '2023-11-12',
+  created: '2023-01-01',
+  expires: i % 5 === 0 ? '2023-11-20' : '2024-01-01',
+  status: ['healthy', 'stale', 'expiring', 'leaked-suspected', 'revoked'][i % 5],
+}));
+
+const StatusBadge = ({ status }) => {
+  const styles = {
+    healthy: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    stale: 'bg-slate-50 text-slate-600 border-slate-200',
+    expiring: 'bg-amber-50 text-amber-700 border-amber-200',
+    'leaked-suspected': 'bg-red-50 text-red-700 border-red-200',
+    revoked: 'bg-gray-50 text-gray-500 border-gray-200'
+  };
+  return <span className={clsx('px-2 py-0.5 rounded border text-[10px] font-semibold uppercase tracking-wider', styles[status])}>{status}</span>;
+};
+
+export default function App() {
+  const [filter, setFilter] = useState('all');
+  const [drawer, setDrawer] = useState(null);
+  const [selected, setSelected] = useState([]);
+
+  const filteredData = useMemo(() => {
+    if (filter === 'all') return MOCK_DATA;
+    if (filter === 'active') return MOCK_DATA.filter(d => d.status === 'healthy');
+    return MOCK_DATA.filter(d => d.status === filter || (filter === 'over-scoped' && d.scopes.length > 2));
+  }, [filter]);
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-4 md:p-6">
+      <header className="max-w-7xl mx-auto mb-8">
+        <h1 className="text-2xl font-bold mb-6 text-slate-900">API Key Management</h1>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[ { label: 'Total Keys', val: 25 }, { label: 'Active', val: 18 }, { label: 'Over-scoped', val: 8 }, { label: 'Expiring', val: 3 } ].map(s => (
+            <div key={s.label} className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{s.label}</div>
+              <div className="text-2xl font-semibold mt-1">{s.val}</div>
+            </div>
+          ))}
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-200 flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="relative w-full md:w-72">
+            <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-slate-400" />
+            <input className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Search by name or owner..." />
+          </div>
+          <div className="flex gap-1 overflow-x-auto w-full md:w-auto">
+            {['all', 'active', 'stale', 'expiring', 'over-scoped'].map(f => (
+              <button key={f} onClick={() => setFilter(f)} className={clsx("px-3 py-1.5 text-xs font-semibold rounded-md capitalize whitespace-nowrap transition-colors", filter === f ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}>{f}</button>
+            ))}
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th className="p-3 text-left font-semibold text-slate-600">Name</th>
+                <th className="p-3 text-left font-semibold text-slate-600">Owner</th>
+                <th className="p-3 text-left font-semibold text-slate-600 hidden md:table-cell">Scopes</th>
+                <th className="p-3 text-left font-semibold text-slate-600">Status</th>
+                <th className="p-3 text-right"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredData.map(row => (
+                <tr key={row.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => setDrawer(row)}>
+                  <td className="p-3 font-medium text-slate-900">{row.name}</td>
+                  <td className="p-3 text-slate-600">{row.owner}</td>
+                  <td className="p-3 text-slate-600 hidden md:table-cell">{row.scopes.join(', ')}</td>
+                  <td className="p-3"><StatusBadge status={row.status} /></td>
+                  <td className="p-3 text-right"><MoreVertical className="w-4 h-4 text-slate-400 inline" /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </main>
+
+      {drawer && (
+        <div className="fixed inset-0 bg-black/30 z-50 backdrop-blur-sm" onClick={() => setDrawer(null)}>
+          <div className="absolute right-0 top-0 h-full w-full md:w-[400px] bg-white shadow-2xl p-6 overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-lg font-bold">Key Details: {drawer.name}</h2>
+              <button onClick={() => setDrawer(null)} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div><p className="text-slate-400 text-xs">Owner</p><p className="font-medium">{drawer.owner}</p></div>
+                <div><p className="text-slate-400 text-xs">Expires</p><p className="font-medium">{drawer.expires}</p></div>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <p className="text-xs font-bold text-slate-500 uppercase mb-4 flex items-center gap-2"><ShieldAlert className="w-3 h-3"/> Audit Trail</p>
+                <div className="space-y-4 text-sm text-slate-600">
+                  <div className="flex gap-3"><Clock className="w-4 h-4 mt-0.5"/> <div><p>Rotated 12 days ago</p><p className="text-xs text-slate-400">By System</p></div></div>
+                  <div className="flex gap-3"><Key className="w-4 h-4 mt-0.5"/> <div><p>Scope 'admin' added</p><p className="text-xs text-slate-400">By Alice</p></div></div>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 pt-4 border-t">
+                <button className="flex items-center justify-center gap-2 w-full bg-slate-900 text-white py-2.5 rounded-md text-sm font-medium hover:bg-slate-800"><RefreshCw className="w-4 h-4"/> Rotate Key</button>
+                <button className="flex items-center justify-center gap-2 w-full border border-slate-300 py-2.5 rounded-md text-sm font-medium hover:bg-slate-50"><Edit3 className="w-4 h-4"/> Edit Scopes</button>
+                <button className="flex items-center justify-center gap-2 w-full text-red-600 py-2.5 rounded-md text-sm font-medium hover:bg-red-50"><Trash2 className="w-4 h-4"/> Revoke Access</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

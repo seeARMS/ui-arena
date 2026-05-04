@@ -13,16 +13,6 @@ Build:
 - A side drawer that opens with full audit/event detail when a row is clicked.
 - Responsive behavior — degrade gracefully to a stacked list on narrow screens.
 
-Stack: a compiled React 18 app built by the TasteBench runner with Vite. Return source files only, not HTML. The runner provides React, ReactDOM, the Vite build, index.html, and the root render call.
-
-Return exactly this JSON shape, with no markdown wrapper:
-{
-  "files": [
-    { "path": "src/App.jsx", "content": "..." },
-    { "path": "src/styles.css", "content": "..." }
-  ]
-}
-
-src/App.jsx must export default App. Use normal React imports from "react" for hooks. Put all CSS in src/styles.css. Do not include package.json, index.html, ReactDOM/createRoot code, script tags, CDN URLs, Tailwind CDN, runtime Babel, external assets, or network requests.
+Stack: React app. Build it as a small project directory using mock data. The runner will install dependencies, compile the app, and repair build errors if needed.
 
 Mock at least 25 rows with varied states. Prioritize density and operational confidence — avoid empty whitespace and decorative elements that dilute scanning.

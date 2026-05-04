@@ -35,13 +35,13 @@ npm run arena:install-browsers
 npm run arena:run -- --interface pricing-ai-coding-assistant
 
 # Run one model.
-npm run arena:run -- --interface pricing-ai-coding-assistant --models gpt-5-2
+npm run arena:run -- --interface pricing-ai-coding-assistant --models gpt-5-5
 
 # Re-run evaluators for existing completed runs without calling models again.
 npm run arena:evaluate -- --interface pricing-ai-coding-assistant
 
 # Exercise the full artifact pipeline without calling OpenRouter.
-npm run arena:dry-run -- --interface pricing-ai-coding-assistant --models gpt-5-2
+npm run arena:dry-run -- --interface pricing-ai-coding-assistant --models gpt-5-5
 
 # Rebuild the compact result index used by Astro.
 npm run arena:index

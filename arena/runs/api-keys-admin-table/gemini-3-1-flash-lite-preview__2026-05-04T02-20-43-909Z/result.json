@@ -1,0 +1,270 @@
+{
+  "schemaVersion": 1,
+  "runId": "gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z",
+  "interfaceId": "api-keys-admin-table",
+  "interfaceTitle": "Admin table for managing API keys and permissions",
+  "modelId": "gemini-3-1-flash-lite-preview",
+  "modelDisplayName": "Gemini 3.1 Flash Lite Preview",
+  "family": "Google",
+  "gateway": "openrouter",
+  "gatewayModel": "google/gemini-3.1-flash-lite-preview",
+  "gatewayGenerationId": "gen-1777861382-EbhjeWf26aQnJvBIUtgr",
+  "providerName": "Google AI Studio",
+  "status": "complete",
+  "createdAt": "2026-05-04T02:20:43.909Z",
+  "completedAt": "2026-05-04T02:23:17.347Z",
+  "request": {
+    "dryRun": false,
+    "artifactType": "react-project",
+    "promptSha256": "03534157b5f177deb1dad83ebcb714c523cb33acb2afb334847a31762158a7f3",
+    "params": {
+      "temperature": 0.2,
+      "max_tokens": 24000
+    }
+  },
+  "execution": {
+    "startedAt": "2026-05-04T02:20:43.909Z",
+    "completedAt": "2026-05-04T02:23:17.347Z",
+    "durationMs": 14915,
+    "modelStartedAt": "2026-05-04T02:23:02.432Z",
+    "modelCompletedAt": "2026-05-04T02:23:09.318Z",
+    "modelDurationMs": 6886,
+    "generationTimeMs": 6734,
+    "latencyMs": 723
+  },
+  "usage": {
+    "source": "openrouter:generation",
+    "promptTokens": 671,
+    "completionTokens": 1810,
+    "totalTokens": 2795,
+    "nativePromptTokens": 564,
+    "nativeCompletionTokens": 2231,
+    "reasoningTokens": 0,
+    "cachedPromptTokens": 0,
+    "cacheDiscount": null,
+    "totalCost": 0.0034875,
+    "upstreamInferenceCost": 0.0034875,
+    "currency": "USD",
+    "rawResponseUsage": {
+      "prompt_tokens": 564,
+      "completion_tokens": 2231,
+      "total_tokens": 2795,
+      "cost": 0.0034875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0034875,
+        "upstream_inference_prompt_cost": 0.000141,
+        "upstream_inference_completions_cost": 0.0033465
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "artifacts": {
+    "preview": "/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/",
+    "source": "/sources/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source.txt",
+    "sourceJson": "/sources/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/files.json",
+    "localResultPath": "arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/result.json",
+    "localRunPath": "arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z",
+    "localSourcePath": "arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source",
+    "localPreviewPath": "public/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z",
+    "sourceFormat": "react-project",
+    "sourceFiles": [
+      "index.html",
+      "package.json",
+      "postcss.config.js",
+      "src/App.jsx",
+      "src/main.jsx",
+      "src/styles.css",
+      "tailwind.config.js",
+      "vite.config.js"
+    ],
+    "desktopScreenshot": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z__desktop.png",
+    "mobileScreenshot": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z__mobile.png"
+  },
+  "finishReason": "stop",
+  "repairs": [
+    {
+      "attempt": 1,
+      "gatewayGenerationId": "gen-1777861402-5FDIqboVywaPYm21nGnU",
+      "finishReason": "stop",
+      "buildError": "$ npm run build\n\nstdout:\n\n> api-key-manager@1.0.0 build\n> vite build --base=./\n\nvite v5.4.21 building for production...\ntransforming...\n\n\nstderr:\nnode:internal/process/promises:394\n    triggerUncaughtException(err, true /* fromPromise */);\n    ^\n\n[Failed to load PostCSS config: Failed to load PostCSS config (searchPath: /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source): [ReferenceError] module is not defined in ES module scope\nThis file is being treated as an ES module because it has a '.js' file extension and '/Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/package.json' contains \"type\": \"module\". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.\nReferenceError: module is not defined in ES module scope\nThis file is being treated as an ES module because it has a '.js' file extension and '/Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/package.json' contains \"type\": \"module\". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.\n    at file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/postcss.config.js:1:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:430:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:661:26)\n    at async importDefault (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:33759:18)\n    at async Object.search (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:25915:23)]\n\nNode.js v24.14.0\n\n\nerror:\nCommand failed: npm run build\nnode:internal/process/promises:394\n    triggerUncaughtException(err, true /* fromPromise */);\n    ^\n\n[Failed to load PostCSS config: Failed to load PostCSS config (searchPath: /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source): [ReferenceError] module is not defined in ES module scope\nThis file is being treated as an ES module because it has a '.js' file extension and '/Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/package.json' contains \"type\": \"module\". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.\nReferenceError: module is not defined in ES module scope\nThis file is being treated as an ES module because it has a '.js' file extension and '/Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/package.json' contains \"type\": \"module\". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.\n    at file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/postcss.config.js:1:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:430:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:661:26)\n    at async importDefault (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:33759:18)\n    at async Object.search (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:25915:23)]\n\nNode.js v24.14.0\n",
+      "modelStartedAt": "2026-05-04T02:23:22.903Z",
+      "modelCompletedAt": "2026-05-04T02:23:29.713Z",
+      "modelDurationMs": 6810
+    },
+    {
+      "attempt": 2,
+      "gatewayGenerationId": "gen-1777861423-gMIMTu0DOPYDr7GgFowd",
+      "finishReason": "stop",
+      "buildError": "$ npm run build\n\nstdout:\n\n> build\n> vite build --base=./\n\nvite v7.3.2 building client environment for production...\ntransforming...\n✓ 3 modules transformed.\n\n\nstderr:\n✗ Build failed in 34ms\nerror during build:\n[vite:css] Failed to load PostCSS config (searchPath: /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source): [Error] Loading PostCSS Plugin failed: Cannot find module 'autoprefixer'\nRequire stack:\n- /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/postcss.config.js\n\n(@/Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/postcss.config.js)\nError: Loading PostCSS Plugin failed: Cannot find module 'autoprefixer'\nRequire stack:\n- /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/postcss.config.js\n\n(@/Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/postcss.config.js)\n    at load (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/node_modules/vite/dist/node/chunks/config.js:7660:10)\n    at async Promise.all (index 1)\n    at async plugins (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/node_modules/vite/dist/node/chunks/config.js:7682:11)\n    at async processResult (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/node_modules/vite/dist/node/chunks/config.js:7721:13)\nfile: /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/src/styles.css\n\n\n\nerror:\nCommand failed: npm run build\n✗ Build failed in 34ms\nerror during build:\n[vite:css] Failed to load PostCSS config (searchPath: /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source): [Error] Loading PostCSS Plugin failed: Cannot find module 'autoprefixer'\nRequire stack:\n- /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/postcss.config.js\n\n(@/Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/postcss.config.js)\nError: Loading PostCSS Plugin failed: Cannot find module 'autoprefixer'\nRequire stack:\n- /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/postcss.config.js\n\n(@/Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/postcss.config.js)\n    at load (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/node_modules/vite/dist/node/chunks/config.js:7660:10)\n    at async Promise.all (index 1)\n    at async plugins (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/node_modules/vite/dist/node/chunks/config.js:7682:11)\n    at async processResult (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/node_modules/vite/dist/node/chunks/config.js:7721:13)\nfile: /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/source/src/styles.css\n\n",
+      "modelStartedAt": "2026-05-04T02:23:43.780Z",
+      "modelCompletedAt": "2026-05-04T02:23:50.751Z",
+      "modelDurationMs": 6971
+    }
+  ],
+  "screenshots": {
+    "desktop": {
+      "width": 1440,
+      "height": 1100,
+      "path": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z__desktop.png",
+      "capturedAt": "2026-05-04T02:24:06.744Z"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "path": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z__mobile.png",
+      "capturedAt": "2026-05-04T02:24:07.326Z"
+    }
+  },
+  "evaluations": {
+    "lighthouse": {
+      "id": "lighthouse",
+      "displayName": "Lighthouse",
+      "status": "complete",
+      "version": "13.2.0",
+      "completedAt": "2026-05-04T02:24:14.335Z",
+      "durationMs": 6995,
+      "scores": {
+        "performance": {
+          "title": "Performance",
+          "score": 0.85,
+          "value": 85
+        },
+        "accessibility": {
+          "title": "Accessibility",
+          "score": 0.92,
+          "value": 92
+        }
+      },
+      "metrics": {
+        "firstContentfulPaint": {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "displayValue": "1.7 s",
+          "numericValue": 1657.0102,
+          "score": 0.46
+        },
+        "largestContentfulPaint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "displayValue": "1.8 s",
+          "numericValue": 1807.0102,
+          "score": 0.7
+        },
+        "speedIndex": {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "displayValue": "1.7 s",
+          "numericValue": 1657.0102,
+          "score": 0.77
+        },
+        "totalBlockingTime": {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "displayValue": "0 ms",
+          "numericValue": 0,
+          "score": 1
+        },
+        "cumulativeLayoutShift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "displayValue": "0",
+          "numericValue": 0,
+          "score": 1
+        }
+      },
+      "summary": {
+        "requestedUrl": "http://127.0.0.1:53975/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/",
+        "finalUrl": "http://127.0.0.1:53975/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/",
+        "fetchTime": "2026-05-04T02:24:10.077Z",
+        "accessibilityIssueCount": 2
+      },
+      "issues": [
+        {
+          "id": "color-contrast",
+          "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+          "score": 0,
+          "displayValue": null,
+          "description": "Low-contrast text is difficult or impossible for many users to read. [Learn how to provide sufficient color contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast)."
+        },
+        {
+          "id": "td-has-header",
+          "title": "`<td>` elements in a large `<table>` do not have table headers.",
+          "score": 0,
+          "displayValue": null,
+          "description": "Screen readers have features to make navigating tables easier. Ensuring that `<td>` elements in a large table (3 or more cells in width and height) have an associated table header may improve the experience for screen reader users. [Learn more about table headers](https://dequeuniversity.com/rules/axe/4.11/td-has-header)."
+        }
+      ],
+      "artifacts": {
+        "report": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/lighthouse/report.html",
+        "json": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/lighthouse/lhr.json"
+      },
+      "error": null
+    },
+    "axe": {
+      "id": "axe",
+      "displayName": "Axe",
+      "status": "complete",
+      "version": "4.11.4",
+      "completedAt": "2026-05-04T02:24:15.270Z",
+      "durationMs": 932,
+      "scores": null,
+      "metrics": null,
+      "summary": {
+        "violationCount": 2,
+        "passCount": 26,
+        "incompleteCount": 0,
+        "inapplicableCount": 63,
+        "seriousOrCriticalCount": 1,
+        "impactCounts": {
+          "critical": 0,
+          "serious": 1,
+          "moderate": 0,
+          "minor": 1,
+          "unknown": 0
+        }
+      },
+      "issues": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodeCount": 4,
+          "targets": [
+            ".bg-white.rounded-lg.shadow-sm:nth-child(1) > .tracking-widest.font-bold",
+            ".bg-white.rounded-lg.shadow-sm:nth-child(2) > .tracking-widest.font-bold",
+            ".bg-white.rounded-lg.shadow-sm:nth-child(3) > .tracking-widest.font-bold",
+            ".bg-white.rounded-lg.shadow-sm:nth-child(4) > .tracking-widest.font-bold"
+          ]
+        },
+        {
+          "id": "empty-table-header",
+          "impact": "minor",
+          "help": "Table header text should not be empty",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+          "description": "Ensure table headers have discernible text",
+          "nodeCount": 1,
+          "targets": [
+            "th:nth-child(5)"
+          ]
+        }
+      ],
+      "artifacts": {
+        "json": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/axe/axe.json"
+      },
+      "error": null
+    }
+  }
+}

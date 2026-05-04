@@ -1,6 +1,8 @@
-import { mkdir, rm } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join, posix } from "node:path";
 import { pathToFileURL } from "node:url";
+import { promisify } from "node:util";
 
 import { build as viteBuild } from "vite";
 
@@ -20,9 +22,11 @@ import {
   writeText,
 } from "./shared.mjs";
 
+const execFileAsync = promisify(execFile);
 const OPENROUTER_CHAT_URL = "https://openrouter.ai/api/v1/chat/completions";
 const OPENROUTER_GENERATION_URL = "https://openrouter.ai/api/v1/generation";
 const DEFAULT_INTERFACE = "pricing-ai-coding-assistant";
+const MAX_REPAIR_ATTEMPTS = 2;
 const PREVIEW_CSP = [
   "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'",
   "script-src * data: blob: 'unsafe-inline' 'unsafe-eval'",
@@ -67,19 +71,19 @@ function buildMessages({ interfacePrompt, prompt }) {
       content: [
         "You are participating in UI Arena, a gallery of AI-generated product interface examples.",
         usesReactRuntime
-          ? "Return exactly one JSON object with a files array. Do not return markdown. Do not wrap it in a code fence."
+          ? "Build a complete React project for the requested interface. Return only project files using the file block format below. Do not return markdown or explanations."
           : "Return exactly one complete static HTML document.",
         usesReactRuntime
-          ? 'The JSON shape must be {"files":[{"path":"src/App.jsx","content":"..."},{"path":"src/styles.css","content":"..."}]}.'
+          ? "For each file, write exactly: <<<FILE: path/to/file>>>, then the file content, then <<<END FILE>>>. Include any project files you want: package.json, index.html, Vite config, src files, public assets, styles, components, and mock data."
           : "The output must work by opening index.html directly in a browser.",
         usesReactRuntime
-          ? "The runner will compile the files with Vite, React 18, and ReactDOM 18. Do not include index.html, package.json, ReactDOM.render/createRoot calls, external scripts, CDNs, Tailwind CDN, runtime Babel, or package imports other than react."
+          ? "The runner will write the project to a directory, fill in missing Vite/React boilerplate when needed, install dependencies from package.json, run the build, and use the generated static output."
           : "The document must include all CSS and JavaScript inline.",
         usesReactRuntime
-          ? "src/App.jsx must export default App. Put all styling in src/styles.css. Keep all data in the source files. No external network requests."
+          ? "Prefer a Vite-compatible React SPA with mock data. If you omit package.json, index.html, or src/main.jsx, the runner will create sensible defaults."
           : "Do not use external fonts, images, scripts, stylesheets, CDNs, analytics, or network requests.",
         usesReactRuntime
-          ? "Do not include explanations outside the JSON object."
+          ? "Keep the project concise. Generate repeated mock rows programmatically instead of serializing huge arrays."
           : "Do not include explanations outside the HTML.",
       ].join("\n"),
     },
@@ -96,11 +100,8 @@ function buildMessages({ interfacePrompt, prompt }) {
         "- Make it responsive from mobile to desktop.",
         "- Include realistic copy, states, and content needed for the interface.",
         usesReactRuntime
-          ? "- Keep it self-contained in React source files that can be compiled by Vite."
+          ? "- Build it as a React app project using mock data."
           : "- Keep it self-contained in one index.html file.",
-        usesReactRuntime
-          ? "- Use normal React imports, for example `import { useMemo, useState } from \"react\";`."
-          : "",
       ].join("\n"),
     },
   ];
@@ -161,75 +162,241 @@ function extractJsonObject(content) {
   return JSON.parse(candidate.slice(start, end + 1));
 }
 
-function normalizeGeneratedPath(path) {
+function filesToBlockText(files) {
+  return files
+    .map((file) => `<<<FILE: ${file.path}>>>\n${file.content.trimEnd()}\n<<<END FILE>>>`)
+    .join("\n\n");
+}
+
+function extractFileBlocks(content) {
+  const text = String(content ?? "");
+  const blockPattern = /<<<FILE:\s*([^>\n]+?)\s*>>>\r?\n?([\s\S]*?)\r?\n?<<<END FILE>>>/g;
+  const files = [];
+  let match;
+
+  while ((match = blockPattern.exec(text)) !== null) {
+    files.push({
+      path: match[1].trim(),
+      content: match[2].replace(/^\r?\n/, "").replace(/\r?\n$/, ""),
+    });
+  }
+
+  return files;
+}
+
+function normalizeGeneratedProjectPath(path) {
   let normalized = String(path ?? "").trim().replaceAll("\\", "/").replace(/^\.?\//, "");
 
-  if (!normalized.startsWith("src/")) {
-    if (/^(App|styles|data)\.(jsx|js|css|json)$/i.test(normalized)) {
-      normalized = `src/${normalized}`;
-    } else {
-      return null;
-    }
+  if (/^(App|styles|data)\.(jsx|tsx|js|ts|css|json)$/i.test(normalized)) {
+    normalized = `src/${normalized}`;
   }
 
   normalized = posix.normalize(normalized);
 
   if (
+    !normalized ||
     posix.isAbsolute(normalized) ||
     normalized.startsWith("../") ||
-    normalized.includes("/../") ||
-    !normalized.startsWith("src/")
+    normalized.includes("/../")
   ) {
     throw new Error(`Unsafe generated file path: ${path}`);
   }
 
-  if (!/\.(jsx|js|css|json)$/i.test(normalized)) {
+  if (
+    normalized === "node_modules" ||
+    normalized.startsWith("node_modules/") ||
+    normalized === ".git" ||
+    normalized.startsWith(".git/") ||
+    normalized === "dist" ||
+    normalized.startsWith("dist/") ||
+    normalized === "build" ||
+    normalized.startsWith("build/") ||
+    normalized === "out" ||
+    normalized.startsWith("out/")
+  ) {
     return null;
   }
 
   return normalized;
 }
 
-function ensureAppDefaultExport(content) {
-  if (/\bexport\s+default\b/.test(content)) {
-    return content;
+function normalizePackageJson(content) {
+  let packageJson = {};
+
+  if (content?.trim()) {
+    packageJson = JSON.parse(content);
   }
 
-  if (/\b(function|const|let|var)\s+App\b/.test(content)) {
-    return `${content.trimEnd()}\n\nexport default App;\n`;
+  const dependencies = { ...(packageJson.dependencies ?? {}) };
+  const devDependencies = { ...(packageJson.devDependencies ?? {}) };
+
+  dependencies.react ??= "^18.3.1";
+  dependencies["react-dom"] ??= "^18.3.1";
+
+  if (!dependencies.vite && !devDependencies.vite) {
+    devDependencies.vite = "^7.3.2";
   }
 
-  throw new Error("src/App.jsx must define and export a default App component.");
+  const scripts = { ...(packageJson.scripts ?? {}) };
+  if (!scripts.build) {
+    scripts.build = "vite build --base=./";
+  } else if (/\bvite\s+build\b/.test(scripts.build) && !/\b--base(?:=|\s)/.test(scripts.build)) {
+    scripts.build = scripts.build.replace(/\bvite\s+build\b/, "vite build --base=./");
+  }
+
+  return `${JSON.stringify(
+    {
+      private: true,
+      type: "module",
+      ...packageJson,
+      scripts,
+      dependencies,
+      devDependencies,
+    },
+    null,
+    2,
+  )}\n`;
 }
 
-function normalizeReactAppFiles(content) {
-  const payload = extractJsonObject(content);
-  const rawFiles = Array.isArray(payload.files)
-    ? payload.files
-    : Object.entries(payload).map(([path, fileContent]) => ({ path, content: fileContent }));
+function findAppEntry(filesByPath) {
+  return [
+    "src/App.jsx",
+    "src/App.tsx",
+    "src/App.js",
+    "src/App.ts",
+    "src/app.jsx",
+    "src/app.tsx",
+    "src/app.js",
+    "src/app.ts",
+  ].find((path) => filesByPath.has(path));
+}
+
+function findMainEntry(filesByPath) {
+  return [
+    "src/main.jsx",
+    "src/main.tsx",
+    "src/main.js",
+    "src/main.ts",
+    "src/index.jsx",
+    "src/index.tsx",
+    "src/index.js",
+    "src/index.ts",
+  ].find((path) => filesByPath.has(path));
+}
+
+function ensureProjectIndexHtml(content, interfacePrompt, result) {
+  const fallback = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="${REACT_APP_CSP}" />
+    <title>${interfacePrompt.title} - ${result.modelDisplayName}</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+`;
+
+  if (!content?.trim()) {
+    return fallback;
+  }
+
+  return injectReactAppCsp(content);
+}
+
+function injectReactAppCsp(html) {
+  const withoutExistingCsp = html.replace(
+    /<meta\s+[^>]*http-equiv=(["'])Content-Security-Policy\1[^>]*>\s*/gi,
+    "",
+  );
+  const meta = `<meta http-equiv="Content-Security-Policy" content="${REACT_APP_CSP}" />`;
+
+  if (/<head[^>]*>/i.test(withoutExistingCsp)) {
+    return withoutExistingCsp.replace(/<head[^>]*>/i, (match) => `${match}\n    ${meta}`);
+  }
+
+  return withoutExistingCsp.replace(/<html[^>]*>/i, (match) => `${match}\n<head>\n    ${meta}\n</head>`);
+}
+
+function normalizeReactProjectFiles(content, { interfacePrompt, result }) {
+  const blockFiles = extractFileBlocks(content);
+  const payload = blockFiles.length > 0 ? null : extractJsonObject(content);
+  const rawFiles = blockFiles.length > 0
+    ? blockFiles
+    : Array.isArray(payload.files)
+      ? payload.files
+      : Array.isArray(payload.project?.files)
+        ? payload.project.files
+        : Object.entries(payload).map(([path, fileContent]) => ({ path, content: fileContent }));
   const byPath = new Map();
 
   for (const file of rawFiles) {
-    const filePath = normalizeGeneratedPath(file.path);
+    const filePath = normalizeGeneratedProjectPath(file.path);
 
     if (!filePath) {
       continue;
     }
 
-    byPath.set(filePath, String(file.content ?? ""));
+    const fileContent =
+      typeof file.content === "string"
+        ? file.content
+        : typeof file === "string"
+          ? file
+          : typeof file.content?.text === "string"
+            ? file.content.text
+            : "";
+
+    byPath.set(filePath, fileContent);
   }
 
-  const appPath = ["src/App.jsx", "src/App.js"].find((path) => byPath.has(path));
+  const appPath = findAppEntry(byPath);
+  const mainPath = findMainEntry(byPath);
 
-  if (!appPath) {
-    throw new Error("Generated React app must include src/App.jsx.");
+  if (!appPath && !mainPath) {
+    byPath.set(
+      "src/App.jsx",
+      `export default function App() {
+  return (
+    <main>
+      <h1>${interfacePrompt.title}</h1>
+      <p>Generated React project shell.</p>
+    </main>
+  );
+}
+`,
+    );
   }
 
-  byPath.set(appPath, ensureAppDefaultExport(byPath.get(appPath)));
+  const resolvedAppPath = findAppEntry(byPath);
+  const resolvedMainPath = findMainEntry(byPath);
 
   if (!byPath.has("src/styles.css")) {
     byPath.set("src/styles.css", "");
   }
+
+  if (!resolvedMainPath && resolvedAppPath) {
+    const appImport = `./${posix.relative("src", resolvedAppPath)}`;
+    byPath.set(
+      "src/main.jsx",
+      `import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "${appImport}";
+import "./styles.css";
+
+createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);
+`,
+    );
+  }
+
+  byPath.set("package.json", normalizePackageJson(byPath.get("package.json")));
+  byPath.set("index.html", ensureProjectIndexHtml(byPath.get("index.html"), interfacePrompt, result));
 
   return [...byPath.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
@@ -450,8 +617,7 @@ async function fetchOpenRouterGeneration({ apiKey, generationId }) {
   return null;
 }
 
-async function callOpenRouter({ apiKey, interfacePrompt, prompt, model, requestTimeoutMs }) {
-  const messages = buildMessages({ interfacePrompt, prompt });
+async function callOpenRouterMessages({ apiKey, messages, model, requestTimeoutMs }) {
   const body = {
     model: model.model,
     messages,
@@ -507,6 +673,15 @@ async function callOpenRouter({ apiKey, interfacePrompt, prompt, model, requestT
   };
 }
 
+async function callOpenRouter({ apiKey, interfacePrompt, prompt, model, requestTimeoutMs }) {
+  return callOpenRouterMessages({
+    apiKey,
+    messages: buildMessages({ interfacePrompt, prompt }),
+    model,
+    requestTimeoutMs,
+  });
+}
+
 async function writeHtmlRunArtifacts({ interfacePrompt, runId, requestBody, responseJson, generation, html, result }) {
   const runDir = join(rootDir, "arena", "runs", interfacePrompt.id, runId);
   const sourceDir = join(runDir, "source");
@@ -536,90 +711,291 @@ async function writeHtmlRunArtifacts({ interfacePrompt, runId, requestBody, resp
   return { resultPath, result };
 }
 
-async function writeReactRunArtifacts({ interfacePrompt, runId, requestBody, responseJson, generation, files, result }) {
+async function execCaptured(command, args, { cwd, timeoutMs = 120000 }) {
+  try {
+    return await execFileAsync(command, args, {
+      cwd,
+      timeout: timeoutMs,
+      maxBuffer: 1024 * 1024 * 12,
+      env: {
+        ...process.env,
+        CI: "1",
+      },
+    });
+  } catch (error) {
+    const details = [
+      `$ ${command} ${args.join(" ")}`,
+      error.stdout ? `stdout:\n${error.stdout}` : "",
+      error.stderr ? `stderr:\n${error.stderr}` : "",
+      error.message ? `error:\n${error.message}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+    const wrapped = new Error(details);
+    wrapped.cause = error;
+    wrapped.stdout = error.stdout;
+    wrapped.stderr = error.stderr;
+    throw wrapped;
+  }
+}
+
+async function writeProjectFiles(sourceDir, files) {
+  await rm(sourceDir, { recursive: true, force: true });
+
+  for (const file of files) {
+    await writeText(join(sourceDir, file.path), file.content);
+  }
+}
+
+async function patchPreviewAssetReferences(previewDir) {
+  async function walk(dir) {
+    const entries = await readdir(dir, { withFileTypes: true }).catch(() => []);
+
+    for (const entry of entries) {
+      const path = join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        await walk(path);
+        continue;
+      }
+
+      if (!/\.(html|css|js)$/i.test(entry.name)) {
+        continue;
+      }
+
+      const original = await readFile(path, "utf8");
+      const next = original
+        .replaceAll('="/assets/', '="./assets/')
+        .replaceAll("='/assets/", "='./assets/")
+        .replaceAll("url(/assets/", "url(./assets/");
+
+      if (next !== original) {
+        await writeFile(path, next);
+      }
+    }
+  }
+
+  await walk(previewDir);
+
+  const indexPath = join(previewDir, "index.html");
+  const indexHtml = await readFile(indexPath, "utf8").catch(() => null);
+
+  if (indexHtml !== null) {
+    const next = injectReactAppCsp(indexHtml);
+    if (next !== indexHtml) {
+      await writeFile(indexPath, next);
+    }
+  }
+}
+
+async function findBuildOutputDir(sourceDir) {
+  for (const candidate of ["dist", "build", "out"]) {
+    const indexPath = join(sourceDir, candidate, "index.html");
+    if (await readFile(indexPath, "utf8").then(() => true, () => false)) {
+      return join(sourceDir, candidate);
+    }
+  }
+
+  return null;
+}
+
+async function installProjectDependencies(sourceDir) {
+  await execCaptured("npm", ["install", "--no-audit", "--no-fund", "--package-lock=false"], {
+    cwd: sourceDir,
+    timeoutMs: 180000,
+  });
+}
+
+async function buildProjectOnce({ sourceDir, previewDir, files }) {
+  await writeProjectFiles(sourceDir, files);
+
+  try {
+    await installProjectDependencies(sourceDir);
+    await execCaptured("npm", ["run", "build"], { cwd: sourceDir, timeoutMs: 180000 });
+
+    let outputDir = await findBuildOutputDir(sourceDir);
+
+    if (!outputDir) {
+      await viteBuild({
+        root: sourceDir,
+        base: "./",
+        logLevel: "warn",
+        esbuild: {
+          jsx: "automatic",
+          jsxImportSource: "react",
+        },
+        build: {
+          outDir: join(sourceDir, "dist"),
+          emptyOutDir: true,
+          assetsDir: "assets",
+          sourcemap: false,
+          target: "es2020",
+        },
+      });
+      outputDir = await findBuildOutputDir(sourceDir);
+    }
+
+    if (!outputDir) {
+      throw new Error("Build completed but no static output was found in dist/, build/, or out/.");
+    }
+
+    await rm(previewDir, { recursive: true, force: true });
+    await cp(outputDir, previewDir, { recursive: true });
+    await patchPreviewAssetReferences(previewDir);
+  } finally {
+    await Promise.all([
+      rm(join(sourceDir, "node_modules"), { recursive: true, force: true }),
+      rm(join(sourceDir, "dist"), { recursive: true, force: true }),
+      rm(join(sourceDir, "build"), { recursive: true, force: true }),
+      rm(join(sourceDir, "out"), { recursive: true, force: true }),
+    ]);
+  }
+}
+
+function buildRepairMessages({ interfacePrompt, prompt, files, buildError }) {
+  return [
+    {
+      role: "system",
+      content: [
+        "You are repairing a generated React project for UI Arena.",
+        "Return only corrected project files using <<<FILE: path>>> and <<<END FILE>>> blocks.",
+        "Do not return markdown or explanations. Include all files needed after the repair, not just a diff.",
+        "Keep repeated mock data concise by generating rows programmatically where possible.",
+      ].join("\n"),
+    },
+    {
+      role: "user",
+      content: [
+        `Interface prompt: ${interfacePrompt.title}`,
+        "",
+        prompt.trim(),
+        "",
+        "The project failed to build. Fix the files so npm install and npm run build produce a static React app.",
+        "",
+        "Build error:",
+        "```",
+        String(buildError?.message ?? buildError).slice(0, 12000),
+        "```",
+        "",
+        "Current project files:",
+        "```",
+        sourceTextForFiles(files).slice(0, 60000),
+        "```",
+      ].join("\n"),
+    },
+  ];
+}
+
+async function repairReactProject({ apiKey, interfacePrompt, prompt, model, files, buildError, requestTimeoutMs }) {
+  const repairCall = await callOpenRouterMessages({
+    apiKey,
+    messages: buildRepairMessages({ interfacePrompt, prompt, files, buildError }),
+    model,
+    requestTimeoutMs,
+  });
+
+  return {
+    repairCall,
+    files: normalizeReactProjectFiles(repairCall.content, {
+      interfacePrompt,
+      result: {
+        modelDisplayName: model.displayName,
+      },
+    }),
+  };
+}
+
+async function writeReactRunArtifacts({
+  apiKey,
+  interfacePrompt,
+  prompt,
+  model,
+  runId,
+  requestBody,
+  responseJson,
+  generation,
+  files,
+  result,
+  requestTimeoutMs,
+  dryRun,
+}) {
   const runDir = join(rootDir, "arena", "runs", interfacePrompt.id, runId);
   const sourceDir = join(runDir, "source");
   const previewDir = join(publicDir, "previews", interfacePrompt.id, runId);
   const publicSourceDir = join(publicDir, "sources", interfacePrompt.id, runId);
   const resultPath = join(runDir, "result.json");
-  const appPath = files.find((file) => file.path === "src/App.jsx" || file.path === "src/App.js")?.path ?? "src/App.jsx";
-  const appImport = `./${posix.relative("src", appPath)}`;
-  const sourceFiles = [
-    ...files.filter((file) => file.path !== "src/main.jsx" && file.path !== "src/main.js"),
-    {
-      path: "index.html",
-      content: `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="${REACT_APP_CSP}" />
-    <title>${interfacePrompt.title} - ${result.modelDisplayName}</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
-`,
-    },
-    {
-      path: "src/main.jsx",
-      content: `import React from "react";
-import { createRoot } from "react-dom/client";
-import App from "${appImport}";
-import "./styles.css";
-
-createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
-`,
-    },
-  ];
+  const repairs = [];
+  let sourceFiles = files;
 
   await Promise.all([
-    rm(sourceDir, { recursive: true, force: true }),
     rm(previewDir, { recursive: true, force: true }),
     rm(publicSourceDir, { recursive: true, force: true }),
   ]);
 
+  await mkdir(runDir, { recursive: true });
   await Promise.all([
     writeJson(join(runDir, "request.json"), requestBody),
     writeJson(join(runDir, "response.raw.json"), responseJson),
     generation ? writeJson(join(runDir, "generation.openrouter.json"), generation) : Promise.resolve(),
-    ...sourceFiles.map((file) => writeText(join(sourceDir, file.path), file.content)),
-    writeText(join(publicSourceDir, "source.txt"), sourceTextForFiles(sourceFiles)),
   ]);
 
-  await viteBuild({
-    root: sourceDir,
-    base: "./",
-    logLevel: "warn",
-    esbuild: {
-      jsx: "automatic",
-      jsxImportSource: "react",
-    },
-    build: {
-      outDir: previewDir,
-      emptyOutDir: true,
-      assetsDir: "assets",
-      sourcemap: false,
-      target: "es2020",
-    },
-  });
+  for (let attempt = 0; attempt <= MAX_REPAIR_ATTEMPTS; attempt += 1) {
+    try {
+      await buildProjectOnce({ sourceDir, previewDir, files: sourceFiles });
+      break;
+    } catch (buildError) {
+      if (dryRun || attempt >= MAX_REPAIR_ATTEMPTS) {
+        throw buildError;
+      }
+
+      console.warn(`Repairing ${interfacePrompt.id}/${runId} after build attempt ${attempt + 1}: ${buildError.message.split("\n")[0]}`);
+      const repaired = await repairReactProject({
+        apiKey,
+        interfacePrompt,
+        prompt,
+        model,
+        files: sourceFiles,
+        buildError,
+        requestTimeoutMs,
+      });
+      const repairNumber = repairs.length + 1;
+      await Promise.all([
+        writeJson(join(runDir, `repair-${repairNumber}.request.json`), repaired.repairCall.requestBody),
+        writeJson(join(runDir, `repair-${repairNumber}.response.raw.json`), repaired.repairCall.responseJson),
+        repaired.repairCall.generation
+          ? writeJson(join(runDir, `repair-${repairNumber}.generation.openrouter.json`), repaired.repairCall.generation)
+          : Promise.resolve(),
+      ]);
+      repairs.push({
+        attempt: repairNumber,
+        gatewayGenerationId: repaired.repairCall.responseJson.id,
+        finishReason: repaired.repairCall.finishReason,
+        buildError: buildError.message.slice(0, 8000),
+        modelStartedAt: repaired.repairCall.modelStartedAt,
+        modelCompletedAt: repaired.repairCall.modelCompletedAt,
+        modelDurationMs: repaired.repairCall.modelDurationMs,
+      });
+      sourceFiles = repaired.files;
+    }
+  }
+
+  await Promise.all([
+    writeText(join(publicSourceDir, "source.txt"), sourceTextForFiles(sourceFiles)),
+    writeJson(join(publicSourceDir, "files.json"), sourceFiles),
+  ]);
 
   result.artifacts = {
     preview: `${publicUrlFor(previewDir)}/`,
     source: publicUrlFor(join(publicSourceDir, "source.txt")),
+    sourceJson: publicUrlFor(join(publicSourceDir, "files.json")),
     localResultPath: toRepoPath(resultPath),
     localRunPath: toRepoPath(runDir),
     localSourcePath: toRepoPath(sourceDir),
     localPreviewPath: toRepoPath(previewDir),
-    sourceFormat: "react-vite",
+    sourceFormat: "react-project",
     sourceFiles: sourceFiles.map((file) => file.path),
   };
+  result.repairs = repairs;
 
   await writeJson(resultPath, result);
   return { resultPath, result };
@@ -674,7 +1050,7 @@ async function runModel({
   requestTimeoutMs,
 }) {
   const { manifest: interfacePrompt, prompt } = interfaceBundle;
-  const artifactType = promptUsesReactRuntime(prompt) ? "react-vite" : "html";
+  const artifactType = promptUsesReactRuntime(prompt) ? "react-project" : "html";
   const runId = `${model.id}__${safeTimestamp(timestamp)}`;
   const startedMs = performance.now();
   const result = buildBaseResult({ interfacePrompt, prompt, model, runId, timestamp, dryRun, artifactType });
@@ -700,8 +1076,8 @@ async function runModel({
             finish_reason: "dry_run",
             message: {
               content:
-                artifactType === "react-vite"
-                  ? JSON.stringify({ files: reactFilesForDryRun({ interfacePrompt, model }) }, null, 2)
+                artifactType === "react-project"
+                  ? filesToBlockText(reactFilesForDryRun({ interfacePrompt, model }))
                   : htmlForDryRun({ interfacePrompt, model }),
             },
           },
@@ -712,8 +1088,8 @@ async function runModel({
           total_tokens: 0,
         },
       };
-      if (artifactType === "react-vite") {
-        files = normalizeReactAppFiles(responseJson.choices[0].message.content);
+      if (artifactType === "react-project") {
+        files = normalizeReactProjectFiles(responseJson.choices[0].message.content, { interfacePrompt, result });
       } else {
         html = responseJson.choices[0].message.content;
       }
@@ -725,8 +1101,8 @@ async function runModel({
       requestBody = call.requestBody;
       responseJson = call.responseJson;
       generation = call.generation;
-      if (artifactType === "react-vite") {
-        files = normalizeReactAppFiles(call.content);
+      if (artifactType === "react-project") {
+        files = normalizeReactProjectFiles(call.content, { interfacePrompt, result });
       } else {
         html = extractHtml(call.content);
       }
@@ -747,8 +1123,21 @@ async function runModel({
     result.usage = usageFrom({ responseJson, generation, dryRun });
 
     const written =
-      artifactType === "react-vite"
-        ? await writeReactRunArtifacts({ interfacePrompt, runId, requestBody, responseJson, generation, files, result })
+      artifactType === "react-project"
+        ? await writeReactRunArtifacts({
+            apiKey,
+            interfacePrompt,
+            prompt,
+            model,
+            runId,
+            requestBody,
+            responseJson,
+            generation,
+            files,
+            result,
+            requestTimeoutMs,
+            dryRun,
+          })
         : await writeHtmlRunArtifacts({
             interfacePrompt,
             runId,

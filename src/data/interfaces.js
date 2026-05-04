@@ -55,17 +55,7 @@ export const surfaces = [
 
 export const surfaceById = (id) => surfaces.find((s) => s.id === id);
 
-const REACT_STACK_NOTE = `Stack: a compiled React 18 app built by the TasteBench runner with Vite. Return source files only, not HTML. The runner provides React, ReactDOM, the Vite build, index.html, and the root render call.
-
-Return exactly this JSON shape, with no markdown wrapper:
-{
-  "files": [
-    { "path": "src/App.jsx", "content": "..." },
-    { "path": "src/styles.css", "content": "..." }
-  ]
-}
-
-src/App.jsx must export default App. Use normal React imports from "react" for hooks. Put all CSS in src/styles.css. Do not include package.json, index.html, ReactDOM/createRoot code, script tags, CDN URLs, Tailwind CDN, runtime Babel, external assets, or network requests.`;
+const REACT_STACK_NOTE = `Stack: React app. Build it as a small project directory using mock data. The runner will install dependencies, compile the app, and repair build errors if needed.`;
 
 const HTML_STACK_NOTE = `Stack: a single self-contained HTML file. No external assets, no runtime fetches. System fonts only.`;
 
@@ -427,12 +417,28 @@ const modelSlots = generatedModelSlots.length
   ? generatedModelSlots
   : [
       {
-        id: "gpt-5-2",
-        displayName: "GPT-5.2",
+        id: "gpt-5-5",
+        displayName: "GPT-5.5",
         family: "OpenAI",
         accent: "#e04f2f",
         accentSoft: "#f7d9cd",
-        gatewayModel: "openai/gpt-5.2",
+        gatewayModel: "openai/gpt-5.5",
+      },
+      {
+        id: "claude-opus-4-6",
+        displayName: "Claude Opus 4.6",
+        family: "Anthropic",
+        accent: "#8b4f28",
+        accentSoft: "#eddacb",
+        gatewayModel: "anthropic/claude-opus-4.6",
+      },
+      {
+        id: "claude-opus-4-5",
+        displayName: "Claude Opus 4.5",
+        family: "Anthropic",
+        accent: "#5a4c8f",
+        accentSoft: "#dfd9f0",
+        gatewayModel: "anthropic/claude-opus-4.5",
       },
     ];
 

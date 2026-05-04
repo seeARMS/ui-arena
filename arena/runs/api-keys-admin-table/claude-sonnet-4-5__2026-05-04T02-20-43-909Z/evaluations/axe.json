@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "id": "axe",
+  "displayName": "Axe",
+  "description": "Runs axe-core accessibility checks through Playwright and records violations by impact.",
+  "categories": [
+    "accessibility"
+  ],
+  "status": "complete",
+  "version": "4.11.4",
+  "startedAt": "2026-05-04T02:23:01.151Z",
+  "completedAt": "2026-05-04T02:23:02.431Z",
+  "durationMs": 1280,
+  "scores": null,
+  "metrics": null,
+  "summary": {
+    "violationCount": 4,
+    "passCount": 27,
+    "incompleteCount": 1,
+    "inapplicableCount": 62,
+    "seriousOrCriticalCount": 3,
+    "impactCounts": {
+      "critical": 2,
+      "serious": 1,
+      "moderate": 0,
+      "minor": 1,
+      "unknown": 0
+    }
+  },
+  "issues": [
+    {
+      "id": "button-name",
+      "impact": "critical",
+      "help": "Buttons must have discernible text",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/button-name?application=playwright",
+      "description": "Ensure buttons have discernible text",
+      "nodeCount": 25,
+      "targets": [
+        "tr:nth-child(1) > .td-actions > .actions-wrapper > .actions-btn",
+        "tr:nth-child(2) > .td-actions > .actions-wrapper > .actions-btn",
+        "tr:nth-child(3) > .td-actions > .actions-wrapper > .actions-btn",
+        "tr:nth-child(4) > .td-actions > .actions-wrapper > .actions-btn"
+      ]
+    },
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "nodeCount": 73,
+      "targets": [
+        ".stat-warning",
+        ".active",
+        "tr:nth-child(1) > .td-name > .key-id",
+        "tr:nth-child(1) > td:nth-child(8) > .status-pill"
+      ]
+    },
+    {
+      "id": "empty-table-header",
+      "impact": "minor",
+      "help": "Table header text should not be empty",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+      "description": "Ensure table headers have discernible text",
+      "nodeCount": 2,
+      "targets": [
+        ".th-checkbox",
+        ".th-actions"
+      ]
+    },
+    {
+      "id": "label",
+      "impact": "critical",
+      "help": "Form elements must have labels",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/label?application=playwright",
+      "description": "Ensure every form element has a label",
+      "nodeCount": 26,
+      "targets": [
+        ".th-checkbox > input[type=\"checkbox\"]",
+        "tr:nth-child(1) > td:nth-child(1) > input[type=\"checkbox\"]",
+        "tr:nth-child(2) > td:nth-child(1) > input[type=\"checkbox\"]",
+        "tr:nth-child(3) > td:nth-child(1) > input[type=\"checkbox\"]"
+      ]
+    }
+  ],
+  "artifacts": {
+    "json": "/evaluations/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-20-43-909Z/axe/axe.json"
+  }
+}

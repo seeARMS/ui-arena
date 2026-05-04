@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "id": "axe",
+  "displayName": "Axe",
+  "description": "Runs axe-core accessibility checks through Playwright and records violations by impact.",
+  "categories": [
+    "accessibility"
+  ],
+  "status": "complete",
+  "version": "4.11.4",
+  "startedAt": "2026-05-04T02:24:14.338Z",
+  "completedAt": "2026-05-04T02:24:15.270Z",
+  "durationMs": 932,
+  "scores": null,
+  "metrics": null,
+  "summary": {
+    "violationCount": 2,
+    "passCount": 26,
+    "incompleteCount": 0,
+    "inapplicableCount": 63,
+    "seriousOrCriticalCount": 1,
+    "impactCounts": {
+      "critical": 0,
+      "serious": 1,
+      "moderate": 0,
+      "minor": 1,
+      "unknown": 0
+    }
+  },
+  "issues": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "nodeCount": 4,
+      "targets": [
+        ".bg-white.rounded-lg.shadow-sm:nth-child(1) > .tracking-widest.font-bold",
+        ".bg-white.rounded-lg.shadow-sm:nth-child(2) > .tracking-widest.font-bold",
+        ".bg-white.rounded-lg.shadow-sm:nth-child(3) > .tracking-widest.font-bold",
+        ".bg-white.rounded-lg.shadow-sm:nth-child(4) > .tracking-widest.font-bold"
+      ]
+    },
+    {
+      "id": "empty-table-header",
+      "impact": "minor",
+      "help": "Table header text should not be empty",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+      "description": "Ensure table headers have discernible text",
+      "nodeCount": 1,
+      "targets": [
+        "th:nth-child(5)"
+      ]
+    }
+  ],
+  "artifacts": {
+    "json": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-20-43-909Z/axe/axe.json"
+  }
+}

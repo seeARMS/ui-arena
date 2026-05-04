@@ -1,0 +1,1366 @@
+===== index.html =====
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; media-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; form-action 'none'; base-uri 'none'" />
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Key Management</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+===== package.json =====
+{
+  "private": true,
+  "type": "module",
+  "name": "api-key-admin",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --base=./",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "lucide-react": "^0.294.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8"
+  }
+}
+
+===== src/App.css =====
+.app {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.header {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 16px 24px;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.header-title h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.stats-strip {
+  display: flex;
+  gap: 32px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.stat-success {
+  color: #10b981;
+}
+
+.stat-warning {
+  color: #f59e0b;
+}
+
+.stat-danger {
+  color: #ef4444;
+}
+
+.main {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.controls {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 280px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.filters {
+  display: flex;
+  gap: 4px;
+  background: white;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  border-radius: 6px;
+  transition: all 0.2s;
+  text-transform: capitalize;
+}
+
+.filter-btn:hover {
+  background: #f3f4f6;
+  color: #1a1a1a;
+}
+
+.filter-btn.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.table-container {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table thead {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.table th.sortable:hover {
+  background: #f3f4f6;
+}
+
+.th-checkbox {
+  width: 40px;
+}
+
+.th-actions {
+  width: 50px;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.table tbody tr.selected {
+  background: #eff6ff;
+}
+
+.table td {
+  padding: 12px 16px;
+  color: #1a1a1a;
+}
+
+.td-name {
+  min-width: 200px;
+}
+
+.key-name {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.key-id {
+  font-size: 11px;
+  color: #9ca3af;
+  font-family: 'Courier New', monospace;
+}
+
+.scopes {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.scope-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.scope-more {
+  background: #e5e7eb;
+  color: #6b7280;
+}
+
+.td-date {
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.td-actions {
+  text-align: right;
+}
+
+.actions-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.actions-btn {
+  padding: 6px;
+  border-radius: 4px;
+  color: #6b7280;
+  transition: all 0.2s;
+}
+
+.actions-btn:hover {
+  background: #f3f4f6;
+  color: #1a1a1a;
+}
+
+.popover {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  z-index: 50;
+  overflow: hidden;
+}
+
+.popover button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #374151;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.popover button:hover {
+  background: #f9fafb;
+}
+
+.bulk-actions {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+.bulk-actions-content {
+  background: #1a1a1a;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.bulk-count {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bulk-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.bulk-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transition: background 0.2s;
+}
+
+.bulk-buttons button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.bulk-buttons button.danger {
+  background: #dc2626;
+}
+
+.bulk-buttons button.danger:hover {
+  background: #b91c1c;
+}
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer {
+  width: 100%;
+  max-width: 500px;
+  background: white;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.drawer-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.drawer-close {
+  padding: 6px;
+  color: #6b7280;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.drawer-close:hover {
+  background: #f3f4f6;
+  color: #1a1a1a;
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.drawer-section {
+  margin-bottom: 32px;
+}
+
+.drawer-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.drawer-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #374151;
+}
+
+.drawer-id {
+  font-size: 12px;
+  color: #9ca3af;
+  font-family: 'Courier New', monospace;
+}
+
+.drawer-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.drawer-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.scopes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.audit-events {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.audit-event {
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border-left: 3px solid #3b82f6;
+}
+
+.audit-event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.audit-event-type {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.audit-event-time {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.audit-event-details {
+  font-size: 13px;
+  color: #4b5563;
+  margin-bottom: 4px;
+}
+
+.audit-event-actor {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.mobile-list {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .table {
+    display: none;
+  }
+
+  .mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .mobile-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mobile-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .mobile-card.selected {
+    background: #eff6ff;
+    border-color: #3b82f6;
+  }
+
+  .mobile-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .mobile-card-title {
+    flex: 1;
+  }
+
+  .mobile-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mobile-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .mobile-label {
+    font-weight: 500;
+    color: #6b7280;
+  }
+
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .search-wrapper {
+    min-width: 100%;
+  }
+
+  .filters {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .drawer {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .header-content {
+    padding: 12px 16px;
+  }
+
+  .main {
+    padding: 16px;
+  }
+
+  .stats-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .bulk-actions-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .bulk-buttons {
+    flex-direction: column;
+  }
+}
+
+===== src/App.jsx =====
+import React, { useState, useMemo } from 'react';
+import { Search, ChevronDown, MoreVertical, RotateCw, XCircle, Edit3, FileText, AlertTriangle, CheckCircle2, Clock, Shield, Key } from 'lucide-react';
+import { generateMockKeys } from './mockData';
+import './App.css';
+
+const FILTERS = ['all', 'active', 'stale', 'expiring', 'over-scoped'];
+
+const STATUS_CONFIG = {
+  healthy: { label: 'Healthy', color: '#10b981', icon: CheckCircle2 },
+  stale: { label: 'Stale', color: '#f59e0b', icon: Clock },
+  expiring: { label: 'Expiring', color: '#ef4444', icon: AlertTriangle },
+  'leaked-suspected': { label: 'Leaked?', color: '#dc2626', icon: Shield },
+  revoked: { label: 'Revoked', color: '#6b7280', icon: XCircle }
+};
+
+function App() {
+  const [keys, setKeys] = useState(generateMockKeys(25));
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [sortConfig, setSortConfig] = useState({ key: 'lastUsed', direction: 'desc' });
+  const [selectedKeys, setSelectedKeys] = useState(new Set());
+  const [openPopover, setOpenPopover] = useState(null);
+  const [drawerKey, setDrawerKey] = useState(null);
+
+  const filteredAndSortedKeys = useMemo(() => {
+    let filtered = keys.filter(key => {
+      const matchesSearch = searchQuery === '' || 
+        key.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        key.owner.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        key.scopes.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchesFilter = activeFilter === 'all' || 
+        (activeFilter === 'active' && key.status === 'healthy') ||
+        (activeFilter === 'stale' && key.status === 'stale') ||
+        (activeFilter === 'expiring' && key.status === 'expiring') ||
+        (activeFilter === 'over-scoped' && key.scopes.length > 5);
+
+      return matchesSearch && matchesFilter;
+    });
+
+    filtered.sort((a, b) => {
+      let aVal = a[sortConfig.key];
+      let bVal = b[sortConfig.key];
+
+      if (sortConfig.key === 'scopes') {
+        aVal = a.scopes.length;
+        bVal = b.scopes.length;
+      }
+
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return filtered;
+  }, [keys, searchQuery, activeFilter, sortConfig]);
+
+  const stats = useMemo(() => {
+    const total = keys.length;
+    const active = keys.filter(k => k.status === 'healthy').length;
+    const overScoped = keys.filter(k => k.scopes.length > 5).length;
+    const expiringThisWeek = keys.filter(k => {
+      const daysUntilExpiry = Math.floor((new Date(k.expires) - new Date()) / (1000 * 60 * 60 * 24));
+      return daysUntilExpiry <= 7 && daysUntilExpiry >= 0;
+    }).length;
+
+    return { total, active, overScoped, expiringThisWeek };
+  }, [keys]);
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
+  const toggleSelectKey = (id) => {
+    const newSelected = new Set(selectedKeys);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedKeys(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedKeys.size === filteredAndSortedKeys.length) {
+      setSelectedKeys(new Set());
+    } else {
+      setSelectedKeys(new Set(filteredAndSortedKeys.map(k => k.id)));
+    }
+  };
+
+  const handleAction = (action, keyId) => {
+    setOpenPopover(null);
+    
+    if (action === 'rotate') {
+      setKeys(prev => prev.map(k => 
+        k.id === keyId ? { ...k, lastRotated: new Date().toISOString(), status: 'healthy' } : k
+      ));
+    } else if (action === 'revoke') {
+      setKeys(prev => prev.map(k => 
+        k.id === keyId ? { ...k, status: 'revoked' } : k
+      ));
+    } else if (action === 'audit') {
+      setDrawerKey(keys.find(k => k.id === keyId));
+    }
+  };
+
+  const handleBulkAction = (action) => {
+    if (action === 'revoke') {
+      setKeys(prev => prev.map(k => 
+        selectedKeys.has(k.id) ? { ...k, status: 'revoked' } : k
+      ));
+    } else if (action === 'rotate') {
+      setKeys(prev => prev.map(k => 
+        selectedKeys.has(k.id) ? { ...k, lastRotated: new Date().toISOString(), status: 'healthy' } : k
+      ));
+    }
+    setSelectedKeys(new Set());
+  };
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
+    return `${Math.floor(diffDays / 365)}y ago`;
+  };
+
+  const formatExpiry = (dateStr) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = date - now;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) return 'Expired';
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Tomorrow';
+    if (diffDays < 7) return `${diffDays}d`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)}w`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo`;
+    return `${Math.floor(diffDays / 365)}y`;
+  };
+
+  return (
+    <div className="app">
+      <header className="header">
+        <div className="header-content">
+          <div className="header-title">
+            <Key size={24} />
+            <h1>API Key Management</h1>
+          </div>
+          <div className="stats-strip">
+            <div className="stat">
+              <span className="stat-label">Total Keys</span>
+              <span className="stat-value">{stats.total}</span>
+            </div>
+            <div className="stat">
+              <span className="stat-label">Active</span>
+              <span className="stat-value stat-success">{stats.active}</span>
+            </div>
+            <div className="stat">
+              <span className="stat-label">Over-scoped</span>
+              <span className="stat-value stat-warning">{stats.overScoped}</span>
+            </div>
+            <div className="stat">
+              <span className="stat-label">Expiring This Week</span>
+              <span className="stat-value stat-danger">{stats.expiringThisWeek}</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="main">
+        <div className="controls">
+          <div className="search-wrapper">
+            <Search size={18} className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search keys, owners, scopes..."
+              className="search-input"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="filters">
+            {FILTERS.map(filter => (
+              <button
+                key={filter}
+                className={`filter-btn ${activeFilter === filter ? 'active' : ''}`}
+                onClick={() => setActiveFilter(filter)}
+              >
+                {filter.replace('-', ' ')}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="table-container">
+          <table className="table">
+            <thead>
+              <tr>
+                <th className="th-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={selectedKeys.size === filteredAndSortedKeys.length && filteredAndSortedKeys.length > 0}
+                    onChange={toggleSelectAll}
+                  />
+                </th>
+                <th onClick={() => handleSort('name')} className="sortable">
+                  Name {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
+                <th onClick={() => handleSort('owner')} className="sortable">
+                  Owner {sortConfig.key === 'owner' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
+                <th onClick={() => handleSort('scopes')} className="sortable">
+                  Scopes {sortConfig.key === 'scopes' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
+                <th onClick={() => handleSort('lastUsed')} className="sortable">
+                  Last Used {sortConfig.key === 'lastUsed' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
+                <th onClick={() => handleSort('created')} className="sortable">
+                  Created {sortConfig.key === 'created' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
+                <th onClick={() => handleSort('expires')} className="sortable">
+                  Expires {sortConfig.key === 'expires' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
+                <th>Status</th>
+                <th className="th-actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredAndSortedKeys.map(key => {
+                const StatusIcon = STATUS_CONFIG[key.status].icon;
+                return (
+                  <tr 
+                    key={key.id} 
+                    className={selectedKeys.has(key.id) ? 'selected' : ''}
+                    onClick={(e) => {
+                      if (!e.target.closest('input') && !e.target.closest('.actions-btn')) {
+                        setDrawerKey(key);
+                      }
+                    }}
+                  >
+                    <td onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={selectedKeys.has(key.id)}
+                        onChange={() => toggleSelectKey(key.id)}
+                      />
+                    </td>
+                    <td className="td-name">
+                      <div className="key-name">{key.name}</div>
+                      <div className="key-id">{key.id}</div>
+                    </td>
+                    <td>{key.owner}</td>
+                    <td>
+                      <div className="scopes">
+                        {key.scopes.slice(0, 2).map((scope, i) => (
+                          <span key={i} className="scope-badge">{scope}</span>
+                        ))}
+                        {key.scopes.length > 2 && (
+                          <span className="scope-badge scope-more">+{key.scopes.length - 2}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="td-date">{formatDate(key.lastUsed)}</td>
+                    <td className="td-date">{formatDate(key.created)}</td>
+                    <td className="td-date">{formatExpiry(key.expires)}</td>
+                    <td>
+                      <span 
+                        className="status-pill" 
+                        style={{ backgroundColor: `${STATUS_CONFIG[key.status].color}15`, color: STATUS_CONFIG[key.status].color }}
+                      >
+                        <StatusIcon size={12} />
+                        {STATUS_CONFIG[key.status].label}
+                      </span>
+                    </td>
+                    <td className="td-actions" onClick={(e) => e.stopPropagation()}>
+                      <div className="actions-wrapper">
+                        <button 
+                          className="actions-btn"
+                          onClick={() => setOpenPopover(openPopover === key.id ? null : key.id)}
+                        >
+                          <MoreVertical size={16} />
+                        </button>
+                        {openPopover === key.id && (
+                          <div className="popover">
+                            <button onClick={() => handleAction('rotate', key.id)}>
+                              <RotateCw size={14} />
+                              Rotate Key
+                            </button>
+                            <button onClick={() => handleAction('revoke', key.id)}>
+                              <XCircle size={14} />
+                              Revoke
+                            </button>
+                            <button onClick={() => handleAction('edit', key.id)}>
+                              <Edit3 size={14} />
+                              Edit Scopes
+                            </button>
+                            <button onClick={() => handleAction('audit', key.id)}>
+                              <FileText size={14} />
+                              View Audit Trail
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
+          {/* Mobile view */}
+          <div className="mobile-list">
+            {filteredAndSortedKeys.map(key => {
+              const StatusIcon = STATUS_CONFIG[key.status].icon;
+              return (
+                <div 
+                  key={key.id} 
+                  className={`mobile-card ${selectedKeys.has(key.id) ? 'selected' : ''}`}
+                  onClick={() => setDrawerKey(key)}
+                >
+                  <div className="mobile-card-header">
+                    <input
+                      type="checkbox"
+                      checked={selectedKeys.has(key.id)}
+                      onChange={() => toggleSelectKey(key.id)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <div className="mobile-card-title">
+                      <div className="key-name">{key.name}</div>
+                      <div className="key-id">{key.id}</div>
+                    </div>
+                    <span 
+                      className="status-pill" 
+                      style={{ backgroundColor: `${STATUS_CONFIG[key.status].color}15`, color: STATUS_CONFIG[key.status].color }}
+                    >
+                      <StatusIcon size={12} />
+                      {STATUS_CONFIG[key.status].label}
+                    </span>
+                  </div>
+                  <div className="mobile-card-body">
+                    <div className="mobile-row">
+                      <span className="mobile-label">Owner:</span>
+                      <span>{key.owner}</span>
+                    </div>
+                    <div className="mobile-row">
+                      <span className="mobile-label">Scopes:</span>
+                      <div className="scopes">
+                        {key.scopes.slice(0, 2).map((scope, i) => (
+                          <span key={i} className="scope-badge">{scope}</span>
+                        ))}
+                        {key.scopes.length > 2 && (
+                          <span className="scope-badge scope-more">+{key.scopes.length - 2}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mobile-row">
+                      <span className="mobile-label">Last Used:</span>
+                      <span>{formatDate(key.lastUsed)}</span>
+                    </div>
+                    <div className="mobile-row">
+                      <span className="mobile-label">Expires:</span>
+                      <span>{formatExpiry(key.expires)}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {selectedKeys.size > 0 && (
+          <div className="bulk-actions">
+            <div className="bulk-actions-content">
+              <span className="bulk-count">{selectedKeys.size} selected</span>
+              <div className="bulk-buttons">
+                <button onClick={() => handleBulkAction('rotate')}>
+                  <RotateCw size={16} />
+                  Rotate
+                </button>
+                <button onClick={() => handleBulkAction('revoke')} className="danger">
+                  <XCircle size={16} />
+                  Revoke
+                </button>
+                <button onClick={() => setSelectedKeys(new Set())}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {drawerKey && (
+          <div className="drawer-overlay" onClick={() => setDrawerKey(null)}>
+            <div className="drawer" onClick={(e) => e.stopPropagation()}>
+              <div className="drawer-header">
+                <h2>Audit Trail</h2>
+                <button onClick={() => setDrawerKey(null)} className="drawer-close">
+                  <XCircle size={20} />
+                </button>
+              </div>
+              <div className="drawer-body">
+                <div className="drawer-section">
+                  <h3>{drawerKey.name}</h3>
+                  <p className="drawer-id">{drawerKey.id}</p>
+                </div>
+                
+                <div className="drawer-section">
+                  <div className="drawer-field">
+                    <span className="drawer-label">Owner</span>
+                    <span>{drawerKey.owner}</span>
+                  </div>
+                  <div className="drawer-field">
+                    <span className="drawer-label">Status</span>
+                    <span 
+                      className="status-pill" 
+                      style={{ backgroundColor: `${STATUS_CONFIG[drawerKey.status].color}15`, color: STATUS_CONFIG[drawerKey.status].color }}
+                    >
+                      {STATUS_CONFIG[drawerKey.status].label}
+                    </span>
+                  </div>
+                  <div className="drawer-field">
+                    <span className="drawer-label">Created</span>
+                    <span>{new Date(drawerKey.created).toLocaleString()}</span>
+                  </div>
+                  <div className="drawer-field">
+                    <span className="drawer-label">Last Used</span>
+                    <span>{new Date(drawerKey.lastUsed).toLocaleString()}</span>
+                  </div>
+                  <div className="drawer-field">
+                    <span className="drawer-label">Expires</span>
+                    <span>{new Date(drawerKey.expires).toLocaleString()}</span>
+                  </div>
+                  <div className="drawer-field">
+                    <span className="drawer-label">Last Rotated</span>
+                    <span>{new Date(drawerKey.lastRotated).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                <div className="drawer-section">
+                  <h4>Scopes ({drawerKey.scopes.length})</h4>
+                  <div className="scopes-list">
+                    {drawerKey.scopes.map((scope, i) => (
+                      <span key={i} className="scope-badge">{scope}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="drawer-section">
+                  <h4>Recent Activity</h4>
+                  <div className="audit-events">
+                    {drawerKey.auditEvents.map((event, i) => (
+                      <div key={i} className="audit-event">
+                        <div className="audit-event-header">
+                          <span className="audit-event-type">{event.type}</span>
+                          <span className="audit-event-time">{formatDate(event.timestamp)}</span>
+                        </div>
+                        <div className="audit-event-details">{event.details}</div>
+                        <div className="audit-event-actor">by {event.actor}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default App;
+
+===== src/index.css =====
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f8f9fa;
+  color: #1a1a1a;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input {
+  font-family: inherit;
+}
+
+===== src/main.jsx =====
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+===== src/mockData.js =====
+const OWNERS = [
+  'alice@company.com',
+  'bob@company.com',
+  'charlie@company.com',
+  'diana@company.com',
+  'evan@company.com',
+  'fiona@company.com',
+  'george@company.com',
+  'hannah@company.com'
+];
+
+const SCOPE_POOL = [
+  'read:users',
+  'write:users',
+  'delete:users',
+  'read:projects',
+  'write:projects',
+  'delete:projects',
+  'read:billing',
+  'write:billing',
+  'admin:all',
+  'read:logs',
+  'write:logs',
+  'read:analytics',
+  'write:analytics',
+  'read:deployments',
+  'write:deployments',
+  'read:secrets',
+  'write:secrets',
+  'admin:security'
+];
+
+const STATUSES = ['healthy', 'stale', 'expiring', 'leaked-suspected', 'revoked'];
+
+const KEY_PREFIXES = [
+  'prod-api',
+  'staging-api',
+  'dev-api',
+  'ci-pipeline',
+  'monitoring',
+  'backup-service',
+  'webhook-handler',
+  'data-sync',
+  'integration',
+  'analytics'
+];
+
+const EVENT_TYPES = [
+  'Key Created',
+  'Key Rotated',
+  'Scopes Modified',
+  'Key Used',
+  'Failed Auth Attempt',
+  'Key Revoked',
+  'Permissions Updated'
+];
+
+function randomDate(start, end) {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+}
+
+function generateAuditEvents(count) {
+  const events = [];
+  const now = new Date();
+  
+  for (let i = 0; i < count; i++) {
+    const daysAgo = Math.floor(Math.random() * 90);
+    const timestamp = new Date(now);
+    timestamp.setDate(timestamp.getDate() - daysAgo);
+    
+    const type = EVENT_TYPES[Math.floor(Math.random() * EVENT_TYPES.length)];
+    const actor = OWNERS[Math.floor(Math.random() * OWNERS.length)];
+    
+    let details = '';
+    switch (type) {
+      case 'Key Created':
+        details = 'API key created with initial scopes';
+        break;
+      case 'Key Rotated':
+        details = 'Key rotated successfully, old key invalidated';
+        break;
+      case 'Scopes Modified':
+        details = `Added ${Math.floor(Math.random() * 3) + 1} new scopes`;
+        break;
+      case 'Key Used':
+        details = `Authenticated request from ${['10.0.1.', '10.0.2.', '10.0.3.'][Math.floor(Math.random() * 3)]}${Math.floor(Math.random() * 255)}`;
+        break;
+      case 'Failed Auth Attempt':
+        details = 'Invalid key signature detected';
+        break;
+      case 'Key Revoked':
+        details = 'Key manually revoked by administrator';
+        break;
+      case 'Permissions Updated':
+        details = 'Scope permissions modified';
+        break;
+    }
+    
+    events.push({
+      type,
+      timestamp: timestamp.toISOString(),
+      details,
+      actor
+    });
+  }
+  
+  return events.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+}
+
+export function generateMockKeys(count) {
+  const keys = [];
+  const now = new Date();
+  
+  for (let i = 0; i < count; i++) {
+    const createdDaysAgo = Math.floor(Math.random() * 365);
+    const created = new Date(now);
+    created.setDate(created.getDate() - createdDaysAgo);
+    
+    const lastUsedDaysAgo = Math.floor(Math.random() * createdDaysAgo);
+    const lastUsed = new Date(now);
+    lastUsed.setDate(lastUsed.getDate() - lastUsedDaysAgo);
+    
+    const expiresInDays = Math.floor(Math.random() * 180) - 30;
+    const expires = new Date(now);
+    expires.setDate(expires.getDate() + expiresInDays);
+    
+    const lastRotatedDaysAgo = Math.floor(Math.random() * 90);
+    const lastRotated = new Date(now);
+    lastRotated.setDate(lastRotated.getDate() - lastRotatedDaysAgo);
+    
+    const scopeCount = Math.floor(Math.random() * 8) + 1;
+    const scopes = [];
+    const shuffled = [...SCOPE_POOL].sort(() => 0.5 - Math.random());
+    for (let j = 0; j < scopeCount; j++) {
+      scopes.push(shuffled[j]);
+    }
+    
+    let status = STATUSES[Math.floor(Math.random() * STATUSES.length)];
+    
+    // Make status more realistic based on dates
+    if (lastUsedDaysAgo > 60) {
+      status = 'stale';
+    } else if (expiresInDays < 7 && expiresInDays >= 0) {
+      status = 'expiring';
+    } else if (expiresInDays < 0) {
+      status = 'revoked';
+    } else if (Math.random() < 0.7) {
+      status = 'healthy';
+    }
+    
+    const prefix = KEY_PREFIXES[Math.floor(Math.random() * KEY_PREFIXES.length)];
+    const suffix = Math.random().toString(36).substring(2, 6);
+    
+    keys.push({
+      id: `sk_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`,
+      name: `${prefix}-${suffix}`,
+      owner: OWNERS[Math.floor(Math.random() * OWNERS.length)],
+      scopes,
+      lastUsed: lastUsed.toISOString(),
+      created: created.toISOString(),
+      expires: expires.toISOString(),
+      lastRotated: lastRotated.toISOString(),
+      status,
+      auditEvents: generateAuditEvents(Math.floor(Math.random() * 10) + 5)
+    });
+  }
+  
+  return keys;
+}
+
+===== src/styles.css =====
+
