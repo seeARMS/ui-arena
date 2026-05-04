@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "id": "lighthouse",
+  "displayName": "Lighthouse",
+  "description": "Runs Lighthouse against the generated preview and records performance and accessibility scores.",
+  "categories": [
+    "performance",
+    "accessibility"
+  ],
+  "status": "complete",
+  "version": "13.2.0",
+  "startedAt": "2026-05-04T02:50:54.276Z",
+  "completedAt": "2026-05-04T02:51:02.736Z",
+  "durationMs": 8461,
+  "scores": {
+    "performance": {
+      "title": "Performance",
+      "score": 0.82,
+      "value": 82
+    },
+    "accessibility": {
+      "title": "Accessibility",
+      "score": 0.94,
+      "value": 94
+    }
+  },
+  "metrics": {
+    "firstContentfulPaint": {
+      "id": "first-contentful-paint",
+      "title": "First Contentful Paint",
+      "displayValue": "1.8 s",
+      "numericValue": 1809.0247,
+      "score": 0.38
+    },
+    "largestContentfulPaint": {
+      "id": "largest-contentful-paint",
+      "title": "Largest Contentful Paint",
+      "displayValue": "2.0 s",
+      "numericValue": 1959.0247,
+      "score": 0.64
+    },
+    "speedIndex": {
+      "id": "speed-index",
+      "title": "Speed Index",
+      "displayValue": "1.8 s",
+      "numericValue": 1809.0247,
+      "score": 0.7
+    },
+    "totalBlockingTime": {
+      "id": "total-blocking-time",
+      "title": "Total Blocking Time",
+      "displayValue": "0 ms",
+      "numericValue": 0,
+      "score": 1
+    },
+    "cumulativeLayoutShift": {
+      "id": "cumulative-layout-shift",
+      "title": "Cumulative Layout Shift",
+      "displayValue": "0",
+      "numericValue": 0,
+      "score": 1
+    }
+  },
+  "summary": {
+    "requestedUrl": "http://127.0.0.1:60234/previews/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/",
+    "finalUrl": "http://127.0.0.1:60234/previews/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/",
+    "fetchTime": "2026-05-04T02:50:57.719Z",
+    "accessibilityIssueCount": 2
+  },
+  "issues": [
+    {
+      "id": "color-contrast",
+      "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+      "score": 0,
+      "displayValue": null,
+      "description": "Low-contrast text is difficult or impossible for many users to read. [Learn how to provide sufficient color contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast)."
+    },
+    {
+      "id": "landmark-one-main",
+      "title": "Document does not have a main landmark.",
+      "score": 0,
+      "displayValue": null,
+      "description": "One main landmark helps screen reader users navigate a web page. [Learn more about landmarks](https://dequeuniversity.com/rules/axe/4.11/landmark-one-main)."
+    }
+  ],
+  "artifacts": {
+    "report": "/evaluations/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/lighthouse/report.html",
+    "json": "/evaluations/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/lighthouse/lhr.json"
+  }
+}

@@ -1,0 +1,84 @@
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #161b22;
+  border-bottom: 1px solid #21262d;
+  flex-wrap: wrap;
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8b949e;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px 8px 34px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e1e4e8;
+}
+
+.search-input::placeholder {
+  color: #6e7681;
+}
+
+.search-input:focus {
+  border-color: #58a6ff;
+  outline: none;
+}
+
+.filter-segments {
+  display: flex;
+  background: #0d1117;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  overflow: hidden;
+}
+
+.filter-segment {
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.filter-segment:not(:last-child) {
+  border-right: 1px solid #30363d;
+}
+
+.filter-segment:hover {
+  background: #21262d;
+  color: #e1e4e8;
+}
+
+.filter-segment.active {
+  background: #21262d;
+  color: #e1e4e8;
+}
+
+@media (max-width: 600px) {
+  .filter-segments {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .filter-segment {
+    flex: 1;
+    white-space: nowrap;
+  }
+}

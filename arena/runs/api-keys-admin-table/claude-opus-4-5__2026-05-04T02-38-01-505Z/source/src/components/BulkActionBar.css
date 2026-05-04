@@ -1,0 +1,78 @@
+.bulk-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #161b22;
+  border-top: 1px solid #30363d;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 50;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.bulk-count {
+  font-weight: 600;
+  color: #58a6ff;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+.bulk-actions button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e1e4e8;
+  font-size: 13px;
+}
+
+.bulk-actions button:hover {
+  background: #30363d;
+}
+
+.bulk-actions button.danger {
+  background: rgba(248, 81, 73, 0.15);
+  border-color: #f85149;
+  color: #f85149;
+}
+
+.bulk-actions button.danger:hover {
+  background: rgba(248, 81, 73, 0.25);
+}
+
+.bulk-clear {
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  font-size: 13px;
+}
+
+.bulk-clear:hover {
+  color: #e1e4e8;
+}
+
+@media (max-width: 600px) {
+  .bulk-action-bar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .bulk-actions {
+    order: 3;
+    width: 100%;
+  }
+  .bulk-actions button {
+    flex: 1;
+    justify-content: center;
+  }
+}

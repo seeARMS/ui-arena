@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "id": "lighthouse",
+  "displayName": "Lighthouse",
+  "description": "Runs Lighthouse against the generated preview and records performance and accessibility scores.",
+  "categories": [
+    "performance",
+    "accessibility"
+  ],
+  "status": "complete",
+  "version": "13.2.0",
+  "startedAt": "2026-05-04T02:39:44.244Z",
+  "completedAt": "2026-05-04T02:39:52.779Z",
+  "durationMs": 8535,
+  "scores": {
+    "performance": {
+      "title": "Performance",
+      "score": 0.81,
+      "value": 81
+    },
+    "accessibility": {
+      "title": "Accessibility",
+      "score": 0.82,
+      "value": 82
+    }
+  },
+  "metrics": {
+    "firstContentfulPaint": {
+      "id": "first-contentful-paint",
+      "title": "First Contentful Paint",
+      "displayValue": "2.0 s",
+      "numericValue": 1959.9874,
+      "score": 0.31
+    },
+    "largestContentfulPaint": {
+      "id": "largest-contentful-paint",
+      "title": "Largest Contentful Paint",
+      "displayValue": "2.0 s",
+      "numericValue": 1959.9874,
+      "score": 0.64
+    },
+    "speedIndex": {
+      "id": "speed-index",
+      "title": "Speed Index",
+      "displayValue": "2.0 s",
+      "numericValue": 1959.9874,
+      "score": 0.64
+    },
+    "totalBlockingTime": {
+      "id": "total-blocking-time",
+      "title": "Total Blocking Time",
+      "displayValue": "0 ms",
+      "numericValue": 4.5,
+      "score": 1
+    },
+    "cumulativeLayoutShift": {
+      "id": "cumulative-layout-shift",
+      "title": "Cumulative Layout Shift",
+      "displayValue": "0",
+      "numericValue": 0,
+      "score": 1
+    }
+  },
+  "summary": {
+    "requestedUrl": "http://127.0.0.1:57773/previews/api-keys-admin-table/gpt-5-5__2026-05-04T02-38-01-505Z/",
+    "finalUrl": "http://127.0.0.1:57773/previews/api-keys-admin-table/gpt-5-5__2026-05-04T02-38-01-505Z/",
+    "fetchTime": "2026-05-04T02:39:47.948Z",
+    "accessibilityIssueCount": 3
+  },
+  "issues": [
+    {
+      "id": "aria-allowed-attr",
+      "title": "`[aria-*]` attributes do not match their roles",
+      "score": 0,
+      "displayValue": null,
+      "description": "Each ARIA `role` supports a specific subset of `aria-*` attributes. Mismatching these invalidates the `aria-*` attributes. [Learn how to match ARIA attributes to their roles](https://dequeuniversity.com/rules/axe/4.11/aria-allowed-attr)."
+    },
+    {
+      "id": "aria-valid-attr-value",
+      "title": "`[aria-*]` attributes do not have valid values",
+      "score": 0,
+      "displayValue": null,
+      "description": "Assistive technologies, like screen readers, can't interpret ARIA attributes with invalid values. [Learn more about valid values for ARIA attributes](https://dequeuniversity.com/rules/axe/4.11/aria-valid-attr-value)."
+    },
+    {
+      "id": "color-contrast",
+      "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+      "score": 0,
+      "displayValue": null,
+      "description": "Low-contrast text is difficult or impossible for many users to read. [Learn how to provide sufficient color contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast)."
+    }
+  ],
+  "artifacts": {
+    "report": "/evaluations/api-keys-admin-table/gpt-5-5__2026-05-04T02-38-01-505Z/lighthouse/report.html",
+    "json": "/evaluations/api-keys-admin-table/gpt-5-5__2026-05-04T02-38-01-505Z/lighthouse/lhr.json"
+  }
+}

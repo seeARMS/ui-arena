@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "id": "axe",
+  "displayName": "Axe",
+  "description": "Runs axe-core accessibility checks through Playwright and records violations by impact.",
+  "categories": [
+    "accessibility"
+  ],
+  "status": "complete",
+  "version": "4.11.4",
+  "startedAt": "2026-05-04T02:51:02.741Z",
+  "completedAt": "2026-05-04T02:51:04.096Z",
+  "durationMs": 1355,
+  "scores": null,
+  "metrics": null,
+  "summary": {
+    "violationCount": 3,
+    "passCount": 33,
+    "incompleteCount": 1,
+    "inapplicableCount": 55,
+    "seriousOrCriticalCount": 1,
+    "impactCounts": {
+      "critical": 0,
+      "serious": 1,
+      "moderate": 2,
+      "minor": 0,
+      "unknown": 0
+    }
+  },
+  "issues": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "nodeCount": 46,
+      "targets": [
+        "tr:nth-child(1) > .col-name > .name-cell > .key-prefix",
+        "tr:nth-child(2) > .col-name > .name-cell > .key-prefix",
+        "tr:nth-child(2) > .col-scopes > .over-scoped.scope-badges > .scope-more.scope-badge[title=\"admin:deployments\"]",
+        "tr:nth-child(3) > .col-name > .name-cell > .key-prefix"
+      ]
+    },
+    {
+      "id": "landmark-one-main",
+      "impact": "moderate",
+      "help": "Document should have one main landmark",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/landmark-one-main?application=playwright",
+      "description": "Ensure the document has a main landmark",
+      "nodeCount": 1,
+      "targets": [
+        "html"
+      ]
+    },
+    {
+      "id": "region",
+      "impact": "moderate",
+      "help": "All page content should be contained by landmarks",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/region?application=playwright",
+      "description": "Ensure all page content is contained by landmarks",
+      "nodeCount": 244,
+      "targets": [
+        ".summary-header",
+        ".search-input",
+        ".filter-segments",
+        "thead"
+      ]
+    }
+  ],
+  "artifacts": {
+    "json": "/evaluations/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/axe/axe.json"
+  }
+}

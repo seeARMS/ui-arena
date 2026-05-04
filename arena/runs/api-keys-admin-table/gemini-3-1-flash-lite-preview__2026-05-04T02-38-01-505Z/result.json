@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 1,
+  "runId": "gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z",
+  "interfaceId": "api-keys-admin-table",
+  "interfaceTitle": "Admin table for managing API keys and permissions",
+  "modelId": "gemini-3-1-flash-lite-preview",
+  "modelDisplayName": "Gemini 3.1 Flash Lite Preview",
+  "family": "Google",
+  "gateway": "openrouter",
+  "gatewayModel": "google/gemini-3.1-flash-lite-preview",
+  "gatewayGenerationId": "gen-1777863748-0zIwO6KlgVrQJddwPUqp",
+  "providerName": null,
+  "status": "complete",
+  "createdAt": "2026-05-04T02:38:01.505Z",
+  "completedAt": "2026-05-04T03:02:46.692Z",
+  "request": {
+    "dryRun": false,
+    "artifactType": "react-project",
+    "promptSha256": "03534157b5f177deb1dad83ebcb714c523cb33acb2afb334847a31762158a7f3",
+    "params": {
+      "temperature": 0.2,
+      "max_tokens": 8000
+    }
+  },
+  "execution": {
+    "startedAt": "2026-05-04T02:38:01.505Z",
+    "completedAt": "2026-05-04T03:02:46.692Z",
+    "durationMs": 18747,
+    "modelStartedAt": "2026-05-04T03:02:27.953Z",
+    "modelCompletedAt": "2026-05-04T03:02:34.904Z",
+    "modelDurationMs": 6951,
+    "generationTimeMs": null,
+    "latencyMs": null
+  },
+  "usage": {
+    "source": "openrouter:response",
+    "promptTokens": 564,
+    "completionTokens": 2234,
+    "totalTokens": 2798,
+    "nativePromptTokens": null,
+    "nativeCompletionTokens": null,
+    "reasoningTokens": 0,
+    "cachedPromptTokens": 0,
+    "cacheDiscount": null,
+    "totalCost": 0.003492,
+    "upstreamInferenceCost": 0.003492,
+    "currency": "USD",
+    "rawResponseUsage": {
+      "prompt_tokens": 564,
+      "completion_tokens": 2234,
+      "total_tokens": 2798,
+      "cost": 0.003492,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.003492,
+        "upstream_inference_prompt_cost": 0.000141,
+        "upstream_inference_completions_cost": 0.003351
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "artifacts": {
+    "preview": "/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z/",
+    "source": "/sources/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z/source.txt",
+    "sourceJson": "/sources/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z/files.json",
+    "localResultPath": "arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z/result.json",
+    "localRunPath": "arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z",
+    "localSourcePath": "arena/runs/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z/source",
+    "localPreviewPath": "public/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z",
+    "sourceFormat": "react-project",
+    "sourceFiles": [
+      "index.html",
+      "package.json",
+      "postcss.config.js",
+      "src/App.jsx",
+      "src/index.css",
+      "src/main.jsx",
+      "src/styles.css",
+      "tailwind.config.js"
+    ],
+    "desktopScreenshot": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z__desktop.png",
+    "mobileScreenshot": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z__mobile.png"
+  },
+  "finishReason": "stop",
+  "repairs": [],
+  "screenshots": {
+    "desktop": {
+      "width": 1440,
+      "height": 1100,
+      "path": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z__desktop.png",
+      "capturedAt": "2026-05-04T03:02:53.705Z"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "path": "/screenshots/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z__mobile.png",
+      "capturedAt": "2026-05-04T03:02:54.330Z"
+    }
+  },
+  "evaluations": {
+    "lighthouse": {
+      "id": "lighthouse",
+      "displayName": "Lighthouse",
+      "status": "complete",
+      "version": "13.2.0",
+      "completedAt": "2026-05-04T03:03:02.410Z",
+      "durationMs": 8038,
+      "scores": {
+        "performance": {
+          "title": "Performance",
+          "score": 0.86,
+          "value": 86
+        },
+        "accessibility": {
+          "title": "Accessibility",
+          "score": 0.77,
+          "value": 77
+        }
+      },
+      "metrics": {
+        "firstContentfulPaint": {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "displayValue": "1.7 s",
+          "numericValue": 1657.096,
+          "score": 0.46
+        },
+        "largestContentfulPaint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "displayValue": "1.7 s",
+          "numericValue": 1657.096,
+          "score": 0.75
+        },
+        "speedIndex": {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "displayValue": "1.7 s",
+          "numericValue": 1657.096,
+          "score": 0.77
+        },
+        "totalBlockingTime": {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "displayValue": "0 ms",
+          "numericValue": 0,
+          "score": 1
+        },
+        "cumulativeLayoutShift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "displayValue": "0",
+          "numericValue": 0,
+          "score": 1
+        }
+      },
+      "summary": {
+        "requestedUrl": "http://127.0.0.1:63007/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z/",
+        "finalUrl": "http://127.0.0.1:63007/previews/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z/",
+        "fetchTime": "2026-05-04T03:02:57.819Z",
+        "accessibilityIssueCount": 4
+      },
+      "issues": [
+        {
+          "id": "color-contrast",
+          "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+          "score": 0,
+          "displayValue": null,
+          "description": "Low-contrast text is difficult or impossible for many users to read. [Learn how to provide sufficient color contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast)."
+        },
+        {
+          "id": "label",
+          "title": "Form elements do not have associated labels",
+          "score": 0,
+          "displayValue": null,
+          "description": "Labels ensure that form controls are announced properly by assistive technologies, like screen readers. [Learn more about form element labels](https://dequeuniversity.com/rules/axe/4.11/label)."
+        },
+        {
+          "id": "landmark-one-main",
+          "title": "Document does not have a main landmark.",
+          "score": 0,
+          "displayValue": null,
+          "description": "One main landmark helps screen reader users navigate a web page. [Learn more about landmarks](https://dequeuniversity.com/rules/axe/4.11/landmark-one-main)."
+        },
+        {
+          "id": "td-has-header",
+          "title": "`<td>` elements in a large `<table>` do not have table headers.",
+          "score": 0,
+          "displayValue": null,
+          "description": "Screen readers have features to make navigating tables easier. Ensuring that `<td>` elements in a large table (3 or more cells in width and height) have an associated table header may improve the experience for screen reader users. [Learn more about table headers](https://dequeuniversity.com/rules/axe/4.11/td-has-header)."
+        }
+      ],
+      "artifacts": {
+        "report": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z/lighthouse/report.html",
+        "json": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z/lighthouse/lhr.json"
+      },
+      "error": null
+    },
+    "axe": {
+      "id": "axe",
+      "displayName": "Axe",
+      "status": "complete",
+      "version": "4.11.4",
+      "completedAt": "2026-05-04T03:03:03.537Z",
+      "durationMs": 1124,
+      "scores": null,
+      "metrics": null,
+      "summary": {
+        "violationCount": 5,
+        "passCount": 23,
+        "incompleteCount": 0,
+        "inapplicableCount": 65,
+        "seriousOrCriticalCount": 2,
+        "impactCounts": {
+          "critical": 1,
+          "serious": 1,
+          "moderate": 2,
+          "minor": 1,
+          "unknown": 0
+        }
+      },
+      "issues": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodeCount": 5,
+          "targets": [
+            ".hover\\:bg-slate-50.cursor-pointer:nth-child(5) > td:nth-child(7) > .bg-gray-200.text-gray-500",
+            ".hover\\:bg-slate-50.cursor-pointer:nth-child(10) > td:nth-child(7) > .bg-gray-200.text-gray-500",
+            ".hover\\:bg-slate-50.cursor-pointer:nth-child(15) > td:nth-child(7) > .bg-gray-200.text-gray-500",
+            ".hover\\:bg-slate-50.cursor-pointer:nth-child(20) > td:nth-child(7) > .bg-gray-200.text-gray-500"
+          ]
+        },
+        {
+          "id": "empty-table-header",
+          "impact": "minor",
+          "help": "Table header text should not be empty",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+          "description": "Ensure table headers have discernible text",
+          "nodeCount": 2,
+          "targets": [
+            "th:nth-child(1)",
+            "th:nth-child(8)"
+          ]
+        },
+        {
+          "id": "label",
+          "impact": "critical",
+          "help": "Form elements must have labels",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/label?application=playwright",
+          "description": "Ensure every form element has a label",
+          "nodeCount": 26,
+          "targets": [
+            "th:nth-child(1) > input[type=\"checkbox\"]",
+            ".hover\\:bg-slate-50.cursor-pointer:nth-child(1) > td:nth-child(1) > input[type=\"checkbox\"]",
+            ".hover\\:bg-slate-50.cursor-pointer:nth-child(2) > td:nth-child(1) > input[type=\"checkbox\"]",
+            ".hover\\:bg-slate-50.cursor-pointer:nth-child(3) > td:nth-child(1) > input[type=\"checkbox\"]"
+          ]
+        },
+        {
+          "id": "landmark-one-main",
+          "impact": "moderate",
+          "help": "Document should have one main landmark",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/landmark-one-main?application=playwright",
+          "description": "Ensure the document has a main landmark",
+          "nodeCount": 1,
+          "targets": [
+            "html"
+          ]
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "help": "All page content should be contained by landmarks",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/region?application=playwright",
+          "description": "Ensure all page content is contained by landmarks",
+          "nodeCount": 177,
+          "targets": [
+            ".pl-8",
+            "thead",
+            ".hover\\:bg-slate-50.cursor-pointer:nth-child(1) > td:nth-child(1)",
+            ".hover\\:bg-slate-50.cursor-pointer:nth-child(1) > .font-medium"
+          ]
+        }
+      ],
+      "artifacts": {
+        "json": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z/axe/axe.json"
+      },
+      "error": null
+    }
+  }
+}

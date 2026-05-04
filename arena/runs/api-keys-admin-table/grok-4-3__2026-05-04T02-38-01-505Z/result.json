@@ -1,0 +1,316 @@
+{
+  "schemaVersion": 1,
+  "runId": "grok-4-3__2026-05-04T02-38-01-505Z",
+  "interfaceId": "api-keys-admin-table",
+  "interfaceTitle": "Admin table for managing API keys and permissions",
+  "modelId": "grok-4-3",
+  "modelDisplayName": "Grok 4.3",
+  "family": "xAI",
+  "gateway": "openrouter",
+  "gatewayModel": "x-ai/grok-4.3",
+  "gatewayGenerationId": "gen-1777863401-bqRIQ0if1g5VqALIdyNp",
+  "providerName": null,
+  "status": "complete",
+  "createdAt": "2026-05-04T02:38:01.505Z",
+  "completedAt": "2026-05-04T02:59:37.973Z",
+  "request": {
+    "dryRun": false,
+    "artifactType": "react-project",
+    "promptSha256": "03534157b5f177deb1dad83ebcb714c523cb33acb2afb334847a31762158a7f3",
+    "params": {
+      "temperature": 0.2,
+      "max_tokens": 16000
+    }
+  },
+  "execution": {
+    "startedAt": "2026-05-04T02:38:01.505Z",
+    "completedAt": "2026-05-04T02:59:37.973Z",
+    "durationMs": 176195,
+    "modelStartedAt": "2026-05-04T02:56:41.777Z",
+    "modelCompletedAt": "2026-05-04T02:59:26.035Z",
+    "modelDurationMs": 164258,
+    "generationTimeMs": null,
+    "latencyMs": null
+  },
+  "usage": {
+    "source": "openrouter:response",
+    "promptTokens": 652,
+    "completionTokens": 16035,
+    "totalTokens": 16687,
+    "nativePromptTokens": null,
+    "nativeCompletionTokens": null,
+    "reasoningTokens": 8102,
+    "cachedPromptTokens": 64,
+    "cacheDiscount": null,
+    "totalCost": 0.0408353,
+    "upstreamInferenceCost": 0.0408353,
+    "currency": "USD",
+    "rawResponseUsage": {
+      "prompt_tokens": 652,
+      "completion_tokens": 16035,
+      "total_tokens": 16687,
+      "cost": 0.0408353,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 64,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0408353,
+        "upstream_inference_prompt_cost": 0.0007478,
+        "upstream_inference_completions_cost": 0.0400875
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 8102,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "artifacts": {
+    "preview": "/previews/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/",
+    "source": "/sources/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/source.txt",
+    "sourceJson": "/sources/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/files.json",
+    "localResultPath": "arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/result.json",
+    "localRunPath": "arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z",
+    "localSourcePath": "arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/source",
+    "localPreviewPath": "public/previews/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z",
+    "sourceFormat": "react-project",
+    "sourceFiles": [
+      "index.html",
+      "package.json",
+      "postcss.config.js",
+      "src/App.jsx",
+      "src/index.css",
+      "src/main.jsx",
+      "src/styles.css",
+      "tailwind.config.js",
+      "vite.config.js"
+    ],
+    "desktopScreenshot": "/screenshots/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z__desktop.png",
+    "mobileScreenshot": "/screenshots/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z__mobile.png"
+  },
+  "finishReason": "stop",
+  "repairs": [
+    {
+      "attempt": 1,
+      "gatewayGenerationId": "gen-1777863583-27uZeOV0ClYWjrvtQkQv",
+      "finishReason": "stop",
+      "buildError": "$ npm run build\n\nstdout:\n\n> api-key-admin-table@0.1.0 build\n> vite build --base=./\n\nvite v5.4.21 building for production...\ntransforming...\n✓ 4 modules transformed.\n\n\nstderr:\n\nwarn - The `content` option in your Tailwind CSS configuration is missing or empty.\nwarn - Configure your content sources or your generated CSS will be missing styles.\nwarn - https://tailwindcss.com/docs/content-configuration\nx Build failed in 184ms\nerror during build:\nCould not resolve \"./App.jsx\" from \"src/main.jsx\"\nfile: /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/source/src/main.jsx\n    at getRollupError (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/parseAst.js:406:41)\n    at error (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/parseAst.js:402:42)\n    at ModuleLoader.handleInvalidResolvedId (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/node-entry.js:22120:24)\n    at file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/node-entry.js:22080:26\n\n\nerror:\nCommand failed: npm run build\n\nwarn - The `content` option in your Tailwind CSS configuration is missing or empty.\nwarn - Configure your content sources or your generated CSS will be missing styles.\nwarn - https://tailwindcss.com/docs/content-configuration\nx Build failed in 184ms\nerror during build:\nCould not resolve \"./App.jsx\" from \"src/main.jsx\"\nfile: /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/source/src/main.jsx\n    at getRollupError (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/parseAst.js:406:41)\n    at error (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/parseAst.js:402:42)\n    at ModuleLoader.handleInvalidResolvedId (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/node-entry.js:22120:24)\n    at file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/node-entry.js:22080:26\n",
+      "modelStartedAt": "2026-05-04T02:59:43.177Z",
+      "modelCompletedAt": "2026-05-04T03:01:59.388Z",
+      "modelDurationMs": 136211
+    }
+  ],
+  "screenshots": {
+    "desktop": {
+      "width": 1440,
+      "height": 1100,
+      "path": "/screenshots/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z__desktop.png",
+      "capturedAt": "2026-05-04T03:02:17.859Z"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "path": "/screenshots/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z__mobile.png",
+      "capturedAt": "2026-05-04T03:02:18.495Z"
+    }
+  },
+  "evaluations": {
+    "lighthouse": {
+      "id": "lighthouse",
+      "displayName": "Lighthouse",
+      "status": "complete",
+      "version": "13.2.0",
+      "completedAt": "2026-05-04T03:02:26.747Z",
+      "durationMs": 8232,
+      "scores": {
+        "performance": {
+          "title": "Performance",
+          "score": 0.85,
+          "value": 85
+        },
+        "accessibility": {
+          "title": "Accessibility",
+          "score": 0.77,
+          "value": 77
+        }
+      },
+      "metrics": {
+        "firstContentfulPaint": {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "displayValue": "1.7 s",
+          "numericValue": 1661.296,
+          "score": 0.46
+        },
+        "largestContentfulPaint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "displayValue": "1.8 s",
+          "numericValue": 1811.296,
+          "score": 0.69
+        },
+        "speedIndex": {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "displayValue": "1.7 s",
+          "numericValue": 1661.296,
+          "score": 0.77
+        },
+        "totalBlockingTime": {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "displayValue": "0 ms",
+          "numericValue": 0.5,
+          "score": 1
+        },
+        "cumulativeLayoutShift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "displayValue": "0",
+          "numericValue": 0,
+          "score": 1
+        }
+      },
+      "summary": {
+        "requestedUrl": "http://127.0.0.1:62844/previews/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/",
+        "finalUrl": "http://127.0.0.1:62844/previews/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/",
+        "fetchTime": "2026-05-04T03:02:22.045Z",
+        "accessibilityIssueCount": 4
+      },
+      "issues": [
+        {
+          "id": "color-contrast",
+          "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+          "score": 0,
+          "displayValue": null,
+          "description": "Low-contrast text is difficult or impossible for many users to read. [Learn how to provide sufficient color contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast)."
+        },
+        {
+          "id": "label",
+          "title": "Form elements do not have associated labels",
+          "score": 0,
+          "displayValue": null,
+          "description": "Labels ensure that form controls are announced properly by assistive technologies, like screen readers. [Learn more about form element labels](https://dequeuniversity.com/rules/axe/4.11/label)."
+        },
+        {
+          "id": "landmark-one-main",
+          "title": "Document does not have a main landmark.",
+          "score": 0,
+          "displayValue": null,
+          "description": "One main landmark helps screen reader users navigate a web page. [Learn more about landmarks](https://dequeuniversity.com/rules/axe/4.11/landmark-one-main)."
+        },
+        {
+          "id": "td-has-header",
+          "title": "`<td>` elements in a large `<table>` do not have table headers.",
+          "score": 0,
+          "displayValue": null,
+          "description": "Screen readers have features to make navigating tables easier. Ensuring that `<td>` elements in a large table (3 or more cells in width and height) have an associated table header may improve the experience for screen reader users. [Learn more about table headers](https://dequeuniversity.com/rules/axe/4.11/td-has-header)."
+        }
+      ],
+      "artifacts": {
+        "report": "/evaluations/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/lighthouse/report.html",
+        "json": "/evaluations/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/lighthouse/lhr.json"
+      },
+      "error": null
+    },
+    "axe": {
+      "id": "axe",
+      "displayName": "Axe",
+      "status": "complete",
+      "version": "4.11.4",
+      "completedAt": "2026-05-04T03:02:27.952Z",
+      "durationMs": 1201,
+      "scores": null,
+      "metrics": null,
+      "summary": {
+        "violationCount": 5,
+        "passCount": 20,
+        "incompleteCount": 1,
+        "inapplicableCount": 68,
+        "seriousOrCriticalCount": 2,
+        "impactCounts": {
+          "critical": 1,
+          "serious": 1,
+          "moderate": 2,
+          "minor": 1,
+          "unknown": 0
+        }
+      },
+      "issues": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodeCount": 6,
+          "targets": [
+            "tr:nth-child(5) > td:nth-child(8) > .ml-1.text-orange-600.text-\\[10px\\]",
+            "tr:nth-child(12) > td:nth-child(8) > .ml-1.text-orange-600.text-\\[10px\\]",
+            "tr:nth-child(15) > td:nth-child(8) > .ml-1.text-orange-600.text-\\[10px\\]",
+            "tr:nth-child(19) > td:nth-child(8) > .ml-1.text-orange-600.text-\\[10px\\]"
+          ]
+        },
+        {
+          "id": "empty-table-header",
+          "impact": "minor",
+          "help": "Table header text should not be empty",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+          "description": "Ensure table headers have discernible text",
+          "nodeCount": 2,
+          "targets": [
+            ".w-8",
+            ".w-10"
+          ]
+        },
+        {
+          "id": "label",
+          "impact": "critical",
+          "help": "Form elements must have labels",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/label?application=playwright",
+          "description": "Ensure every form element has a label",
+          "nodeCount": 29,
+          "targets": [
+            ".w-8 > input[type=\"checkbox\"]",
+            "tr:nth-child(1) > td:nth-child(1) > input[type=\"checkbox\"]",
+            "tr:nth-child(2) > td:nth-child(1) > input[type=\"checkbox\"]",
+            "tr:nth-child(3) > td:nth-child(1) > input[type=\"checkbox\"]"
+          ]
+        },
+        {
+          "id": "landmark-one-main",
+          "impact": "moderate",
+          "help": "Document should have one main landmark",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/landmark-one-main?application=playwright",
+          "description": "Ensure the document has a main landmark",
+          "nodeCount": 1,
+          "targets": [
+            "html"
+          ]
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "help": "All page content should be contained by landmarks",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/region?application=playwright",
+          "description": "Ensure all page content is contained by landmarks",
+          "nodeCount": 228,
+          "targets": [
+            ".mb-4:nth-child(1)",
+            ".grid",
+            ".flex-1",
+            "thead"
+          ]
+        }
+      ],
+      "artifacts": {
+        "json": "/evaluations/api-keys-admin-table/grok-4-3__2026-05-04T02-38-01-505Z/axe/axe.json"
+      },
+      "error": null
+    }
+  }
+}

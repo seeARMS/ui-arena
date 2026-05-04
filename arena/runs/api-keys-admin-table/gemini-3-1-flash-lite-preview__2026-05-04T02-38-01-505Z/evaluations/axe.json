@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "id": "axe",
+  "displayName": "Axe",
+  "description": "Runs axe-core accessibility checks through Playwright and records violations by impact.",
+  "categories": [
+    "accessibility"
+  ],
+  "status": "complete",
+  "version": "4.11.4",
+  "startedAt": "2026-05-04T03:03:02.413Z",
+  "completedAt": "2026-05-04T03:03:03.537Z",
+  "durationMs": 1124,
+  "scores": null,
+  "metrics": null,
+  "summary": {
+    "violationCount": 5,
+    "passCount": 23,
+    "incompleteCount": 0,
+    "inapplicableCount": 65,
+    "seriousOrCriticalCount": 2,
+    "impactCounts": {
+      "critical": 1,
+      "serious": 1,
+      "moderate": 2,
+      "minor": 1,
+      "unknown": 0
+    }
+  },
+  "issues": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "nodeCount": 5,
+      "targets": [
+        ".hover\\:bg-slate-50.cursor-pointer:nth-child(5) > td:nth-child(7) > .bg-gray-200.text-gray-500",
+        ".hover\\:bg-slate-50.cursor-pointer:nth-child(10) > td:nth-child(7) > .bg-gray-200.text-gray-500",
+        ".hover\\:bg-slate-50.cursor-pointer:nth-child(15) > td:nth-child(7) > .bg-gray-200.text-gray-500",
+        ".hover\\:bg-slate-50.cursor-pointer:nth-child(20) > td:nth-child(7) > .bg-gray-200.text-gray-500"
+      ]
+    },
+    {
+      "id": "empty-table-header",
+      "impact": "minor",
+      "help": "Table header text should not be empty",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+      "description": "Ensure table headers have discernible text",
+      "nodeCount": 2,
+      "targets": [
+        "th:nth-child(1)",
+        "th:nth-child(8)"
+      ]
+    },
+    {
+      "id": "label",
+      "impact": "critical",
+      "help": "Form elements must have labels",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/label?application=playwright",
+      "description": "Ensure every form element has a label",
+      "nodeCount": 26,
+      "targets": [
+        "th:nth-child(1) > input[type=\"checkbox\"]",
+        ".hover\\:bg-slate-50.cursor-pointer:nth-child(1) > td:nth-child(1) > input[type=\"checkbox\"]",
+        ".hover\\:bg-slate-50.cursor-pointer:nth-child(2) > td:nth-child(1) > input[type=\"checkbox\"]",
+        ".hover\\:bg-slate-50.cursor-pointer:nth-child(3) > td:nth-child(1) > input[type=\"checkbox\"]"
+      ]
+    },
+    {
+      "id": "landmark-one-main",
+      "impact": "moderate",
+      "help": "Document should have one main landmark",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/landmark-one-main?application=playwright",
+      "description": "Ensure the document has a main landmark",
+      "nodeCount": 1,
+      "targets": [
+        "html"
+      ]
+    },
+    {
+      "id": "region",
+      "impact": "moderate",
+      "help": "All page content should be contained by landmarks",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/region?application=playwright",
+      "description": "Ensure all page content is contained by landmarks",
+      "nodeCount": 177,
+      "targets": [
+        ".pl-8",
+        "thead",
+        ".hover\\:bg-slate-50.cursor-pointer:nth-child(1) > td:nth-child(1)",
+        ".hover\\:bg-slate-50.cursor-pointer:nth-child(1) > .font-medium"
+      ]
+    }
+  ],
+  "artifacts": {
+    "json": "/evaluations/api-keys-admin-table/gemini-3-1-flash-lite-preview__2026-05-04T02-38-01-505Z/axe/axe.json"
+  }
+}

@@ -72,6 +72,20 @@
       }
     },
     {
+      "id": "gemini-3-flash-preview",
+      "displayName": "Gemini 3 Flash Preview",
+      "family": "Google",
+      "adapter": "openrouter",
+      "model": "google/gemini-3-flash-preview",
+      "accent": "#c56b14",
+      "accentSoft": "#f3dfc8",
+      "enabled": true,
+      "params": {
+        "temperature": 0.2,
+        "max_tokens": 16000
+      }
+    },
+    {
       "id": "grok-4-3",
       "displayName": "Grok 4.3",
       "family": "xAI",

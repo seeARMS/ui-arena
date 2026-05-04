@@ -1,0 +1,1440 @@
+===== index.html =====
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; media-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; form-action 'none'; base-uri 'none'" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Keys Admin</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html { font-size: 13px; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+        background: #0f1117;
+        color: #c9d1d9;
+        line-height: 1.4;
+        -webkit-font-smoothing: antialiased;
+      }
+      #root { min-height: 100vh; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+===== package.json =====
+{
+  "private": true,
+  "type": "module",
+  "name": "api-keys-admin",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --base=./",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "date-fns": "^3.6.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.2.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0"
+  }
+}
+
+===== src/App.jsx =====
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+import { mockKeys } from './mockData.js'
+import { format, formatDistanceToNow, isAfter, isBefore, addDays } from 'date-fns'
+import './styles.css'
+
+const STATUS_CONFIG = {
+  'healthy': { label: 'Healthy', color: '#238636', bg: '#0d1f0d' },
+  'stale': { label: 'Stale', color: '#d29922', bg: '#2a1f00' },
+  'expiring': { label: 'Expiring', color: '#db6d28', bg: '#2a1500' },
+  'leaked-suspected': { label: 'Leak Suspected', color: '#f85149', bg: '#2d0a0a' },
+  'revoked': { label: 'Revoked', color: '#8b949e', bg: '#161b22' },
+}
+
+const FILTERS = [
+  { key: 'all', label: 'All' },
+  { key: 'active', label: 'Active' },
+  { key: 'stale', label: 'Stale' },
+  { key: 'expiring', label: 'Expiring' },
+  { key: 'over-scoped', label: 'Over-scoped' },
+]
+
+function StatusPill({ status }) {
+  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.healthy
+  return (
+    <span className="status-pill" style={{ color: cfg.color, background: cfg.bg, borderColor: cfg.color }}>
+      <span className="status-dot" style={{ background: cfg.color }} />
+      {cfg.label}
+    </span>
+  )
+}
+
+function ScopeBadges({ scopes, max = 3 }) {
+  const shown = scopes.slice(0, max)
+  const rest = scopes.length - max
+  return (
+    <span className="scope-badges">
+      {shown.map(s => <span key={s} className="scope-badge">{s}</span>)}
+      {rest > 0 && <span className="scope-badge scope-more">+{rest}</span>}
+    </span>
+  )
+}
+
+function ActionPopover({ keyData, onClose, onAction }) {
+  const ref = useRef(null)
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) onClose()
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [onClose])
+
+  const actions = [
+    { id: 'rotate', label: '↻ Rotate Key', disabled: keyData.status === 'revoked' },
+    { id: 'revoke', label: '⊘ Revoke', disabled: keyData.status === 'revoked' },
+    { id: 'edit-scopes', label: '✎ Edit Scopes', disabled: keyData.status === 'revoked' },
+    { id: 'audit', label: '⊞ View Audit Trail' },
+  ]
+
+  return (
+    <div className="action-popover" ref={ref} role="menu">
+      {actions.map(a => (
+        <button
+          key={a.id}
+          className="action-item"
+          role="menuitem"
+          disabled={a.disabled}
+          onClick={(e) => { e.stopPropagation(); onAction(a.id, keyData); onClose() }}
+        >
+          {a.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function AuditDrawer({ keyData, onClose }) {
+  if (!keyData) return null
+
+  return (
+    <>
+      <div className="drawer-overlay" onClick={onClose} />
+      <aside className="audit-drawer" role="dialog" aria-label="Audit details">
+        <div className="drawer-header">
+          <div>
+            <h2 className="drawer-title">{keyData.name}</h2>
+            <span className="drawer-subtitle">{keyData.keyPrefix}</span>
+          </div>
+          <button className="drawer-close" onClick={onClose} aria-label="Close drawer">✕</button>
+        </div>
+
+        <div className="drawer-body">
+          <div className="drawer-meta">
+            <div className="meta-row">
+              <span className="meta-label">Owner</span>
+              <span className="meta-value">{keyData.owner}</span>
+            </div>
+            <div className="meta-row">
+              <span className="meta-label">Status</span>
+              <span className="meta-value"><StatusPill status={keyData.status} /></span>
+            </div>
+            <div className="meta-row">
+              <span className="meta-label">Created</span>
+              <span className="meta-value">{format(keyData.created, 'MMM d, yyyy HH:mm')}</span>
+            </div>
+            <div className="meta-row">
+              <span className="meta-label">Expires</span>
+              <span className="meta-value">{format(keyData.expires, 'MMM d, yyyy HH:mm')}</span>
+            </div>
+            <div className="meta-row">
+              <span className="meta-label">Last Used</span>
+              <span className="meta-value">{formatDistanceToNow(keyData.lastUsed, { addSuffix: true })}</span>
+            </div>
+            <div className="meta-row">
+              <span className="meta-label">Rotations</span>
+              <span className="meta-value">{keyData.rotationCount}</span>
+            </div>
+            <div className="meta-row">
+              <span className="meta-label">Scopes</span>
+              <span className="meta-value"><ScopeBadges scopes={keyData.scopes} max={10} /></span>
+            </div>
+          </div>
+
+          <h3 className="drawer-section-title">Audit Trail ({keyData.auditEvents.length} events)</h3>
+          <div className="audit-timeline">
+            {keyData.auditEvents.map((evt, i) => (
+              <div key={i} className={`audit-event ${evt.type === 'leak_detected' ? 'audit-event-danger' : ''}`}>
+                <div className="audit-event-header">
+                  <span className={`audit-event-type audit-type-${evt.type}`}>{evt.type.replace(/_/g, ' ')}</span>
+                  <span className="audit-event-time">{format(evt.timestamp, 'MMM d, HH:mm:ss')}</span>
+                </div>
+                <div className="audit-event-detail">{evt.detail}</div>
+                <div className="audit-event-actor">by {evt.actor}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </aside>
+    </>
+  )
+}
+
+function SummaryStrip({ keys }) {
+  const now = new Date()
+  const weekFromNow = addDays(now, 7)
+
+  const total = keys.length
+  const active = keys.filter(k => k.status !== 'revoked').length
+  const overScoped = keys.filter(k => k.isOverScoped && k.status !== 'revoked').length
+  const expiringThisWeek = keys.filter(k =>
+    k.status !== 'revoked' && isBefore(k.expires, weekFromNow) && isAfter(k.expires, now)
+  ).length
+  const leaked = keys.filter(k => k.status === 'leaked-suspected').length
+
+  return (
+    <div className="summary-strip">
+      <div className="summary-item">
+        <span className="summary-value">{total}</span>
+        <span className="summary-label">Total Keys</span>
+      </div>
+      <div className="summary-item">
+        <span className="summary-value summary-active">{active}</span>
+        <span className="summary-label">Active</span>
+      </div>
+      <div className="summary-item">
+        <span className="summary-value summary-warn">{overScoped}</span>
+        <span className="summary-label">Over-scoped</span>
+      </div>
+      <div className="summary-item">
+        <span className="summary-value summary-expiring">{expiringThisWeek}</span>
+        <span className="summary-label">Expiring 7d</span>
+      </div>
+      {leaked > 0 && (
+        <div className="summary-item summary-item-danger">
+          <span className="summary-value summary-danger">{leaked}</span>
+          <span className="summary-label">Leak Suspected</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function App() {
+  const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState('all')
+  const [sortCol, setSortCol] = useState('status')
+  const [sortDir, setSortDir] = useState('asc')
+  const [selected, setSelected] = useState(new Set())
+  const [popoverKey, setPopoverKey] = useState(null)
+  const [drawerKey, setDrawerKey] = useState(null)
+  const [toast, setToast] = useState(null)
+
+  const showToast = useCallback((msg) => {
+    setToast(msg)
+    setTimeout(() => setToast(null), 2500)
+  }, [])
+
+  const handleAction = useCallback((action, keyData) => {
+    if (action === 'audit') {
+      setDrawerKey(keyData)
+    } else {
+      showToast(`${action} → ${keyData.name}`)
+    }
+  }, [showToast])
+
+  const statusOrder = { 'leaked-suspected': 0, 'expiring': 1, 'stale': 2, 'healthy': 3, 'revoked': 4 }
+
+  const filteredKeys = useMemo(() => {
+    let result = [...mockKeys]
+
+    if (search) {
+      const q = search.toLowerCase()
+      result = result.filter(k =>
+        k.name.toLowerCase().includes(q) ||
+        k.owner.toLowerCase().includes(q) ||
+        k.keyPrefix.toLowerCase().includes(q) ||
+        k.scopes.some(s => s.toLowerCase().includes(q))
+      )
+    }
+
+    switch (filter) {
+      case 'active': result = result.filter(k => k.status !== 'revoked'); break
+      case 'stale': result = result.filter(k => k.status === 'stale'); break
+      case 'expiring': result = result.filter(k => k.status === 'expiring'); break
+      case 'over-scoped': result = result.filter(k => k.isOverScoped); break
+    }
+
+    result.sort((a, b) => {
+      let cmp = 0
+      switch (sortCol) {
+        case 'name': cmp = a.name.localeCompare(b.name); break
+        case 'owner': cmp = a.owner.localeCompare(b.owner); break
+        case 'scopes': cmp = a.scopes.length - b.scopes.length; break
+        case 'lastUsed': cmp = a.lastUsed - b.lastUsed; break
+        case 'created': cmp = a.created - b.created; break
+        case 'expires': cmp = a.expires - b.expires; break
+        case 'status': cmp = (statusOrder[a.status] ?? 5) - (statusOrder[b.status] ?? 5); break
+        default: cmp = 0
+      }
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+
+    return result
+  }, [search, filter, sortCol, sortDir])
+
+  const toggleSort = (col) => {
+    if (sortCol === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setSortCol(col); setSortDir('asc') }
+  }
+
+  const toggleSelect = (id) => {
+    setSelected(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id); else next.add(id)
+      return next
+    })
+  }
+
+  const toggleAll = () => {
+    if (selected.size === filteredKeys.length) setSelected(new Set())
+    else setSelected(new Set(filteredKeys.map(k => k.id)))
+  }
+
+  const SortHeader = ({ col, children }) => (
+    <th
+      className="sortable-th"
+      onClick={() => toggleSort(col)}
+      aria-sort={sortCol === col ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+    >
+      <span className="th-content">
+        {children}
+        {sortCol === col && <span className="sort-arrow">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+      </span>
+    </th>
+  )
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <div className="header-top">
+          <h1 className="app-title">API Keys</h1>
+          <span className="header-env">production</span>
+        </div>
+        <SummaryStrip keys={mockKeys} />
+      </header>
+
+      <div className="toolbar">
+        <div className="toolbar-left">
+          <input
+            type="search"
+            className="search-input"
+            placeholder="Search keys, owners, scopes…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            aria-label="Search API keys"
+          />
+          <div className="filter-segments" role="tablist">
+            {FILTERS.map(f => (
+              <button
+                key={f.key}
+                role="tab"
+                aria-selected={filter === f.key}
+                className={`filter-btn ${filter === f.key ? 'filter-active' : ''}`}
+                onClick={() => setFilter(f.key)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <span className="result-count">{filteredKeys.length} keys</span>
+      </div>
+
+      {selected.size > 0 && (
+        <div className="bulk-bar">
+          <span className="bulk-count">{selected.size} selected</span>
+          <button className="bulk-btn" onClick={() => { showToast(`Rotating ${selected.size} keys`); setSelected(new Set()) }}>Rotate Selected</button>
+          <button className="bulk-btn bulk-btn-danger" onClick={() => { showToast(`Revoking ${selected.size} keys`); setSelected(new Set()) }}>Revoke Selected</button>
+          <button className="bulk-btn-ghost" onClick={() => setSelected(new Set())}>Clear</button>
+        </div>
+      )}
+
+      <div className="table-wrapper">
+        <table className="keys-table" role="grid">
+          <thead>
+            <tr>
+              <th className="th-check">
+                <input
+                  type="checkbox"
+                  checked={filteredKeys.length > 0 && selected.size === filteredKeys.length}
+                  onChange={toggleAll}
+                  aria-label="Select all"
+                />
+              </th>
+              <SortHeader col="name">Name</SortHeader>
+              <SortHeader col="owner">Owner</SortHeader>
+              <SortHeader col="scopes">Scopes</SortHeader>
+              <SortHeader col="lastUsed">Last Used</SortHeader>
+              <SortHeader col="created">Created</SortHeader>
+              <SortHeader col="expires">Expires</SortHeader>
+              <SortHeader col="status">Status</SortHeader>
+              <th className="th-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredKeys.map(k => (
+              <tr
+                key={k.id}
+                className={`table-row ${selected.has(k.id) ? 'row-selected' : ''} ${k.status === 'leaked-suspected' ? 'row-danger' : ''}`}
+                onClick={() => setDrawerKey(k)}
+              >
+                <td className="td-check" onClick={e => e.stopPropagation()}>
+                  <input
+                    type="checkbox"
+                    checked={selected.has(k.id)}
+                    onChange={() => toggleSelect(k.id)}
+                    aria-label={`Select ${k.name}`}
+                  />
+                </td>
+                <td className="td-name">
+                  <div className="name-cell">
+                    <span className="key-name">{k.name}</span>
+                    <span className="key-prefix">{k.keyPrefix}</span>
+                  </div>
+                </td>
+                <td className="td-owner">{k.owner}</td>
+                <td className="td-scopes">
+                  <ScopeBadges scopes={k.scopes} />
+                  {k.isOverScoped && <span className="overscoped-flag" title="Over-scoped">⚠</span>}
+                </td>
+                <td className="td-time">{formatDistanceToNow(k.lastUsed, { addSuffix: true })}</td>
+                <td className="td-time">{format(k.created, 'MMM d, yyyy')}</td>
+                <td className="td-time">{format(k.expires, 'MMM d, yyyy')}</td>
+                <td className="td-status"><StatusPill status={k.status} /></td>
+                <td className="td-actions" onClick={e => e.stopPropagation()}>
+                  <div className="actions-cell">
+                    <button
+                      className="action-trigger"
+                      onClick={() => setPopoverKey(popoverKey === k.id ? null : k.id)}
+                      aria-label={`Actions for ${k.name}`}
+                      aria-haspopup="menu"
+                    >
+                      ⋯
+                    </button>
+                    {popoverKey === k.id && (
+                      <ActionPopover
+                        keyData={k}
+                        onClose={() => setPopoverKey(null)}
+                        onAction={handleAction}
+                      />
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Mobile stacked list */}
+        <div className="mobile-list">
+          {filteredKeys.map(k => (
+            <div
+              key={k.id}
+              className={`mobile-card ${k.status === 'leaked-suspected' ? 'mobile-card-danger' : ''}`}
+              onClick={() => setDrawerKey(k)}
+            >
+              <div className="mobile-card-header">
+                <input
+                  type="checkbox"
+                  checked={selected.has(k.id)}
+                  onChange={(e) => { e.stopPropagation(); toggleSelect(k.id) }}
+                  aria-label={`Select ${k.name}`}
+                />
+                <div className="mobile-card-title">
+                  <span className="key-name">{k.name}</span>
+                  <span className="key-prefix">{k.keyPrefix}</span>
+                </div>
+                <StatusPill status={k.status} />
+              </div>
+              <div className="mobile-card-body">
+                <div className="mobile-meta">
+                  <span className="mobile-label">Owner:</span> {k.owner}
+                </div>
+                <div className="mobile-meta">
+                  <span className="mobile-label">Last used:</span> {formatDistanceToNow(k.lastUsed, { addSuffix: true })}
+                </div>
+                <div className="mobile-meta">
+                  <span className="mobile-label">Expires:</span> {format(k.expires, 'MMM d, yyyy')}
+                </div>
+                <div className="mobile-meta">
+                  <span className="mobile-label">Scopes:</span> <ScopeBadges scopes={k.scopes} max={2} />
+                  {k.isOverScoped && <span className="overscoped-flag">⚠</span>}
+                </div>
+              </div>
+              <div className="mobile-card-actions" onClick={e => e.stopPropagation()}>
+                <button className="mobile-action-btn" onClick={() => handleAction('rotate', k)}>Rotate</button>
+                <button className="mobile-action-btn" onClick={() => handleAction('revoke', k)}>Revoke</button>
+                <button className="mobile-action-btn" onClick={() => handleAction('audit', k)}>Audit</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {drawerKey && <AuditDrawer keyData={drawerKey} onClose={() => setDrawerKey(null)} />}
+
+      {toast && <div className="toast">{toast}</div>}
+    </div>
+  )
+}
+
+===== src/main.jsx =====
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+
+===== src/mockData.js =====
+import { subDays, subHours, addDays, subMinutes, format } from 'date-fns'
+
+const owners = [
+  'alice@eng.co', 'bob@eng.co', 'carol@eng.co', 'dave@eng.co',
+  'eve@eng.co', 'frank@eng.co', 'grace@eng.co', 'heidi@eng.co',
+  'ivan@eng.co', 'judy@eng.co', 'karl@eng.co', 'leo@eng.co',
+  'mallory@eng.co', 'nina@eng.co', 'oscar@eng.co'
+]
+
+const scopeSets = [
+  ['read:repos'],
+  ['read:repos', 'write:repos'],
+  ['read:repos', 'write:repos', 'admin:org'],
+  ['read:repos', 'write:repos', 'admin:org', 'delete:repos'],
+  ['read:repos', 'write:repos', 'admin:org', 'delete:repos', 'admin:billing'],
+  ['read:repos', 'admin:org', 'admin:billing', 'write:repos', 'admin:hooks', 'delete:repos'],
+  ['read:repos', 'write:deployments'],
+  ['read:repos', 'write:deployments', 'admin:hooks'],
+  ['admin:org', 'admin:billing', 'admin:hooks', 'delete:repos', 'write:repos', 'read:repos'],
+  ['read:repos', 'write:repos', 'write:deployments'],
+]
+
+const prefixes = [
+  'ci-pipeline', 'deploy-prod', 'staging-bot', 'monitoring-svc',
+  'data-sync', 'backup-agent', 'test-runner', 'lint-bot',
+  'release-mgr', 'infra-scanner', 'log-shipper', 'metrics-push',
+  'webhook-relay', 'auth-proxy', 'cdn-purge', 'db-migrate',
+  'secret-rotator', 'artifact-push', 'canary-deploy', 'rollback-svc',
+  'perf-test', 'chaos-monkey', 'audit-logger', 'compliance-check',
+  'api-gateway', 'service-mesh', 'config-sync', 'feature-flags'
+]
+
+const statuses = ['healthy', 'stale', 'expiring', 'leaked-suspected', 'revoked']
+
+function randomDate(start, end) {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
+}
+
+function generateKeys(count) {
+  const now = new Date()
+  const keys = []
+
+  for (let i = 0; i < count; i++) {
+    const created = randomDate(subDays(now, 365), subDays(now, 1))
+    const scopes = scopeSets[i % scopeSets.length]
+    const isOverScoped = scopes.length >= 4
+
+    let status
+    if (i < 3) status = 'leaked-suspected'
+    else if (i < 6) status = 'revoked'
+    else if (i < 10) status = 'expiring'
+    else if (i < 16) status = 'stale'
+    else status = 'healthy'
+
+    let lastUsed
+    if (status === 'stale') {
+      lastUsed = randomDate(subDays(now, 120), subDays(now, 31))
+    } else if (status === 'revoked') {
+      lastUsed = randomDate(subDays(now, 60), subDays(now, 5))
+    } else if (status === 'leaked-suspected') {
+      lastUsed = randomDate(subHours(now, 6), subMinutes(now, 5))
+    } else {
+      lastUsed = randomDate(subDays(now, 7), subMinutes(now, 10))
+    }
+
+    let expires
+    if (status === 'expiring') {
+      expires = randomDate(addDays(now, 1), addDays(now, 7))
+    } else if (status === 'revoked') {
+      expires = randomDate(subDays(now, 30), subDays(now, 1))
+    } else {
+      expires = randomDate(addDays(now, 30), addDays(now, 365))
+    }
+
+    const keyId = `sk_${Math.random().toString(36).substring(2, 10)}_${Math.random().toString(36).substring(2, 6)}`
+
+    keys.push({
+      id: `key-${i + 1}`,
+      name: `${prefixes[i % prefixes.length]}-${String(i + 1).padStart(2, '0')}`,
+      keyPrefix: keyId.substring(0, 12) + '...',
+      owner: owners[i % owners.length],
+      scopes,
+      isOverScoped,
+      lastUsed,
+      created,
+      expires,
+      status,
+      rotationCount: Math.floor(Math.random() * 12),
+      auditEvents: generateAuditEvents(created, now, status),
+    })
+  }
+
+  return keys
+}
+
+function generateAuditEvents(created, now, status) {
+  const events = []
+  const types = ['created', 'rotated', 'scopes_modified', 'used_from_new_ip', 'rate_limit_hit', 'revoked', 'restored']
+
+  events.push({ type: 'created', timestamp: created, actor: 'system', detail: 'Key provisioned via API' })
+
+  const eventCount = 3 + Math.floor(Math.random() * 8)
+  for (let i = 0; i < eventCount; i++) {
+    const ts = randomDate(created, now)
+    const type = types[Math.floor(Math.random() * types.length)]
+    const ips = ['192.168.1.42', '10.0.0.15', '203.0.113.77', '198.51.100.23', '172.16.0.8']
+    let detail = ''
+    switch (type) {
+      case 'rotated': detail = 'Key rotated automatically'; break
+      case 'scopes_modified': detail = 'Scopes updated by admin'; break
+      case 'used_from_new_ip': detail = `First use from ${ips[Math.floor(Math.random() * ips.length)]}`; break
+      case 'rate_limit_hit': detail = `Rate limit exceeded: ${100 + Math.floor(Math.random() * 900)} req/min`; break
+      case 'revoked': detail = 'Key revoked by admin'; break
+      case 'restored': detail = 'Key restored after investigation'; break
+      default: detail = 'Event recorded'
+    }
+    events.push({
+      type,
+      timestamp: ts,
+      actor: owners[Math.floor(Math.random() * owners.length)],
+      detail,
+    })
+  }
+
+  if (status === 'leaked-suspected') {
+    events.push({
+      type: 'leak_detected',
+      timestamp: randomDate(subHours(now, 2), now),
+      actor: 'security-scanner',
+      detail: 'Key pattern found in public GitHub repository',
+    })
+  }
+
+  return events.sort((a, b) => b.timestamp - a.timestamp)
+}
+
+export const mockKeys = generateKeys(30)
+
+===== src/styles.css =====
+/* ===== Layout ===== */
+.app {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 12px 16px 60px;
+}
+
+.app-header {
+  margin-bottom: 12px;
+}
+
+.header-top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.app-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e6edf3;
+}
+
+.header-env {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #1a2332;
+  color: #58a6ff;
+  border: 1px solid #1f3a5f;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===== Summary Strip ===== */
+.summary-strip {
+  display: flex;
+  gap: 2px;
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.summary-item {
+  flex: 1;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-right: 1px solid #21262d;
+}
+
+.summary-item:last-child { border-right: none; }
+
+.summary-item-danger {
+  background: #1a0a0a;
+}
+
+.summary-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e6edf3;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-active { color: #3fb950; }
+.summary-warn { color: #d29922; }
+.summary-expiring { color: #db6d28; }
+.summary-danger { color: #f85149; }
+
+.summary-label {
+  font-size: 11px;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ===== Toolbar ===== */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: #c9d1d9;
+  font-size: 13px;
+  width: 240px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search-input:focus {
+  border-color: #58a6ff;
+}
+
+.search-input::placeholder {
+  color: #484f58;
+}
+
+.filter-segments {
+  display: flex;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.filter-btn {
+  background: #0d1117;
+  border: none;
+  border-right: 1px solid #30363d;
+  padding: 6px 12px;
+  color: #8b949e;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.filter-btn:last-child { border-right: none; }
+
+.filter-btn:hover {
+  color: #c9d1d9;
+  background: #161b22;
+}
+
+.filter-active {
+  background: #1f2937;
+  color: #e6edf3;
+  font-weight: 600;
+}
+
+.result-count {
+  font-size: 12px;
+  color: #484f58;
+  white-space: nowrap;
+}
+
+/* ===== Bulk Bar ===== */
+.bulk-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: #1c2333;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.bulk-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #58a6ff;
+  margin-right: 4px;
+}
+
+.bulk-btn {
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  padding: 4px 12px;
+  color: #c9d1d9;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.bulk-btn:hover { background: #30363d; }
+
+.bulk-btn-danger {
+  border-color: #f8514966;
+  color: #f85149;
+}
+
+.bulk-btn-danger:hover {
+  background: #2d0a0a;
+}
+
+.bulk-btn-ghost {
+  background: none;
+  border: none;
+  color: #8b949e;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.bulk-btn-ghost:hover { color: #c9d1d9; }
+
+/* ===== Table ===== */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.keys-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.keys-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.keys-table th {
+  background: #161b22;
+  color: #8b949e;
+  font-weight: 600;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #21262d;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.sortable-th {
+  cursor: pointer;
+}
+
+.sortable-th:hover {
+  color: #c9d1d9;
+}
+
+.th-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sort-arrow {
+  font-size: 10px;
+  color: #58a6ff;
+}
+
+.th-check {
+  width: 32px;
+}
+
+.th-actions {
+  width: 48px;
+}
+
+.keys-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #161b22;
+  vertical-align: middle;
+}
+
+.table-row {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.table-row:hover {
+  background: #161b22;
+}
+
+.row-selected {
+  background: #0d2240 !important;
+}
+
+.row-danger {
+  background: #1a0808;
+}
+
+.row-danger:hover {
+  background: #220c0c;
+}
+
+.td-check {
+  cursor: default;
+}
+
+.name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.key-name {
+  font-weight: 600;
+  color: #e6edf3;
+  font-size: 12px;
+}
+
+.key-prefix {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  color: #484f58;
+}
+
+.td-owner {
+  color: #8b949e;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.td-time {
+  color: #8b949e;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.td-scopes {
+  max-width: 220px;
+}
+
+/* ===== Scope Badges ===== */
+.scope-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.scope-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: #1c2333;
+  border: 1px solid #30363d;
+  color: #8b949e;
+  font-size: 10px;
+  white-space: nowrap;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.scope-more {
+  color: #58a6ff;
+  border-color: #1f3a5f;
+}
+
+.overscoped-flag {
+  color: #d29922;
+  margin-left: 4px;
+  font-size: 12px;
+}
+
+/* ===== Status Pill ===== */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ===== Actions ===== */
+.actions-cell {
+  position: relative;
+}
+
+.action-trigger {
+  background: none;
+  border: 1px solid transparent;
+  color: #8b949e;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: all 0.15s;
+}
+
+.action-trigger:hover {
+  background: #21262d;
+  border-color: #30363d;
+  color: #c9d1d9;
+}
+
+.action-popover {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 30;
+  background: #1c2128;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 4px 0;
+  min-width: 180px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.action-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 6px 14px;
+  color: #c9d1d9;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.action-item:hover:not(:disabled) {
+  background: #21262d;
+}
+
+.action-item:disabled {
+  color: #484f58;
+  cursor: not-allowed;
+}
+
+/* ===== Drawer ===== */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 40;
+}
+
+.audit-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 480px;
+  max-width: 100vw;
+  background: #0d1117;
+  border-left: 1px solid #21262d;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 20px;
+  border-bottom: 1px solid #21262d;
+  flex-shrink: 0;
+}
+
+.drawer-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e6edf3;
+}
+
+.drawer-subtitle {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 11px;
+  color: #484f58;
+}
+
+.drawer-close {
+  background: none;
+  border: 1px solid #30363d;
+  color: #8b949e;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.drawer-close:hover {
+  background: #21262d;
+  color: #c9d1d9;
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.drawer-meta {
+  margin-bottom: 20px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 6px 0;
+  border-bottom: 1px solid #161b22;
+  gap: 12px;
+}
+
+.meta-label {
+  font-size: 11px;
+  color: #484f58;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.meta-value {
+  font-size: 12px;
+  color: #c9d1d9;
+  text-align: right;
+}
+
+.drawer-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #21262d;
+}
+
+.audit-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.audit-event {
+  padding: 8px 10px;
+  background: #161b22;
+  border-radius: 4px;
+  border-left: 3px solid #30363d;
+}
+
+.audit-event-danger {
+  border-left-color: #f85149;
+  background: #1a0a0a;
+}
+
+.audit-event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+}
+
+.audit-event-type {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #8b949e;
+}
+
+.audit-type-leak_detected { color: #f85149; }
+.audit-type-rotated { color: #3fb950; }
+.audit-type-revoked { color: #f85149; }
+.audit-type-scopes_modified { color: #d29922; }
+.audit-type-used_from_new_ip { color: #58a6ff; }
+.audit-type-rate_limit_hit { color: #db6d28; }
+.audit-type-created { color: #8b949e; }
+
+.audit-event-time {
+  font-size: 10px;
+  color: #484f58;
+  font-variant-numeric: tabular-nums;
+}
+
+.audit-event-detail {
+  font-size: 12px;
+  color: #c9d1d9;
+}
+
+.audit-event-actor {
+  font-size: 10px;
+  color: #484f58;
+  margin-top: 2px;
+}
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1c2128;
+  border: 1px solid #30363d;
+  color: #e6edf3;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 12px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  animation: toastIn 0.2s ease-out;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ===== Mobile List ===== */
+.mobile-list {
+  display: none;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .keys-table {
+    display: none;
+  }
+
+  .mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mobile-card {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 6px;
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+
+  .mobile-card-danger {
+    border-color: #f8514944;
+    background: #1a0808;
+  }
+
+  .mobile-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .mobile-card-title {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .mobile-card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    margin-bottom: 8px;
+  }
+
+  .mobile-meta {
+    font-size: 11px;
+    color: #8b949e;
+  }
+
+  .mobile-label {
+    color: #484f58;
+  }
+
+  .mobile-card-actions {
+    display: flex;
+    gap: 6px;
+    border-top: 1px solid #21262d;
+    padding-top: 8px;
+  }
+
+  .mobile-action-btn {
+    flex: 1;
+    background: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 5px 8px;
+    color: #c9d1d9;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  .mobile-action-btn:hover {
+    background: #30363d;
+  }
+
+  .summary-strip {
+    flex-wrap: wrap;
+  }
+
+  .summary-item {
+    min-width: 80px;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-left {
+    flex-direction: column;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .filter-segments {
+    overflow-x: auto;
+  }
+
+  .audit-drawer {
+    width: 100vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .app {
+    padding: 8px 10px 60px;
+  }
+
+  .summary-strip {
+    flex-direction: column;
+  }
+
+  .summary-item {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-right: none;
+    border-bottom: 1px solid #21262d;
+  }
+
+  .summary-item:last-child { border-bottom: none; }
+
+  .summary-value {
+    font-size: 16px;
+  }
+
+  .mobile-card-body {
+    grid-template-columns: 1fr;
+  }
+
+  .bulk-bar {
+    flex-wrap: wrap;
+  }
+}
+
+===== vite.config.js =====
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+})

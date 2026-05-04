@@ -1,0 +1,299 @@
+{
+  "schemaVersion": 1,
+  "runId": "claude-opus-4-5__2026-05-04T02-38-01-505Z",
+  "interfaceId": "api-keys-admin-table",
+  "interfaceTitle": "Admin table for managing API keys and permissions",
+  "modelId": "claude-opus-4-5",
+  "modelDisplayName": "Claude Opus 4.5",
+  "family": "Anthropic",
+  "gateway": "openrouter",
+  "gatewayModel": "anthropic/claude-opus-4.5",
+  "gatewayGenerationId": "gen-1777862552-GoltKHuZqi0vFpQfhS3G",
+  "providerName": null,
+  "status": "complete",
+  "createdAt": "2026-05-04T02:38:01.505Z",
+  "completedAt": "2026-05-04T02:45:12.298Z",
+  "request": {
+    "dryRun": false,
+    "artifactType": "react-project",
+    "promptSha256": "03534157b5f177deb1dad83ebcb714c523cb33acb2afb334847a31762158a7f3",
+    "params": {
+      "temperature": 0.2,
+      "max_tokens": 16000
+    }
+  },
+  "execution": {
+    "startedAt": "2026-05-04T02:38:01.505Z",
+    "completedAt": "2026-05-04T02:45:12.298Z",
+    "durationMs": 159596,
+    "modelStartedAt": "2026-05-04T02:42:32.702Z",
+    "modelCompletedAt": "2026-05-04T02:45:00.408Z",
+    "modelDurationMs": 147706,
+    "generationTimeMs": null,
+    "latencyMs": null
+  },
+  "usage": {
+    "source": "openrouter:response",
+    "promptTokens": 609,
+    "completionTokens": 16000,
+    "totalTokens": 16609,
+    "nativePromptTokens": null,
+    "nativeCompletionTokens": null,
+    "reasoningTokens": 0,
+    "cachedPromptTokens": 0,
+    "cacheDiscount": null,
+    "totalCost": 0.403045,
+    "upstreamInferenceCost": 0.403045,
+    "currency": "USD",
+    "rawResponseUsage": {
+      "prompt_tokens": 609,
+      "completion_tokens": 16000,
+      "total_tokens": 16609,
+      "cost": 0.403045,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.403045,
+        "upstream_inference_prompt_cost": 0.003045,
+        "upstream_inference_completions_cost": 0.4
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "artifacts": {
+    "preview": "/previews/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/",
+    "source": "/sources/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source.txt",
+    "sourceJson": "/sources/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/files.json",
+    "localResultPath": "arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/result.json",
+    "localRunPath": "arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z",
+    "localSourcePath": "arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source",
+    "localPreviewPath": "public/previews/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z",
+    "sourceFormat": "react-project",
+    "sourceFiles": [
+      "index.html",
+      "package.json",
+      "src/App.css",
+      "src/App.jsx",
+      "src/components/AuditDrawer.css",
+      "src/components/AuditDrawer.jsx",
+      "src/components/BulkActionBar.css",
+      "src/components/BulkActionBar.jsx",
+      "src/components/FilterBar.css",
+      "src/components/FilterBar.jsx",
+      "src/components/KeysTable.css",
+      "src/components/KeysTable.jsx",
+      "src/components/ScopeBadges.css",
+      "src/components/ScopeBadges.jsx",
+      "src/components/StatusPill.css",
+      "src/components/StatusPill.jsx",
+      "src/components/SummaryHeader.css",
+      "src/components/SummaryHeader.jsx",
+      "src/data/mockKeys.js",
+      "src/index.css",
+      "src/main.jsx",
+      "src/styles.css",
+      "vite.config.js"
+    ],
+    "desktopScreenshot": "/screenshots/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z__desktop.png",
+    "mobileScreenshot": "/screenshots/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z__mobile.png"
+  },
+  "finishReason": "length",
+  "repairs": [
+    {
+      "attempt": 1,
+      "gatewayGenerationId": "gen-1777862718-2dvkzCOWChp9UCDSzi0O",
+      "finishReason": "length",
+      "buildError": "$ npm run build\n\nstdout:\n\n> api-keys-admin@1.0.0 build\n> vite build --base=./\n\nvite v5.4.21 building for production...\ntransforming...\n✓ 25 modules transformed.\n\n\nstderr:\nx Build failed in 106ms\nerror during build:\nCould not resolve \"./AuditDrawer.css\" from \"src/components/AuditDrawer.jsx\"\nfile: /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/src/components/AuditDrawer.jsx\n    at getRollupError (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/parseAst.js:406:41)\n    at error (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/parseAst.js:402:42)\n    at ModuleLoader.handleInvalidResolvedId (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/node-entry.js:22120:24)\n    at file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/node-entry.js:22080:26\n\n\nerror:\nCommand failed: npm run build\nx Build failed in 106ms\nerror during build:\nCould not resolve \"./AuditDrawer.css\" from \"src/components/AuditDrawer.jsx\"\nfile: /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/src/components/AuditDrawer.jsx\n    at getRollupError (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/parseAst.js:406:41)\n    at error (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/parseAst.js:402:42)\n    at ModuleLoader.handleInvalidResolvedId (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/node-entry.js:22120:24)\n    at file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/node-entry.js:22080:26\n",
+      "modelStartedAt": "2026-05-04T02:45:18.329Z",
+      "modelCompletedAt": "2026-05-04T02:47:48.887Z",
+      "modelDurationMs": 150557
+    },
+    {
+      "attempt": 2,
+      "gatewayGenerationId": "gen-1777862886-hAsTLcVM5rSVDUrHwQTm",
+      "finishReason": "stop",
+      "buildError": "$ npm run build\n\nstdout:\n\n> api-keys-admin@1.0.0 build\n> vite build --base=./ --base=./\n\nvite v5.4.21 building for production...\ntransforming...\n✓ 10 modules transformed.\n\n\nstderr:\nx Build failed in 43ms\nerror during build:\nCould not resolve \"./data/mockKeys\" from \"src/App.jsx\"\nfile: /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/src/App.jsx\n    at getRollupError (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/parseAst.js:406:41)\n    at error (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/parseAst.js:402:42)\n    at ModuleLoader.handleInvalidResolvedId (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/node-entry.js:22120:24)\n    at file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/node-entry.js:22080:26\n\n\nerror:\nCommand failed: npm run build\nx Build failed in 43ms\nerror during build:\nCould not resolve \"./data/mockKeys\" from \"src/App.jsx\"\nfile: /Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/src/App.jsx\n    at getRollupError (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/parseAst.js:406:41)\n    at error (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/parseAst.js:402:42)\n    at ModuleLoader.handleInvalidResolvedId (file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/node-entry.js:22120:24)\n    at file:///Users/colinarms/src/personal/uiarena/arena/runs/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/source/node_modules/rollup/dist/es/shared/node-entry.js:22080:26\n",
+      "modelStartedAt": "2026-05-04T02:48:06.827Z",
+      "modelCompletedAt": "2026-05-04T02:50:34.226Z",
+      "modelDurationMs": 147398
+    }
+  ],
+  "screenshots": {
+    "desktop": {
+      "width": 1440,
+      "height": 1100,
+      "path": "/screenshots/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z__desktop.png",
+      "capturedAt": "2026-05-04T02:50:53.510Z"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "path": "/screenshots/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z__mobile.png",
+      "capturedAt": "2026-05-04T02:50:54.243Z"
+    }
+  },
+  "evaluations": {
+    "lighthouse": {
+      "id": "lighthouse",
+      "displayName": "Lighthouse",
+      "status": "complete",
+      "version": "13.2.0",
+      "completedAt": "2026-05-04T02:51:02.736Z",
+      "durationMs": 8461,
+      "scores": {
+        "performance": {
+          "title": "Performance",
+          "score": 0.82,
+          "value": 82
+        },
+        "accessibility": {
+          "title": "Accessibility",
+          "score": 0.94,
+          "value": 94
+        }
+      },
+      "metrics": {
+        "firstContentfulPaint": {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "displayValue": "1.8 s",
+          "numericValue": 1809.0247,
+          "score": 0.38
+        },
+        "largestContentfulPaint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "displayValue": "2.0 s",
+          "numericValue": 1959.0247,
+          "score": 0.64
+        },
+        "speedIndex": {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "displayValue": "1.8 s",
+          "numericValue": 1809.0247,
+          "score": 0.7
+        },
+        "totalBlockingTime": {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "displayValue": "0 ms",
+          "numericValue": 0,
+          "score": 1
+        },
+        "cumulativeLayoutShift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "displayValue": "0",
+          "numericValue": 0,
+          "score": 1
+        }
+      },
+      "summary": {
+        "requestedUrl": "http://127.0.0.1:60234/previews/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/",
+        "finalUrl": "http://127.0.0.1:60234/previews/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/",
+        "fetchTime": "2026-05-04T02:50:57.719Z",
+        "accessibilityIssueCount": 2
+      },
+      "issues": [
+        {
+          "id": "color-contrast",
+          "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+          "score": 0,
+          "displayValue": null,
+          "description": "Low-contrast text is difficult or impossible for many users to read. [Learn how to provide sufficient color contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast)."
+        },
+        {
+          "id": "landmark-one-main",
+          "title": "Document does not have a main landmark.",
+          "score": 0,
+          "displayValue": null,
+          "description": "One main landmark helps screen reader users navigate a web page. [Learn more about landmarks](https://dequeuniversity.com/rules/axe/4.11/landmark-one-main)."
+        }
+      ],
+      "artifacts": {
+        "report": "/evaluations/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/lighthouse/report.html",
+        "json": "/evaluations/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/lighthouse/lhr.json"
+      },
+      "error": null
+    },
+    "axe": {
+      "id": "axe",
+      "displayName": "Axe",
+      "status": "complete",
+      "version": "4.11.4",
+      "completedAt": "2026-05-04T02:51:04.096Z",
+      "durationMs": 1355,
+      "scores": null,
+      "metrics": null,
+      "summary": {
+        "violationCount": 3,
+        "passCount": 33,
+        "incompleteCount": 1,
+        "inapplicableCount": 55,
+        "seriousOrCriticalCount": 1,
+        "impactCounts": {
+          "critical": 0,
+          "serious": 1,
+          "moderate": 2,
+          "minor": 0,
+          "unknown": 0
+        }
+      },
+      "issues": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodeCount": 46,
+          "targets": [
+            "tr:nth-child(1) > .col-name > .name-cell > .key-prefix",
+            "tr:nth-child(2) > .col-name > .name-cell > .key-prefix",
+            "tr:nth-child(2) > .col-scopes > .over-scoped.scope-badges > .scope-more.scope-badge[title=\"admin:deployments\"]",
+            "tr:nth-child(3) > .col-name > .name-cell > .key-prefix"
+          ]
+        },
+        {
+          "id": "landmark-one-main",
+          "impact": "moderate",
+          "help": "Document should have one main landmark",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/landmark-one-main?application=playwright",
+          "description": "Ensure the document has a main landmark",
+          "nodeCount": 1,
+          "targets": [
+            "html"
+          ]
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "help": "All page content should be contained by landmarks",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/region?application=playwright",
+          "description": "Ensure all page content is contained by landmarks",
+          "nodeCount": 244,
+          "targets": [
+            ".summary-header",
+            ".search-input",
+            ".filter-segments",
+            "thead"
+          ]
+        }
+      ],
+      "artifacts": {
+        "json": "/evaluations/api-keys-admin-table/claude-opus-4-5__2026-05-04T02-38-01-505Z/axe/axe.json"
+      },
+      "error": null
+    }
+  }
+}

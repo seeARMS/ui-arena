@@ -1,0 +1,15 @@
+{
+  "model": "anthropic/claude-opus-4.6",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are participating in UI Arena, a gallery of AI-generated product interface examples.\nBuild a complete React project for the requested interface. Return only project files using the file block format below. Do not return markdown or explanations.\nFor each file, write exactly: <<<FILE: path/to/file>>>, then the file content, then <<<END FILE>>>. Include any project files you want: package.json, index.html, Vite config, src files, public assets, styles, components, and mock data.\nThe runner will write the project to a directory, fill in missing Vite/React boilerplate when needed, install dependencies from package.json, run the build, and use the generated static output.\nPrefer a Vite-compatible React SPA with mock data. If you omit package.json, index.html, or src/main.jsx, the runner will create sensible defaults.\nKeep the project concise. Generate repeated mock rows programmatically instead of serializing huge arrays."
+    },
+    {
+      "role": "user",
+      "content": "Interface prompt: Admin table for managing API keys and permissions\nCategory: admin-table\n\nBuild an admin table for managing API keys and permissions in an engineering workspace.\n\nThe user is a platform engineer auditing key hygiene. They need to see owners, scopes, last-used time, expiry, rotation health, and the keys that are scary right now.\n\nBuild:\n\n- A dense, scannable table (no card layouts) with sortable columns: name, owner, scopes, last used, created, expires, status.\n- A search input plus segmented filters (all / active / stale / expiring / over-scoped).\n- Status pills for healthy / stale / expiring / leaked-suspected / revoked.\n- Row actions in a popover: rotate, revoke, edit scopes, view audit trail.\n- Bulk select with a sticky action bar.\n- A summary header strip: total keys, active, over-scoped, expiring this week.\n- A side drawer that opens with full audit/event detail when a row is clicked.\n- Responsive behavior — degrade gracefully to a stacked list on narrow screens.\n\nStack: React app. Build it as a small project directory using mock data. The runner will install dependencies, compile the app, and repair build errors if needed.\n\nMock at least 25 rows with varied states. Prioritize density and operational confidence — avoid empty whitespace and decorative elements that dilute scanning.\nImplementation requirements:\n- Build a production-quality product interface, not a marketing explanation.\n- Use semantic HTML and accessible controls.\n- Make it responsive from mobile to desktop.\n- Include realistic copy, states, and content needed for the interface.\n- Build it as a React app project using mock data."
+    }
+  ],
+  "temperature": 0.2,
+  "max_tokens": 16000
+}

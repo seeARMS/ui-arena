@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "id": "axe",
+  "displayName": "Axe",
+  "description": "Runs axe-core accessibility checks through Playwright and records violations by impact.",
+  "categories": [
+    "accessibility"
+  ],
+  "status": "complete",
+  "version": "4.11.4",
+  "startedAt": "2026-05-04T03:05:06.647Z",
+  "completedAt": "2026-05-04T03:05:08.124Z",
+  "durationMs": 1477,
+  "scores": null,
+  "metrics": null,
+  "summary": {
+    "violationCount": 3,
+    "passCount": 26,
+    "incompleteCount": 0,
+    "inapplicableCount": 63,
+    "seriousOrCriticalCount": 2,
+    "impactCounts": {
+      "critical": 2,
+      "serious": 0,
+      "moderate": 0,
+      "minor": 1,
+      "unknown": 0
+    }
+  },
+  "issues": [
+    {
+      "id": "button-name",
+      "impact": "critical",
+      "help": "Buttons must have discernible text",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/button-name?application=playwright",
+      "description": "Ensure buttons have discernible text",
+      "nodeCount": 40,
+      "targets": [
+        ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(1) > .text-right > .inline-block.relative > .hover\\:bg-slate-200.hover\\:text-slate-600.p-1",
+        ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(2) > .text-right > .inline-block.relative > .hover\\:bg-slate-200.hover\\:text-slate-600.p-1",
+        ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(3) > .text-right > .inline-block.relative > .hover\\:bg-slate-200.hover\\:text-slate-600.p-1",
+        ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(4) > .text-right > .inline-block.relative > .hover\\:bg-slate-200.hover\\:text-slate-600.p-1"
+      ]
+    },
+    {
+      "id": "empty-table-header",
+      "impact": "minor",
+      "help": "Table header text should not be empty",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+      "description": "Ensure table headers have discernible text",
+      "nodeCount": 1,
+      "targets": [
+        ".w-10"
+      ]
+    },
+    {
+      "id": "label",
+      "impact": "critical",
+      "help": "Form elements must have labels",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/label?application=playwright",
+      "description": "Ensure every form element has a label",
+      "nodeCount": 41,
+      "targets": [
+        ".w-10 > .border-slate-300.focus\\:ring-blue-500[type=\"checkbox\"]",
+        ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(1) > td:nth-child(1) > .border-slate-300.focus\\:ring-blue-500[type=\"checkbox\"]",
+        ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(2) > td:nth-child(1) > .border-slate-300.focus\\:ring-blue-500[type=\"checkbox\"]",
+        ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(3) > td:nth-child(1) > .border-slate-300.focus\\:ring-blue-500[type=\"checkbox\"]"
+      ]
+    }
+  ],
+  "artifacts": {
+    "json": "/evaluations/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z/axe/axe.json"
+  }
+}

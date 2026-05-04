@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.table-dense th, .table-dense td {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.status-pill {
+  font-size: 0.6875rem;
+  letter-spacing: 0.025em;
+}
+
+.modal {
+  animation: modalPop 0.1s ease-out forwards;
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

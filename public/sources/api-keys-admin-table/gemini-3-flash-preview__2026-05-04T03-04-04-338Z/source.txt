@@ -1,0 +1,513 @@
+===== index.html =====
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; media-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; form-action 'none'; base-uri 'none'" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Key Admin</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+===== package.json =====
+{
+  "private": true,
+  "type": "module",
+  "name": "api-key-admin",
+  "version": "1.0.0",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "lucide-react": "^0.263.1",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^1.14.0",
+    "date-fns": "^2.30.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.3",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.27",
+    "tailwindcss": "^3.3.3",
+    "vite": "^4.4.5"
+  },
+  "scripts": {
+    "build": "vite build --base=./"
+  }
+}
+
+===== src/App.jsx =====
+import React, { useState, useMemo } from 'react';
+import { 
+  Search, Filter, MoreVertical, ShieldAlert, 
+  Clock, CheckCircle2, AlertTriangle, Trash2, 
+  RefreshCw, Eye, History, ChevronRight, X,
+  Download, Plus
+} from 'lucide-react';
+import { format, formatDistanceToNow, isPast, isBefore, addDays } from 'date-fns';
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+// --- Mock Data Generation ---
+const SCOPES = ['read:org', 'write:org', 'admin:repo', 'read:user', 'billing:edit', 'secrets:manage'];
+const USERS = ['alex.rivera', 'sam.chen', 'jordan.smith', 'dev-ops-bot', 'ci-runner-01', 'taylor.v'];
+const STATUSES = ['healthy', 'stale', 'expiring', 'leaked-suspected', 'revoked'];
+
+const generateMockData = (count) => {
+  return Array.from({ length: count }).map((_, i) => {
+    const created = new Date(2023, 0, Math.floor(Math.random() * 300));
+    const lastUsed = Math.random() > 0.1 ? addDays(created, Math.floor(Math.random() * 60)) : null;
+    const expires = addDays(created, 365);
+    const isOverScoped = Math.random() > 0.7;
+    
+    let status = 'healthy';
+    if (i % 15 === 0) status = 'leaked-suspected';
+    else if (isPast(expires)) status = 'revoked';
+    else if (isBefore(expires, addDays(new Date(), 14))) status = 'expiring';
+    else if (lastUsed && isBefore(lastUsed, addDays(new Date(), -90))) status = 'stale';
+
+    return {
+      id: `key_${Math.random().toString(36).substr(2, 9)}`,
+      name: `${['Prod', 'Staging', 'CI', 'Backup', 'Analytics'][i % 5]} ${['Worker', 'Service', 'Access', 'Token'][i % 4]} ${i}`,
+      owner: USERS[i % USERS.length],
+      scopes: SCOPES.slice(0, 1 + Math.floor(Math.random() * (isOverScoped ? 6 : 3))),
+      lastUsed,
+      created,
+      expires,
+      status,
+      isOverScoped,
+      prefix: `pk_${Math.random().toString(36).substr(2, 4)}...`
+    };
+  });
+};
+
+const MOCK_DATA = generateMockData(40);
+
+// --- Components ---
+
+const cn = (...inputs) => twMerge(clsx(inputs));
+
+const StatusPill = ({ status }) => {
+  const styles = {
+    healthy: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    stale: "bg-slate-50 text-slate-600 border-slate-200",
+    expiring: "bg-amber-50 text-amber-700 border-amber-200",
+    'leaked-suspected': "bg-red-50 text-red-700 border-red-200 animate-pulse",
+    revoked: "bg-gray-100 text-gray-500 border-gray-200 grayscale",
+  };
+
+  return (
+    <span className={cn("px-1.5 py-0.5 rounded-md text-[10px] font-bold uppercase border tracking-wider", styles[status])}>
+      {status.replace('-', ' ')}
+    </span>
+  );
+};
+
+export default function ApiKeyAdmin() {
+  const [data, setData] = useState(MOCK_DATA);
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [selectedRows, setSelectedRows] = useState(new Set());
+  const [drawerItem, setDrawerItem] = useState(null);
+  const [activeMenu, setActiveMenu] = useState(null);
+
+  const stats = useMemo(() => ({
+    total: data.length,
+    active: data.filter(d => d.status === 'healthy').length,
+    overScoped: data.filter(d => d.isOverScoped).length,
+    expiring: data.filter(d => d.status === 'expiring').length,
+  }), [data]);
+
+  const filteredData = useMemo(() => {
+    return data.filter(item => {
+      const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) || item.owner.toLowerCase().includes(search.toLowerCase());
+      if (filter === 'all') return matchesSearch;
+      if (filter === 'stale') return matchesSearch && item.status === 'stale';
+      if (filter === 'expiring') return matchesSearch && item.status === 'expiring';
+      if (filter === 'over-scoped') return matchesSearch && item.isOverScoped;
+      if (filter === 'active') return matchesSearch && (item.status === 'healthy' || item.status === 'expiring');
+      return matchesSearch;
+    });
+  }, [data, search, filter]);
+
+  const toggleSelectAll = () => {
+    if (selectedRows.size === filteredData.length) {
+      setSelectedRows(new Set());
+    } else {
+      setSelectedRows(new Set(filteredData.map(r => r.id)));
+    }
+  };
+
+  const toggleRow = (id) => {
+    const next = new Set(selectedRows);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelectedRows(next);
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-100">
+      {/* Header Strip */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <div className="max-w-[1600px] mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-lg font-bold flex items-center gap-2">
+              <ShieldAlert className="w-5 h-5 text-blue-600" />
+              API Key Management
+            </h1>
+            <p className="text-xs text-slate-500">Audit and manage workspace authentication tokens</p>
+          </div>
+          
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
+            {[
+              { label: 'Total Keys', val: stats.total, color: 'text-slate-600' },
+              { label: 'Active', val: stats.active, color: 'text-emerald-600' },
+              { label: 'Over-scoped', val: stats.overScoped, color: 'text-orange-600' },
+              { label: 'Expiring', val: stats.expiring, color: 'text-amber-600' },
+            ].map(s => (
+              <div key={s.label} className="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded flex flex-col min-w-[100px]">
+                <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-tight">{s.label}</span>
+                <span className={cn("text-lg font-bold leading-none mt-0.5", s.color)}>{s.val}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-[1600px] mx-auto p-4">
+        {/* Controls */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-2 flex-1">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Search keys or owners..."
+                className="w-full pl-9 pr-4 py-1.5 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <div className="flex p-1 bg-slate-200/50 rounded-lg self-start">
+              {['all', 'active', 'stale', 'expiring', 'over-scoped'].map(f => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={cn(
+                    "px-3 py-1 text-xs font-medium rounded capitalize transition-all",
+                    filter === f ? "bg-white text-blue-700 shadow-sm" : "text-slate-600 hover:text-slate-900"
+                  )}
+                >
+                  {f.replace('-', ' ')}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-md hover:bg-slate-50">
+              <Download className="w-4 h-4" /> Export
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 shadow-sm">
+              <Plus className="w-4 h-4" /> Create Key
+            </button>
+          </div>
+        </div>
+
+        {/* Table Container */}
+        <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden relative">
+          {/* Sticky Bulk Actions */}
+          {selectedRows.size > 0 && (
+            <div className="absolute top-0 left-0 right-0 z-20 bg-blue-600 text-white px-4 py-2 flex items-center justify-between animate-in slide-in-from-top duration-200">
+              <span className="text-sm font-medium">{selectedRows.size} keys selected</span>
+              <div className="flex items-center gap-3">
+                <button className="text-xs font-bold uppercase flex items-center gap-1 hover:opacity-80"><RefreshCw className="w-3.5 h-3.5" /> Rotate</button>
+                <button className="text-xs font-bold uppercase flex items-center gap-1 hover:opacity-80"><Trash2 className="w-3.5 h-3.5" /> Revoke</button>
+                <button onClick={() => setSelectedRows(new Set())} className="ml-2 p-1 hover:bg-blue-500 rounded"><X className="w-4 h-4" /></button>
+              </div>
+            </div>
+          )}
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[1000px]">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200">
+                  <th className="w-10 px-4 py-3">
+                    <input 
+                      type="checkbox" 
+                      className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      checked={selectedRows.size === filteredData.length && filteredData.length > 0}
+                      onChange={toggleSelectAll}
+                    />
+                  </th>
+                  <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Name / Prefix</th>
+                  <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                  <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Owner</th>
+                  <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Scopes</th>
+                  <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Last Used</th>
+                  <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Expires</th>
+                  <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredData.map((row) => (
+                  <tr 
+                    key={row.id} 
+                    className={cn(
+                      "hover:bg-slate-50/80 transition-colors group cursor-pointer",
+                      selectedRows.has(row.id) && "bg-blue-50/30"
+                    )}
+                    onClick={() => setDrawerItem(row)}
+                  >
+                    <td className="px-4 py-2.5" onClick={(e) => e.stopPropagation()}>
+                      <input 
+                        type="checkbox" 
+                        className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        checked={selectedRows.has(row.id)}
+                        onChange={() => toggleRow(row.id)}
+                      />
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold text-slate-900">{row.name}</span>
+                        <code className="text-[10px] text-slate-400 font-mono">{row.prefix}</code>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <StatusPill status={row.status} />
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                          {row.owner.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="text-sm text-slate-600">{row.owner}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <div className="flex flex-wrap gap-1 max-w-[200px]">
+                        {row.scopes.slice(0, 2).map(s => (
+                          <span key={s} className="text-[10px] bg-slate-100 text-slate-600 px-1 rounded border border-slate-200">
+                            {s.split(':')[1] || s}
+                          </span>
+                        ))}
+                        {row.scopes.length > 2 && (
+                          <span className="text-[10px] text-slate-400 font-medium">+{row.scopes.length - 2} more</span>
+                        )}
+                        {row.isOverScoped && (
+                          <AlertTriangle className="w-3.5 h-3.5 text-orange-500" title="Over-scoped" />
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-slate-600">
+                          {row.lastUsed ? formatDistanceToNow(row.lastUsed) + ' ago' : 'Never'}
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          {row.lastUsed ? format(row.lastUsed, 'MMM d, HH:mm') : '-'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <div className="flex flex-col">
+                        <span className={cn("text-xs", isBefore(row.expires, addDays(new Date(), 30)) ? "text-amber-600 font-medium" : "text-slate-600")}>
+                          {format(row.expires, 'MMM d, yyyy')}
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          {formatDistanceToNow(row.expires)} left
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2.5 text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="relative inline-block">
+                        <button 
+                          onClick={() => setActiveMenu(activeMenu === row.id ? null : row.id)}
+                          className="p-1 hover:bg-slate-200 rounded-md text-slate-400 hover:text-slate-600"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                        
+                        {activeMenu === row.id && (
+                          <div className="absolute right-0 mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl z-50 py-1 text-left">
+                            <button className="w-full px-3 py-1.5 text-xs flex items-center gap-2 hover:bg-slate-50 text-slate-700">
+                              <RefreshCw className="w-3.5 h-3.5" /> Rotate Key
+                            </button>
+                            <button className="w-full px-3 py-1.5 text-xs flex items-center gap-2 hover:bg-slate-50 text-slate-700">
+                              <Eye className="w-3.5 h-3.5" /> View Scopes
+                            </button>
+                            <button className="w-full px-3 py-1.5 text-xs flex items-center gap-2 hover:bg-slate-50 text-slate-700">
+                              <History className="w-3.5 h-3.5" /> Audit Trail
+                            </button>
+                            <div className="h-px bg-slate-100 my-1" />
+                            <button className="w-full px-3 py-1.5 text-xs flex items-center gap-2 hover:bg-red-50 text-red-600">
+                              <Trash2 className="w-3.5 h-3.5" /> Revoke Key
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      {/* Side Drawer */}
+      {drawerItem && (
+        <>
+          <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40" onClick={() => setDrawerItem(null)} />
+          <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <div>
+                <h2 className="font-bold text-slate-900">Key Details</h2>
+                <p className="text-xs text-slate-500 font-mono">{drawerItem.id}</p>
+              </div>
+              <button onClick={() => setDrawerItem(null)} className="p-2 hover:bg-slate-200 rounded-full">
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-6 space-y-8">
+              <section>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Identity & Status</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-slate-500 font-medium">Display Name</label>
+                    <p className="text-sm font-semibold">{drawerItem.name}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-slate-500 font-medium">Status</label>
+                    <div><StatusPill status={drawerItem.status} /></div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-slate-500 font-medium">Owner</label>
+                    <p className="text-sm">{drawerItem.owner}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-slate-500 font-medium">Created</label>
+                    <p className="text-sm">{format(drawerItem.created, 'MMM d, yyyy')}</p>
+                  </div>
+                </div>
+              </section>
+
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Permissions</h3>
+                  {drawerItem.isOverScoped && (
+                    <span className="text-[10px] text-orange-600 font-bold flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" /> OVER-SCOPED
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {drawerItem.scopes.map(s => (
+                    <div key={s} className="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-mono text-slate-700">
+                      {s}
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Recent Activity</h3>
+                <div className="space-y-4">
+                  {[
+                    { event: 'Key used', meta: 'IP: 192.168.1.45', time: '2 hours ago', icon: Clock },
+                    { event: 'Permissions updated', meta: 'Added read:org', time: '3 days ago', icon: RefreshCw },
+                    { event: 'Key created', meta: 'By admin_user', time: '12 days ago', icon: CheckCircle2 },
+                  ].map((e, i) => (
+                    <div key={i} className="flex gap-3">
+                      <div className="mt-0.5">
+                        <e.icon className="w-4 h-4 text-slate-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-800">{e.event}</p>
+                        <p className="text-xs text-slate-500">{e.meta}</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">{e.time}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
+
+            <div className="p-4 border-t border-slate-200 bg-slate-50 flex gap-3">
+              <button className="flex-1 py-2 bg-white border border-slate-200 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                Rotate Key
+              </button>
+              <button className="flex-1 py-2 bg-red-600 rounded-md text-sm font-semibold text-white hover:bg-red-700">
+                Revoke Access
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+===== src/index.css =====
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+}
+
+/* Custom scrollbar for dense table */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-slate-100;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full border-2 border-slate-100 hover:bg-slate-400;
+}
+
+===== src/main.jsx =====
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+===== src/styles.css =====
+
+
+===== tailwind.config.js =====
+module.exports = {
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  theme: {
+    extend: {
+      fontSize: {
+        'xxs': '0.65rem',
+      }
+    },
+  },
+  plugins: [],
+}
+
+===== vite.config.js =====
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+})

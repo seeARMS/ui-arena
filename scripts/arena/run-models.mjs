@@ -83,6 +83,9 @@ function buildMessages({ interfacePrompt, prompt }) {
           ? "Prefer a Vite-compatible React SPA with mock data. If you omit package.json, index.html, or src/main.jsx, the runner will create sensible defaults."
           : "Do not use external fonts, images, scripts, stylesheets, CDNs, analytics, or network requests.",
         usesReactRuntime
+          ? "Do not use external fonts, images, scripts, stylesheets, CDNs, analytics, or network requests; every runtime asset must be bundled into the project."
+          : "",
+        usesReactRuntime
           ? "Keep the project concise. Generate repeated mock rows programmatically instead of serializing huge arrays."
           : "Do not include explanations outside the HTML.",
       ].join("\n"),
@@ -170,7 +173,7 @@ function filesToBlockText(files) {
 
 function extractFileBlocks(content) {
   const text = String(content ?? "");
-  const blockPattern = /<<<FILE:\s*([^>\n]+?)\s*>>>\r?\n?([\s\S]*?)\r?\n?<<<END FILE>>>/g;
+  const blockPattern = /<<<FILE:\s*([^\n>]+?)\s*(?:>>>[^\S\r\n]*\r?\n|\r?\n)([\s\S]*?)\r?\n?<<<END FILE>>>/g;
   const files = [];
   let match;
 
@@ -319,6 +322,18 @@ function injectReactAppCsp(html) {
   }
 
   return withoutExistingCsp.replace(/<html[^>]*>/i, (match) => `${match}\n<head>\n    ${meta}\n</head>`);
+}
+
+function removeExternalDocumentAssets(html) {
+  return String(html ?? "")
+    .replace(
+      /<script\b[^>]*\bsrc=(["'])https?:\/\/[^"']+\1[^>]*>\s*<\/script>\s*/gi,
+      "",
+    )
+    .replace(
+      /<link\b[^>]*\bhref=(["'])https?:\/\/[^"']+\1[^>]*>\s*/gi,
+      "",
+    );
 }
 
 function normalizeReactProjectFiles(content, { interfacePrompt, result }) {
@@ -781,7 +796,7 @@ async function patchPreviewAssetReferences(previewDir) {
   const indexHtml = await readFile(indexPath, "utf8").catch(() => null);
 
   if (indexHtml !== null) {
-    const next = injectReactAppCsp(indexHtml);
+    const next = injectReactAppCsp(removeExternalDocumentAssets(indexHtml));
     if (next !== indexHtml) {
       await writeFile(indexPath, next);
     }

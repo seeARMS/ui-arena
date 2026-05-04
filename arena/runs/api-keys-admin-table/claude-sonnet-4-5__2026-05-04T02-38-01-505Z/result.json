@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "runId": "claude-sonnet-4-5__2026-05-04T02-38-01-505Z",
+  "interfaceId": "api-keys-admin-table",
+  "interfaceTitle": "Admin table for managing API keys and permissions",
+  "modelId": "claude-sonnet-4-5",
+  "modelDisplayName": "Claude Sonnet 4.5",
+  "family": "Anthropic",
+  "gateway": "openrouter",
+  "gatewayModel": "anthropic/claude-sonnet-4.5",
+  "gatewayGenerationId": "gen-1777863064-fgrfgz8X2N4U3aILKfXv",
+  "providerName": null,
+  "status": "complete",
+  "createdAt": "2026-05-04T02:38:01.505Z",
+  "completedAt": "2026-05-04T02:53:16.252Z",
+  "request": {
+    "dryRun": false,
+    "artifactType": "react-project",
+    "promptSha256": "03534157b5f177deb1dad83ebcb714c523cb33acb2afb334847a31762158a7f3",
+    "params": {
+      "temperature": 0.2,
+      "max_tokens": 16000
+    }
+  },
+  "execution": {
+    "startedAt": "2026-05-04T02:38:01.505Z",
+    "completedAt": "2026-05-04T02:53:16.252Z",
+    "durationMs": 132155,
+    "modelStartedAt": "2026-05-04T02:51:04.097Z",
+    "modelCompletedAt": "2026-05-04T02:53:04.032Z",
+    "modelDurationMs": 119934,
+    "generationTimeMs": null,
+    "latencyMs": null
+  },
+  "usage": {
+    "source": "openrouter:response",
+    "promptTokens": 609,
+    "completionTokens": 12903,
+    "totalTokens": 13512,
+    "nativePromptTokens": null,
+    "nativeCompletionTokens": null,
+    "reasoningTokens": 0,
+    "cachedPromptTokens": 0,
+    "cacheDiscount": null,
+    "totalCost": 0.195372,
+    "upstreamInferenceCost": 0.195372,
+    "currency": "USD",
+    "rawResponseUsage": {
+      "prompt_tokens": 609,
+      "completion_tokens": 12903,
+      "total_tokens": 13512,
+      "cost": 0.195372,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.195372,
+        "upstream_inference_prompt_cost": 0.001827,
+        "upstream_inference_completions_cost": 0.193545
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "artifacts": {
+    "preview": "/previews/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z/",
+    "source": "/sources/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z/source.txt",
+    "sourceJson": "/sources/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z/files.json",
+    "localResultPath": "arena/runs/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z/result.json",
+    "localRunPath": "arena/runs/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z",
+    "localSourcePath": "arena/runs/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z/source",
+    "localPreviewPath": "public/previews/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z",
+    "sourceFormat": "react-project",
+    "sourceFiles": [
+      "index.html",
+      "package.json",
+      "src/App.css",
+      "src/App.jsx",
+      "src/index.css",
+      "src/main.jsx",
+      "src/mockData.js",
+      "src/styles.css",
+      "vite.config.js"
+    ],
+    "desktopScreenshot": "/screenshots/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z__desktop.png",
+    "mobileScreenshot": "/screenshots/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z__mobile.png"
+  },
+  "finishReason": "stop",
+  "repairs": [],
+  "screenshots": {
+    "desktop": {
+      "width": 1440,
+      "height": 1100,
+      "path": "/screenshots/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z__desktop.png",
+      "capturedAt": "2026-05-04T02:53:22.761Z"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "path": "/screenshots/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z__mobile.png",
+      "capturedAt": "2026-05-04T02:53:23.443Z"
+    }
+  },
+  "evaluations": {
+    "lighthouse": {
+      "id": "lighthouse",
+      "displayName": "Lighthouse",
+      "status": "complete",
+      "version": "13.2.0",
+      "completedAt": "2026-05-04T02:53:31.578Z",
+      "durationMs": 8088,
+      "scores": {
+        "performance": {
+          "title": "Performance",
+          "score": 0.85,
+          "value": 85
+        },
+        "accessibility": {
+          "title": "Accessibility",
+          "score": 0.95,
+          "value": 95
+        }
+      },
+      "metrics": {
+        "firstContentfulPaint": {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "displayValue": "1.7 s",
+          "numericValue": 1657.0632,
+          "score": 0.46
+        },
+        "largestContentfulPaint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "displayValue": "1.8 s",
+          "numericValue": 1807.0632,
+          "score": 0.7
+        },
+        "speedIndex": {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "displayValue": "1.7 s",
+          "numericValue": 1657.0632,
+          "score": 0.77
+        },
+        "totalBlockingTime": {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "displayValue": "10 ms",
+          "numericValue": 7.5,
+          "score": 1
+        },
+        "cumulativeLayoutShift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "displayValue": "0",
+          "numericValue": 0,
+          "score": 1
+        }
+      },
+      "summary": {
+        "requestedUrl": "http://127.0.0.1:60822/previews/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z/",
+        "finalUrl": "http://127.0.0.1:60822/previews/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z/",
+        "fetchTime": "2026-05-04T02:53:26.905Z",
+        "accessibilityIssueCount": 2
+      },
+      "issues": [
+        {
+          "id": "color-contrast",
+          "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+          "score": 0,
+          "displayValue": null,
+          "description": "Low-contrast text is difficult or impossible for many users to read. [Learn how to provide sufficient color contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast)."
+        },
+        {
+          "id": "td-has-header",
+          "title": "`<td>` elements in a large `<table>` do not have table headers.",
+          "score": 0,
+          "displayValue": null,
+          "description": "Screen readers have features to make navigating tables easier. Ensuring that `<td>` elements in a large table (3 or more cells in width and height) have an associated table header may improve the experience for screen reader users. [Learn more about table headers](https://dequeuniversity.com/rules/axe/4.11/td-has-header)."
+        }
+      ],
+      "artifacts": {
+        "report": "/evaluations/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z/lighthouse/report.html",
+        "json": "/evaluations/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z/lighthouse/lhr.json"
+      },
+      "error": null
+    },
+    "axe": {
+      "id": "axe",
+      "displayName": "Axe",
+      "status": "complete",
+      "version": "4.11.4",
+      "completedAt": "2026-05-04T02:53:32.807Z",
+      "durationMs": 1226,
+      "scores": null,
+      "metrics": null,
+      "summary": {
+        "violationCount": 2,
+        "passCount": 31,
+        "incompleteCount": 0,
+        "inapplicableCount": 58,
+        "seriousOrCriticalCount": 1,
+        "impactCounts": {
+          "critical": 0,
+          "serious": 1,
+          "moderate": 0,
+          "minor": 1,
+          "unknown": 0
+        }
+      },
+      "issues": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodeCount": 10,
+          "targets": [
+            ".clickable-row:nth-child(1) > td:nth-child(4) > .scopes > .more.scope-badge",
+            ".clickable-row:nth-child(2) > td:nth-child(4) > .scopes > .more.scope-badge",
+            ".clickable-row:nth-child(4) > td:nth-child(4) > .scopes > .more.scope-badge",
+            ".clickable-row:nth-child(5) > td:nth-child(4) > .scopes > .more.scope-badge"
+          ]
+        },
+        {
+          "id": "empty-table-header",
+          "impact": "minor",
+          "help": "Table header text should not be empty",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+          "description": "Ensure table headers have discernible text",
+          "nodeCount": 1,
+          "targets": [
+            "th:nth-child(9)"
+          ]
+        }
+      ],
+      "artifacts": {
+        "json": "/evaluations/api-keys-admin-table/claude-sonnet-4-5__2026-05-04T02-38-01-505Z/axe/axe.json"
+      },
+      "error": null
+    }
+  }
+}

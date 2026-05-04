@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 1,
+  "runId": "gemini-3-flash-preview__2026-05-04T03-04-04-338Z",
+  "interfaceId": "api-keys-admin-table",
+  "interfaceTitle": "Admin table for managing API keys and permissions",
+  "modelId": "gemini-3-flash-preview",
+  "modelDisplayName": "Gemini 3 Flash Preview",
+  "family": "Google",
+  "gateway": "openrouter",
+  "gatewayModel": "google/gemini-3-flash-preview",
+  "gatewayGenerationId": "gen-1777863844-NK6P05kz3FHiWRTTSTaN",
+  "providerName": null,
+  "status": "complete",
+  "createdAt": "2026-05-04T03:04:04.338Z",
+  "completedAt": "2026-05-04T03:04:47.942Z",
+  "request": {
+    "dryRun": false,
+    "artifactType": "react-project",
+    "promptSha256": "03534157b5f177deb1dad83ebcb714c523cb33acb2afb334847a31762158a7f3",
+    "params": {
+      "temperature": 0.2,
+      "max_tokens": 16000
+    }
+  },
+  "execution": {
+    "startedAt": "2026-05-04T03:04:04.338Z",
+    "completedAt": "2026-05-04T03:04:47.942Z",
+    "durationMs": 43603,
+    "modelStartedAt": "2026-05-04T03:04:04.339Z",
+    "modelCompletedAt": "2026-05-04T03:04:36.032Z",
+    "modelDurationMs": 31692,
+    "generationTimeMs": null,
+    "latencyMs": null
+  },
+  "usage": {
+    "source": "openrouter:response",
+    "promptTokens": 562,
+    "completionTokens": 6624,
+    "totalTokens": 7186,
+    "nativePromptTokens": null,
+    "nativeCompletionTokens": null,
+    "reasoningTokens": 0,
+    "cachedPromptTokens": 0,
+    "cacheDiscount": null,
+    "totalCost": 0.020153,
+    "upstreamInferenceCost": 0.020153,
+    "currency": "USD",
+    "rawResponseUsage": {
+      "prompt_tokens": 562,
+      "completion_tokens": 6624,
+      "total_tokens": 7186,
+      "cost": 0.020153,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.020153,
+        "upstream_inference_prompt_cost": 0.000281,
+        "upstream_inference_completions_cost": 0.019872
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "artifacts": {
+    "preview": "/previews/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z/",
+    "source": "/sources/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z/source.txt",
+    "sourceJson": "/sources/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z/files.json",
+    "localResultPath": "arena/runs/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z/result.json",
+    "localRunPath": "arena/runs/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z",
+    "localSourcePath": "arena/runs/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z/source",
+    "localPreviewPath": "public/previews/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z",
+    "sourceFormat": "react-project",
+    "sourceFiles": [
+      "index.html",
+      "package.json",
+      "src/App.jsx",
+      "src/index.css",
+      "src/main.jsx",
+      "src/styles.css",
+      "tailwind.config.js",
+      "vite.config.js"
+    ],
+    "desktopScreenshot": "/screenshots/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z__desktop.png",
+    "mobileScreenshot": "/screenshots/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z__mobile.png"
+  },
+  "finishReason": "stop",
+  "repairs": [],
+  "screenshots": {
+    "desktop": {
+      "width": 1440,
+      "height": 1100,
+      "path": "/screenshots/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z__desktop.png",
+      "capturedAt": "2026-05-04T03:04:57.155Z"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "path": "/screenshots/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z__mobile.png",
+      "capturedAt": "2026-05-04T03:04:57.828Z"
+    }
+  },
+  "evaluations": {
+    "lighthouse": {
+      "id": "lighthouse",
+      "displayName": "Lighthouse",
+      "status": "complete",
+      "version": "13.2.0",
+      "completedAt": "2026-05-04T03:05:06.642Z",
+      "durationMs": 8347,
+      "scores": {
+        "performance": {
+          "title": "Performance",
+          "score": 0.81,
+          "value": 81
+        },
+        "accessibility": {
+          "title": "Accessibility",
+          "score": 0.69,
+          "value": 69
+        }
+      },
+      "metrics": {
+        "firstContentfulPaint": {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "displayValue": "2.0 s",
+          "numericValue": 1958.8512,
+          "score": 0.31
+        },
+        "largestContentfulPaint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "displayValue": "2.0 s",
+          "numericValue": 1958.8512,
+          "score": 0.64
+        },
+        "speedIndex": {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "displayValue": "2.0 s",
+          "numericValue": 1958.8512,
+          "score": 0.64
+        },
+        "totalBlockingTime": {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "displayValue": "0 ms",
+          "numericValue": 0,
+          "score": 1
+        },
+        "cumulativeLayoutShift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "displayValue": "0",
+          "numericValue": 0,
+          "score": 1
+        }
+      },
+      "summary": {
+        "requestedUrl": "http://127.0.0.1:63505/previews/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z/",
+        "finalUrl": "http://127.0.0.1:63505/previews/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z/",
+        "fetchTime": "2026-05-04T03:05:01.743Z",
+        "accessibilityIssueCount": 3
+      },
+      "issues": [
+        {
+          "id": "button-name",
+          "title": "Buttons do not have an accessible name",
+          "score": 0,
+          "displayValue": null,
+          "description": "When a button doesn't have an accessible name, screen readers announce it as \"button\", making it unusable for users who rely on screen readers. [Learn how to make buttons more accessible](https://dequeuniversity.com/rules/axe/4.11/button-name)."
+        },
+        {
+          "id": "label",
+          "title": "Form elements do not have associated labels",
+          "score": 0,
+          "displayValue": null,
+          "description": "Labels ensure that form controls are announced properly by assistive technologies, like screen readers. [Learn more about form element labels](https://dequeuniversity.com/rules/axe/4.11/label)."
+        },
+        {
+          "id": "target-size",
+          "title": "Touch targets do not have sufficient size or spacing.",
+          "score": 0,
+          "displayValue": null,
+          "description": "Touch targets with sufficient size and spacing help users who may have difficulty targeting small controls to activate the targets. [Learn more about touch targets](https://dequeuniversity.com/rules/axe/4.11/target-size)."
+        }
+      ],
+      "artifacts": {
+        "report": "/evaluations/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z/lighthouse/report.html",
+        "json": "/evaluations/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z/lighthouse/lhr.json"
+      },
+      "error": null
+    },
+    "axe": {
+      "id": "axe",
+      "displayName": "Axe",
+      "status": "complete",
+      "version": "4.11.4",
+      "completedAt": "2026-05-04T03:05:08.124Z",
+      "durationMs": 1477,
+      "scores": null,
+      "metrics": null,
+      "summary": {
+        "violationCount": 3,
+        "passCount": 26,
+        "incompleteCount": 0,
+        "inapplicableCount": 63,
+        "seriousOrCriticalCount": 2,
+        "impactCounts": {
+          "critical": 2,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 1,
+          "unknown": 0
+        }
+      },
+      "issues": [
+        {
+          "id": "button-name",
+          "impact": "critical",
+          "help": "Buttons must have discernible text",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/button-name?application=playwright",
+          "description": "Ensure buttons have discernible text",
+          "nodeCount": 40,
+          "targets": [
+            ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(1) > .text-right > .inline-block.relative > .hover\\:bg-slate-200.hover\\:text-slate-600.p-1",
+            ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(2) > .text-right > .inline-block.relative > .hover\\:bg-slate-200.hover\\:text-slate-600.p-1",
+            ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(3) > .text-right > .inline-block.relative > .hover\\:bg-slate-200.hover\\:text-slate-600.p-1",
+            ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(4) > .text-right > .inline-block.relative > .hover\\:bg-slate-200.hover\\:text-slate-600.p-1"
+          ]
+        },
+        {
+          "id": "empty-table-header",
+          "impact": "minor",
+          "help": "Table header text should not be empty",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/empty-table-header?application=playwright",
+          "description": "Ensure table headers have discernible text",
+          "nodeCount": 1,
+          "targets": [
+            ".w-10"
+          ]
+        },
+        {
+          "id": "label",
+          "impact": "critical",
+          "help": "Form elements must have labels",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/label?application=playwright",
+          "description": "Ensure every form element has a label",
+          "nodeCount": 41,
+          "targets": [
+            ".w-10 > .border-slate-300.focus\\:ring-blue-500[type=\"checkbox\"]",
+            ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(1) > td:nth-child(1) > .border-slate-300.focus\\:ring-blue-500[type=\"checkbox\"]",
+            ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(2) > td:nth-child(1) > .border-slate-300.focus\\:ring-blue-500[type=\"checkbox\"]",
+            ".hover\\:bg-slate-50\\/80.transition-colors.group:nth-child(3) > td:nth-child(1) > .border-slate-300.focus\\:ring-blue-500[type=\"checkbox\"]"
+          ]
+        }
+      ],
+      "artifacts": {
+        "json": "/evaluations/api-keys-admin-table/gemini-3-flash-preview__2026-05-04T03-04-04-338Z/axe/axe.json"
+      },
+      "error": null
+    }
+  }
+}

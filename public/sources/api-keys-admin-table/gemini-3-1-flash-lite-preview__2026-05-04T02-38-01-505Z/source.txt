@@ -1,0 +1,184 @@
+===== index.html =====
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; media-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; form-action 'none'; base-uri 'none'" /><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>API Key Manager</title></head>
+  <body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body>
+</html>
+
+===== package.json =====
+{
+  "private": true,
+  "type": "module",
+  "name": "api-key-manager",
+  "version": "1.0.0",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "lucide-react": "^0.292.0",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^2.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "vite": "^5.0.0"
+  },
+  "scripts": {
+    "build": "vite build --base=./"
+  }
+}
+
+===== postcss.config.js =====
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+===== src/App.jsx =====
+import React, { useState, useMemo } from 'react';
+import { Search, MoreVertical, ShieldAlert, Clock, Trash2, RefreshCw, Edit3, ChevronDown, X } from 'lucide-react';
+import { clsx } from 'clsx';
+
+const MOCK_DATA = Array.from({ length: 25 }).map((_, i) => ({
+  id: `key-${i}`,
+  name: ['Production-Read', 'Staging-Write', 'CI-Deploy', 'Analytics-Sync', 'Internal-Tool'][i % 5],
+  owner: ['Alice', 'Bob', 'Charlie', 'Dave', 'Eve'][i % 5],
+  scopes: i % 3 === 0 ? ['admin', 'read'] : ['read'],
+  lastUsed: i % 4 === 0 ? '2023-10-25' : '2023-11-01',
+  created: '2023-01-01',
+  expires: i % 5 === 0 ? '2023-11-05' : '2024-01-01',
+  status: ['healthy', 'stale', 'expiring', 'leaked-suspected', 'revoked'][i % 5],
+}));
+
+const StatusBadge = ({ status }) => {
+  const styles = {
+    healthy: 'bg-green-100 text-green-700',
+    stale: 'bg-slate-100 text-slate-600',
+    expiring: 'bg-amber-100 text-amber-700',
+    'leaked-suspected': 'bg-red-100 text-red-700',
+    revoked: 'bg-gray-200 text-gray-500'
+  };
+  return <span className={clsx('px-2 py-0.5 rounded-full text-xs font-medium', styles[status])}>{status}</span>;
+};
+
+export default function App() {
+  const [selected, setSelected] = useState([]);
+  const [drawer, setDrawer] = useState(null);
+
+  return (
+    <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto">
+      <header className="mb-8">
+        <h1 className="text-2xl font-bold mb-4">API Key Management</h1>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: 'Total Keys', val: '25' },
+            { label: 'Active', val: '18' },
+            { label: 'Over-scoped', val: '3' },
+            { label: 'Expiring Soon', val: '5' },
+          ].map(stat => (
+            <div key={stat.label} className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+              <div className="text-sm text-slate-500">{stat.label}</div>
+              <div className="text-2xl font-semibold">{stat.val}</div>
+            </div>
+          ))}
+        </div>
+      </header>
+
+      <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-200 flex flex-wrap gap-4 items-center justify-between">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
+            <input className="w-full pl-8 pr-4 py-2 border rounded-md text-sm" placeholder="Search keys..." />
+          </div>
+          <div className="flex gap-2">
+            {['All', 'Active', 'Stale', 'Expiring'].map(f => (
+              <button key={f} className="px-3 py-1.5 text-sm font-medium rounded-md hover:bg-slate-100">{f}</button>
+            ))}
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-slate-50 text-slate-600 uppercase text-xs">
+              <tr>
+                <th className="p-4"><input type="checkbox" /></th>
+                {['Name', 'Owner', 'Scopes', 'Last Used', 'Expires', 'Status', ''].map(h => <th key={h} className="p-4 font-semibold">{h}</th>)}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {MOCK_DATA.map(row => (
+                <tr key={row.id} className="hover:bg-slate-50 cursor-pointer" onClick={() => setDrawer(row)}>
+                  <td className="p-4"><input type="checkbox" onClick={e => e.stopPropagation()} /></td>
+                  <td className="p-4 font-medium">{row.name}</td>
+                  <td className="p-4">{row.owner}</td>
+                  <td className="p-4">{row.scopes.join(', ')}</td>
+                  <td className="p-4">{row.lastUsed}</td>
+                  <td className="p-4">{row.expires}</td>
+                  <td className="p-4"><StatusBadge status={row.status} /></td>
+                  <td className="p-4 text-right"><MoreVertical className="h-4 w-4" /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {drawer && (
+        <div className="fixed inset-0 bg-black/20 z-50 flex justify-end">
+          <div className="w-full max-w-md bg-white h-full shadow-xl p-6 overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold">Key Audit: {drawer.name}</h2>
+              <button onClick={() => setDrawer(null)}><X /></button>
+            </div>
+            <div className="space-y-4">
+              <div className="p-4 bg-slate-50 rounded border">
+                <p className="text-xs text-slate-500 uppercase">Status</p>
+                <p className="font-medium">{drawer.status}</p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-semibold">Recent Events</h3>
+                {['Key rotated', 'Scope updated', 'Used by Service-A'].map(e => (
+                  <div key={e} className="text-sm py-2 border-b">{e}</div>
+                ))}
+              </div>
+              <div className="flex gap-2 pt-4">
+                <button className="flex-1 bg-red-600 text-white py-2 rounded text-sm">Revoke</button>
+                <button className="flex-1 border py-2 rounded text-sm">Rotate</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+===== src/index.css =====
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body { @apply bg-slate-50 text-slate-900; }
+
+===== src/main.jsx =====
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './index.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
+===== src/styles.css =====
+
+
+===== tailwind.config.js =====
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: { extend: {} },
+  plugins: [],
+}

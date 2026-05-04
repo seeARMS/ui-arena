@@ -440,6 +440,14 @@ const modelSlots = generatedModelSlots.length
         accentSoft: "#dfd9f0",
         gatewayModel: "anthropic/claude-opus-4.5",
       },
+      {
+        id: "gemini-3-flash-preview",
+        displayName: "Gemini 3 Flash Preview",
+        family: "Google",
+        accent: "#c56b14",
+        accentSoft: "#f3dfc8",
+        gatewayModel: "google/gemini-3-flash-preview",
+      },
     ];
 
 export function interfaceById(interfaceId) {

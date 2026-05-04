@@ -1,0 +1,1164 @@
+===== index.html =====
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; media-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; form-action 'none'; base-uri 'none'" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Key Admin</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+===== package.json =====
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build --base=./",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {}
+}
+
+===== src/main.jsx =====
+import React, { useMemo, useState } from 'react';
+import { createRoot } from 'react-dom/client';
+import './styles.css';
+
+const owners = [
+  ['Maya Chen', 'platform'],
+  ['Theo Banks', 'payments'],
+  ['Priya Rao', 'infra'],
+  ['Sam Okafor', 'data'],
+  ['Nina Park', 'mobile'],
+  ['Luis Gomez', 'security'],
+  ['Ari Singh', 'growth'],
+  ['Elena Voss', 'reliability']
+];
+
+const scopeSets = [
+  ['deploy:read', 'logs:read'],
+  ['deploy:write', 'deploy:read', 'env:read'],
+  ['billing:read', 'billing:write'],
+  ['secrets:read', 'secrets:write', 'admin:*'],
+  ['users:read', 'users:write', 'tokens:write'],
+  ['metrics:read'],
+  ['audit:read', 'logs:read', 'incidents:write'],
+  ['repo:read', 'repo:write', 'deploy:write', 'admin:*'],
+  ['webhooks:write', 'events:read'],
+  ['secrets:read', 'env:write', 'tokens:write', 'admin:*']
+];
+
+const statuses = [
+  'healthy',
+  'healthy',
+  'healthy',
+  'stale',
+  'expiring',
+  'leaked-suspected',
+  'revoked',
+  'over-scoped'
+];
+
+function daysAgo(days) {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return date.toISOString();
+}
+
+function daysFromNow(days) {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString();
+}
+
+function makeKeys() {
+  const names = [
+    'prod-deploy-gha',
+    'stripe-recon-worker',
+    'terraform-cloud-prod',
+    'datadog-log-forwarder',
+    'mobile-release-bot',
+    'incident-automation',
+    'warehouse-loader',
+    'preview-env-factory',
+    'billing-export-cron',
+    'security-scanner',
+    'support-readonly',
+    'internal-cli-v2',
+    'webhook-dispatcher',
+    'k8s-secret-sync',
+    'audit-archive-writer',
+    'payments-canary',
+    'growth-experiment-api',
+    'sre-runbook-bot',
+    'legacy-ci-token',
+    'vendor-snowflake-sync',
+    'prod-admin-breakglass',
+    'edge-config-publisher',
+    'observability-ingest',
+    'sandbox-test-key',
+    'release-notes-bot',
+    'customer-importer',
+    'fraud-signals-etl',
+    'staging-deploy-gha'
+  ];
+
+  return names.map((name, index) => {
+    const owner = owners[index % owners.length];
+    const status = statuses[(index * 3) % statuses.length];
+    const createdDays = 18 + index * 13;
+    const lastUsedDays =
+      status === 'stale' ? 97 + index : status === 'revoked' ? 180 + index : status === 'leaked-suspected' ? 1 : (index * 5) % 44;
+    const expiresIn =
+      status === 'expiring' ? 1 + (index % 6) : status === 'revoked' ? -12 : status === 'stale' ? 21 + index : 18 + ((index * 9) % 150);
+    const scopes = scopeSets[index % scopeSets.length];
+    const overScoped = scopes.some((s) => s.includes('*')) || scopes.length >= 4 || status === 'over-scoped';
+
+    return {
+      id: `key_${String(index + 1).padStart(3, '0')}`,
+      name,
+      fingerprint: `ak_live_${(98231 + index * 761).toString(16)}…${(4830 + index * 37).toString(16)}`,
+      owner: owner[0],
+      team: owner[1],
+      scopes,
+      lastUsed: daysAgo(lastUsedDays),
+      created: daysAgo(createdDays),
+      expires: daysFromNow(expiresIn),
+      status,
+      overScoped,
+      origin: index % 4 === 0 ? 'GitHub Actions' : index % 4 === 1 ? 'Kubernetes secret' : index % 4 === 2 ? 'Terraform variable' : 'Manual console',
+      ip: `10.${22 + (index % 9)}.${40 + index}.${80 + (index % 90)}`,
+      events: [
+        { time: daysAgo(Math.max(0, lastUsedDays)), type: 'key.used', actor: owner[0], detail: `Authenticated from ${index % 2 ? 'us-east-1' : 'eu-west-1'} via ${index % 4 === 0 ? 'CI runner' : 'service account'}` },
+        { time: daysAgo(Math.max(2, Math.floor(createdDays / 3))), type: overScoped ? 'scope.changed' : 'key.rotated', actor: index % 3 ? 'Automation' : 'Luis Gomez', detail: overScoped ? `Added ${scopes[scopes.length - 1]}` : 'Rotated according to 60-day policy' },
+        { time: daysAgo(createdDays), type: 'key.created', actor: owner[0], detail: `Created for ${name} from ${index % 2 ? 'API' : 'admin console'}` }
+      ]
+    };
+  });
+}
+
+const mockKeys = makeKeys();
+
+function formatDate(iso) {
+  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(iso));
+}
+
+function relative(iso) {
+  const now = new Date();
+  const date = new Date(iso);
+  const diff = Math.round((date - now) / 86400000);
+  if (Math.abs(diff) === 0) return 'today';
+  if (diff > 0) return `in ${diff}d`;
+  return `${Math.abs(diff)}d ago`;
+}
+
+function statusLabel(status) {
+  return status === 'leaked-suspected' ? 'leaked suspected' : status === 'over-scoped' ? 'over-scoped' : status;
+}
+
+function effectiveStatus(key) {
+  if (key.status === 'over-scoped') return 'healthy';
+  return key.status;
+}
+
+function isExpiring(key) {
+  const days = (new Date(key.expires) - new Date()) / 86400000;
+  return days >= 0 && days <= 7 && key.status !== 'revoked';
+}
+
+function isStale(key) {
+  return (new Date() - new Date(key.lastUsed)) / 86400000 > 60 && key.status !== 'revoked';
+}
+
+function App() {
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [sort, setSort] = useState({ key: 'status', dir: 'asc' });
+  const [selected, setSelected] = useState(new Set());
+  const [drawerKey, setDrawerKey] = useState(null);
+  const [openMenu, setOpenMenu] = useState(null);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let rows = mockKeys.filter((key) => {
+      const haystack = `${key.name} ${key.owner} ${key.team} ${key.scopes.join(' ')} ${key.status} ${key.fingerprint}`.toLowerCase();
+      if (q && !haystack.includes(q)) return false;
+      if (filter === 'active') return !['revoked', 'stale'].includes(key.status);
+      if (filter === 'stale') return key.status === 'stale' || isStale(key);
+      if (filter === 'expiring') return key.status === 'expiring' || isExpiring(key);
+      if (filter === 'over-scoped') return key.overScoped;
+      return true;
+    });
+
+    rows.sort((a, b) => {
+      const dir = sort.dir === 'asc' ? 1 : -1;
+      const val = (row) => {
+        if (sort.key === 'scopes') return row.scopes.length;
+        if (sort.key === 'lastUsed' || sort.key === 'created' || sort.key === 'expires') return new Date(row[sort.key]).getTime();
+        if (sort.key === 'owner') return `${row.owner} ${row.team}`;
+        if (sort.key === 'status') return row.status;
+        return row[sort.key];
+      };
+      return String(val(a)).localeCompare(String(val(b)), undefined, { numeric: true }) * dir;
+    });
+
+    return rows;
+  }, [query, filter, sort]);
+
+  const summary = useMemo(() => ({
+    total: mockKeys.length,
+    active: mockKeys.filter((k) => !['revoked', 'stale'].includes(k.status)).length,
+    overScoped: mockKeys.filter((k) => k.overScoped).length,
+    expiring: mockKeys.filter(isExpiring).length
+  }), []);
+
+  function toggleSort(key) {
+    setSort((current) => ({ key, dir: current.key === key && current.dir === 'asc' ? 'desc' : 'asc' }));
+  }
+
+  function toggleSelected(id) {
+    setSelected((current) => {
+      const next = new Set(current);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAll() {
+    setSelected((current) => current.size === filtered.length ? new Set() : new Set(filtered.map((k) => k.id)));
+  }
+
+  function doAction(action, key) {
+    setOpenMenu(null);
+    if (action === 'audit') setDrawerKey(key);
+  }
+
+  const selectedRows = mockKeys.filter((k) => selected.has(k.id));
+
+  return (
+    <div className="app">
+      <header className="topbar">
+        <div>
+          <p className="eyebrow">Engineering workspace</p>
+          <h1>API keys & permissions</h1>
+        </div>
+        <button className="primary">Create key</button>
+      </header>
+
+      <section className="summary-strip" aria-label="API key summary">
+        <Summary label="Total keys" value={summary.total} />
+        <Summary label="Active" value={summary.active} tone="good" />
+        <Summary label="Over-scoped" value={summary.overScoped} tone="warn" />
+        <Summary label="Expiring this week" value={summary.expiring} tone="danger" />
+      </section>
+
+      <section className="toolbar" aria-label="Table controls">
+        <label className="search">
+          <span className="sr-only">Search keys</span>
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search name, owner, team, scope, fingerprint…" />
+        </label>
+        <div className="segments" role="group" aria-label="Filter keys">
+          {['all', 'active', 'stale', 'expiring', 'over-scoped'].map((item) => (
+            <button key={item} className={filter === item ? 'active' : ''} onClick={() => setFilter(item)}>
+              {item.replace('-', ' ')}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <main className="table-wrap">
+        <table>
+          <caption>{filtered.length} keys shown</caption>
+          <thead>
+            <tr>
+              <th className="check">
+                <input type="checkbox" aria-label="Select all visible keys" checked={filtered.length > 0 && selected.size === filtered.length} onChange={toggleAll} />
+              </th>
+              <Sortable label="Name" sortKey="name" sort={sort} onSort={toggleSort} />
+              <Sortable label="Owner" sortKey="owner" sort={sort} onSort={toggleSort} />
+              <Sortable label="Scopes" sortKey="scopes" sort={sort} onSort={toggleSort} />
+              <Sortable label="Last used" sortKey="lastUsed" sort={sort} onSort={toggleSort} />
+              <Sortable label="Created" sortKey="created" sort={sort} onSort={toggleSort} />
+              <Sortable label="Expires" sortKey="expires" sort={sort} onSort={toggleSort} />
+              <Sortable label="Status" sortKey="status" sort={sort} onSort={toggleSort} />
+              <th className="actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((key) => (
+              <tr key={key.id} onClick={() => setDrawerKey(key)} className={selected.has(key.id) ? 'selected-row' : ''}>
+                <td className="check" onClick={(e) => e.stopPropagation()}>
+                  <input type="checkbox" aria-label={`Select ${key.name}`} checked={selected.has(key.id)} onChange={() => toggleSelected(key.id)} />
+                </td>
+                <td>
+                  <div className="key-name">{key.name}</div>
+                  <div className="muted mono">{key.fingerprint}</div>
+                </td>
+                <td>
+                  <div>{key.owner}</div>
+                  <div className="muted">{key.team}</div>
+                </td>
+                <td>
+                  <div className="scope-list">
+                    {key.scopes.slice(0, 3).map((scope) => <span key={scope} className={scope.includes('*') ? 'scope risk' : 'scope'}>{scope}</span>)}
+                    {key.scopes.length > 3 && <span className="scope more">+{key.scopes.length - 3}</span>}
+                  </div>
+                </td>
+                <td>
+                  <div>{relative(key.lastUsed)}</div>
+                  <div className="muted">{key.origin}</div>
+                </td>
+                <td>{formatDate(key.created)}</td>
+                <td>
+                  <div className={isExpiring(key) ? 'danger-text' : ''}>{relative(key.expires)}</div>
+                  <div className="muted">{formatDate(key.expires)}</div>
+                </td>
+                <td>
+                  <StatusPill status={effectiveStatus(key)} />
+                  {key.overScoped && <span className="mini-alert">over-scoped</span>}
+                </td>
+                <td className="actions" onClick={(e) => e.stopPropagation()}>
+                  <ActionMenu keyRow={key} open={openMenu === key.id} onToggle={() => setOpenMenu(openMenu === key.id ? null : key.id)} onAction={doAction} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div className="stacked-list" aria-label="API key list">
+          {filtered.map((key) => (
+            <article className="stacked-row" key={key.id} onClick={() => setDrawerKey(key)}>
+              <div className="stacked-head">
+                <input onClick={(e) => e.stopPropagation()} type="checkbox" aria-label={`Select ${key.name}`} checked={selected.has(key.id)} onChange={() => toggleSelected(key.id)} />
+                <div>
+                  <strong>{key.name}</strong>
+                  <div className="muted mono">{key.fingerprint}</div>
+                </div>
+                <StatusPill status={effectiveStatus(key)} />
+              </div>
+              <dl>
+                <div><dt>Owner</dt><dd>{key.owner} · {key.team}</dd></div>
+                <div><dt>Scopes</dt><dd>{key.scopes.join(', ')}</dd></div>
+                <div><dt>Last used</dt><dd>{relative(key.lastUsed)}</dd></div>
+                <div><dt>Expires</dt><dd>{relative(key.expires)}</dd></div>
+              </dl>
+            </article>
+          ))}
+        </div>
+      </main>
+
+      {selected.size > 0 && (
+        <div className="bulkbar" role="region" aria-label="Bulk actions">
+          <strong>{selected.size} selected</strong>
+          <span>{selectedRows.filter((k) => k.overScoped).length} over-scoped · {selectedRows.filter(isExpiring).length} expiring</span>
+          <button>Rotate selected</button>
+          <button>Edit scopes</button>
+          <button className="danger">Revoke</button>
+          <button className="ghost" onClick={() => setSelected(new Set())}>Clear</button>
+        </div>
+      )}
+
+      {drawerKey && <Drawer keyRow={drawerKey} onClose={() => setDrawerKey(null)} />}
+    </div>
+  );
+}
+
+function Summary({ label, value, tone = '' }) {
+  return (
+    <div className={`summary ${tone}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
+function Sortable({ label, sortKey, sort, onSort }) {
+  const active = sort.key === sortKey;
+  return (
+    <th>
+      <button className="sort" onClick={() => onSort(sortKey)} aria-sort={active ? sort.dir : 'none'}>
+        {label} <span>{active ? (sort.dir === 'asc' ? '↑' : '↓') : '↕'}</span>
+      </button>
+    </th>
+  );
+}
+
+function StatusPill({ status }) {
+  return <span className={`pill ${status}`}>{statusLabel(status)}</span>;
+}
+
+function ActionMenu({ keyRow, open, onToggle, onAction }) {
+  const actions = [
+    ['rotate', 'Rotate'],
+    ['revoke', 'Revoke'],
+    ['scopes', 'Edit scopes'],
+    ['audit', 'View audit trail']
+  ];
+
+  return (
+    <div className="menu">
+      <button className="icon-btn" aria-haspopup="menu" aria-expanded={open} onClick={onToggle}>⋯</button>
+      {open && (
+        <div className="popover" role="menu">
+          {actions.map(([id, label]) => (
+            <button key={id} role="menuitem" className={id === 'revoke' ? 'danger-item' : ''} onClick={() => onAction(id, keyRow)}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Drawer({ keyRow, onClose }) {
+  return (
+    <div className="drawer-backdrop" role="presentation" onMouseDown={onClose}>
+      <aside className="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" onMouseDown={(e) => e.stopPropagation()}>
+        <header>
+          <div>
+            <p className="eyebrow">Audit detail</p>
+            <h2 id="drawer-title">{keyRow.name}</h2>
+            <p className="muted mono">{keyRow.fingerprint}</p>
+          </div>
+          <button className="icon-btn" aria-label="Close audit drawer" onClick={onClose}>×</button>
+        </header>
+
+        <section className="drawer-grid">
+          <div><span>Owner</span><strong>{keyRow.owner}</strong></div>
+          <div><span>Team</span><strong>{keyRow.team}</strong></div>
+          <div><span>Last used</span><strong>{relative(keyRow.lastUsed)}</strong></div>
+          <div><span>Expires</span><strong>{relative(keyRow.expires)}</strong></div>
+          <div><span>Source</span><strong>{keyRow.origin}</strong></div>
+          <div><span>Last IP</span><strong>{keyRow.ip}</strong></div>
+        </section>
+
+        <section>
+          <h3>Permissions</h3>
+          <div className="drawer-scopes">
+            {keyRow.scopes.map((scope) => <span key={scope} className={scope.includes('*') ? 'scope risk' : 'scope'}>{scope}</span>)}
+          </div>
+        </section>
+
+        <section>
+          <h3>Rotation health</h3>
+          <div className="health-line">
+            <StatusPill status={effectiveStatus(keyRow)} />
+            <span>{keyRow.overScoped ? 'High privilege surface detected. Review wildcard and write scopes.' : 'No hygiene exception currently open.'}</span>
+          </div>
+        </section>
+
+        <section>
+          <h3>Event trail</h3>
+          <ol className="timeline">
+            {keyRow.events.map((event, index) => (
+              <li key={index}>
+                <time>{formatDate(event.time)} · {relative(event.time)}</time>
+                <strong>{event.type}</strong>
+                <p>{event.detail}</p>
+                <span>Actor: {event.actor}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <footer>
+          <button>Rotate key</button>
+          <button>Edit scopes</button>
+          <button className="danger">Revoke key</button>
+        </footer>
+      </aside>
+    </div>
+  );
+}
+
+createRoot(document.getElementById('root')).render(<App />);
+
+===== src/styles.css =====
+:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --line: #d9dee7;
+  --line-soft: #e9edf3;
+  --text: #111827;
+  --muted: #64748b;
+  --blue: #2563eb;
+  --green: #147d4a;
+  --amber: #a15c00;
+  --red: #b42318;
+  --purple: #6d28d9;
+  --shadow: 0 18px 42px rgba(15, 23, 42, .16);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button, input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  min-height: 100vh;
+  padding: 18px;
+  padding-bottom: 90px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+h1, h2, h3, p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 22px;
+  letter-spacing: -.03em;
+}
+
+h2 { font-size: 20px; }
+
+h3 {
+  font-size: 13px;
+  margin-bottom: 9px;
+}
+
+.eyebrow {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.primary, .bulkbar button, .drawer footer button {
+  border: 1px solid #1d4ed8;
+  background: var(--blue);
+  color: white;
+  border-radius: 8px;
+  padding: 8px 11px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.summary {
+  padding: 10px 13px;
+  border-right: 1px solid var(--line-soft);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.summary:last-child { border-right: 0; }
+
+.summary span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.summary strong {
+  font-size: 23px;
+  letter-spacing: -.04em;
+}
+
+.summary.good strong { color: var(--green); }
+.summary.warn strong { color: var(--amber); }
+.summary.danger strong { color: var(--red); }
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.search {
+  flex: 1;
+  min-width: 220px;
+}
+
+.search input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 9px;
+  padding: 9px 11px;
+  outline: none;
+}
+
+.search input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .13);
+}
+
+.segments {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 9px;
+  padding: 3px;
+}
+
+.segments button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 6px 9px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 750;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.segments button.active {
+  background: #111827;
+  color: #fff;
+}
+
+.table-wrap {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: visible;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+}
+
+caption {
+  height: 0;
+  overflow: hidden;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f9fafb;
+  border-bottom: 1px solid var(--line);
+  color: #334155;
+  font-size: 11px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+th, td {
+  padding: 7px 9px;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: middle;
+}
+
+tbody tr {
+  transition: background .12s ease;
+}
+
+tbody tr:hover {
+  background: #f8fbff;
+}
+
+tbody tr.selected-row {
+  background: #eff6ff;
+}
+
+.check {
+  width: 34px;
+  text-align: center;
+}
+
+.sort {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
+  font-weight: 800;
+}
+
+.sort span {
+  color: var(--muted);
+  margin-left: 4px;
+}
+
+.key-name {
+  font-weight: 800;
+  font-size: 12.5px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.scope-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 290px;
+}
+
+.scope, .pill, .mini-alert {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.scope {
+  background: #f1f5f9;
+  border: 1px solid #dbe3ee;
+  color: #334155;
+  padding: 4px 6px;
+  font-size: 10.5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.scope.risk {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #be123c;
+}
+
+.scope.more {
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.pill {
+  padding: 5px 7px;
+  font-size: 10.5px;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.pill.healthy {
+  background: #ecfdf3;
+  color: var(--green);
+  border-color: #bbf7d0;
+}
+
+.pill.stale {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+
+.pill.expiring {
+  background: #fffbeb;
+  color: var(--amber);
+  border-color: #fde68a;
+}
+
+.pill.leaked-suspected {
+  background: #fef2f2;
+  color: var(--red);
+  border-color: #fecaca;
+}
+
+.pill.revoked {
+  background: #f8fafc;
+  color: #64748b;
+  border-color: #cbd5e1;
+  text-decoration: line-through;
+}
+
+.mini-alert {
+  margin-left: 5px;
+  padding: 4px 6px;
+  background: #faf5ff;
+  color: var(--purple);
+  border: 1px solid #e9d5ff;
+  font-size: 10px;
+}
+
+.danger-text { color: var(--red); font-weight: 800; }
+
+.actions {
+  width: 64px;
+  text-align: right;
+}
+
+.menu {
+  position: relative;
+  display: inline-flex;
+}
+
+.icon-btn {
+  border: 1px solid var(--line);
+  background: white;
+  color: #334155;
+  width: 30px;
+  height: 28px;
+  border-radius: 7px;
+  font-weight: 900;
+}
+
+.popover {
+  position: absolute;
+  right: 0;
+  top: 32px;
+  z-index: 10;
+  min-width: 160px;
+  padding: 5px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  box-shadow: var(--shadow);
+}
+
+.popover button {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  padding: 8px 9px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.popover button:hover { background: #f1f5f9; }
+.popover .danger-item { color: var(--red); }
+
+.bulkbar {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  z-index: 20;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(820px, calc(100vw - 28px));
+  padding: 10px;
+  background: #111827;
+  color: white;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  font-size: 13px;
+}
+
+.bulkbar span {
+  color: #cbd5e1;
+  margin-right: auto;
+}
+
+.bulkbar button {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.bulkbar .danger, .drawer footer .danger {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.bulkbar .ghost {
+  background: transparent;
+  border-color: #475569;
+}
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(15, 23, 42, .32);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer {
+  width: min(520px, 100vw);
+  height: 100%;
+  overflow: auto;
+  background: white;
+  box-shadow: var(--shadow);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.drawer header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.drawer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.drawer-grid div {
+  padding: 10px;
+  border-right: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.drawer-grid div:nth-child(2n) { border-right: 0; }
+.drawer-grid div:nth-last-child(-n + 2) { border-bottom: 0; }
+
+.drawer-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  margin-bottom: 3px;
+}
+
+.drawer-grid strong {
+  font-size: 13px;
+}
+
+.drawer-scopes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.health-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid var(--line-soft);
+  border-radius: 9px;
+  padding: 10px;
+  font-size: 12px;
+}
+
+.timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-left: 2px solid var(--line);
+}
+
+.timeline li {
+  position: relative;
+  padding: 0 0 16px 16px;
+}
+
+.timeline li::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 3px;
+  width: 8px;
+  height: 8px;
+  background: var(--blue);
+  border-radius: 50%;
+}
+
+.timeline time, .timeline span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.timeline strong {
+  display: block;
+  margin: 3px 0;
+  font-size: 13px;
+}
+
+.timeline p {
+  font-size: 12px;
+  color: #334155;
+}
+
+.drawer footer {
+  position: sticky;
+  bottom: -18px;
+  display: flex;
+  gap: 8px;
+  padding: 12px 0 0;
+  background: white;
+  border-top: 1px solid var(--line-soft);
+  margin-top: auto;
+}
+
+.stacked-list {
+  display: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+@media (max-width: 980px) {
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .segments {
+    overflow-x: auto;
+  }
+
+  .summary-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .summary:nth-child(2) { border-right: 0; }
+  .summary:nth-child(-n + 2) { border-bottom: 1px solid var(--line-soft); }
+
+  table {
+    min-width: 980px;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .app {
+    padding: 12px;
+    padding-bottom: 120px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .primary {
+    padding: 7px 9px;
+  }
+
+  .table-wrap {
+    background: transparent;
+    border: 0;
+    overflow: visible;
+  }
+
+  table {
+    display: none;
+  }
+
+  .stacked-list {
+    display: grid;
+    gap: 8px;
+  }
+
+  .stacked-row {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  .stacked-head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 9px;
+    align-items: start;
+    margin-bottom: 9px;
+  }
+
+  .stacked-head strong {
+    font-size: 13px;
+  }
+
+  .stacked-row dl {
+    margin: 0;
+    display: grid;
+    gap: 6px;
+  }
+
+  .stacked-row dl div {
+    display: grid;
+    grid-template-columns: 82px 1fr;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .stacked-row dt {
+    color: var(--muted);
+    font-weight: 800;
+  }
+
+  .stacked-row dd {
+    margin: 0;
+  }
+
+  .bulkbar {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    transform: none;
+    width: auto;
+    flex-wrap: wrap;
+  }
+
+  .bulkbar span {
+    width: 100%;
+    order: 2;
+  }
+
+  .drawer {
+    width: 100vw;
+  }
+}

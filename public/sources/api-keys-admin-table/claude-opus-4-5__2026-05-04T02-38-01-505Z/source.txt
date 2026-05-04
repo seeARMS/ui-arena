@@ -1,0 +1,1633 @@
+===== index.html =====
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; media-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; form-action 'none'; base-uri 'none'" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Keys Admin</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+===== package.json =====
+{
+  "private": true,
+  "type": "module",
+  "name": "api-keys-admin",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --base=./ --base=./",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "date-fns": "^2.30.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^5.0.0"
+  }
+}
+
+===== src/App.css =====
+.app {
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+.app-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #21262d;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.header-subtitle {
+  color: #8b949e;
+  font-size: 13px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+===== src/App.jsx =====
+import React, { useState, useMemo, useCallback } from 'react'
+import { generateMockKeys } from './data/mockKeys.js'
+import { SummaryHeader } from './components/SummaryHeader'
+import { FilterBar } from './components/FilterBar'
+import { KeysTable } from './components/KeysTable'
+import { BulkActionBar } from './components/BulkActionBar'
+import { AuditDrawer } from './components/AuditDrawer'
+import './App.css'
+
+const mockKeys = generateMockKeys(30)
+
+export default function App() {
+  const [keys, setKeys] = useState(mockKeys)
+  const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState('all')
+  const [sortConfig, setSortConfig] = useState({ key: 'lastUsed', direction: 'desc' })
+  const [selectedIds, setSelectedIds] = useState(new Set())
+  const [drawerKey, setDrawerKey] = useState(null)
+
+  const filteredKeys = useMemo(() => {
+    let result = keys
+
+    if (search) {
+      const s = search.toLowerCase()
+      result = result.filter(k =>
+        k.name.toLowerCase().includes(s) ||
+        k.owner.toLowerCase().includes(s) ||
+        k.scopes.some(sc => sc.toLowerCase().includes(s))
+      )
+    }
+
+    if (filter !== 'all') {
+      result = result.filter(k => {
+        if (filter === 'active') return k.status === 'healthy'
+        if (filter === 'stale') return k.status === 'stale'
+        if (filter === 'expiring') return k.status === 'expiring'
+        if (filter === 'over-scoped') return k.overScoped
+        return true
+      })
+    }
+
+    if (sortConfig.key) {
+      result = [...result].sort((a, b) => {
+        let aVal = a[sortConfig.key]
+        let bVal = b[sortConfig.key]
+        if (sortConfig.key === 'scopes') {
+          aVal = a.scopes.length
+          bVal = b.scopes.length
+        }
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1
+        return 0
+      })
+    }
+
+    return result
+  }, [keys, search, filter, sortConfig])
+
+  const stats = useMemo(() => {
+    const now = new Date()
+    const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+    return {
+      total: keys.length,
+      active: keys.filter(k => k.status === 'healthy').length,
+      overScoped: keys.filter(k => k.overScoped).length,
+      expiringThisWeek: keys.filter(k => new Date(k.expires) <= weekFromNow && new Date(k.expires) > now).length
+    }
+  }, [keys])
+
+  const handleSort = useCallback((key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }))
+  }, [])
+
+  const handleSelect = useCallback((id) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }, [])
+
+  const handleSelectAll = useCallback(() => {
+    if (selectedIds.size === filteredKeys.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(filteredKeys.map(k => k.id)))
+    }
+  }, [filteredKeys, selectedIds.size])
+
+  const handleBulkAction = useCallback((action) => {
+    if (action === 'revoke') {
+      setKeys(prev => prev.map(k =>
+        selectedIds.has(k.id) ? { ...k, status: 'revoked' } : k
+      ))
+    }
+    setSelectedIds(new Set())
+  }, [selectedIds])
+
+  const handleRowAction = useCallback((id, action) => {
+    if (action === 'revoke') {
+      setKeys(prev => prev.map(k => k.id === id ? { ...k, status: 'revoked' } : k))
+    } else if (action === 'rotate') {
+      setKeys(prev => prev.map(k => k.id === id ? {
+        ...k,
+        created: new Date().toISOString(),
+        lastRotated: new Date().toISOString(),
+        status: 'healthy'
+      } : k))
+    }
+  }, [])
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <h1>API Keys</h1>
+        <span className="header-subtitle">Workspace key management & audit</span>
+      </header>
+
+      <SummaryHeader stats={stats} />
+
+      <FilterBar
+        search={search}
+        onSearchChange={setSearch}
+        filter={filter}
+        onFilterChange={setFilter}
+      />
+
+      <div className="table-container">
+        <KeysTable
+          keys={filteredKeys}
+          sortConfig={sortConfig}
+          onSort={handleSort}
+          selectedIds={selectedIds}
+          onSelect={handleSelect}
+          onSelectAll={handleSelectAll}
+          onRowClick={setDrawerKey}
+          onRowAction={handleRowAction}
+        />
+      </div>
+
+      {selectedIds.size > 0 && (
+        <BulkActionBar
+          count={selectedIds.size}
+          onAction={handleBulkAction}
+          onClear={() => setSelectedIds(new Set())}
+        />
+      )}
+
+      {drawerKey && (
+        <AuditDrawer
+          keyData={keys.find(k => k.id === drawerKey)}
+          onClose={() => setDrawerKey(null)}
+        />
+      )}
+    </div>
+  )
+}
+
+===== src/components/AuditDrawer.css =====
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+}
+
+.audit-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 480px;
+  max-width: 100vw;
+  background: #161b22;
+  border-left: 1px solid #30363d;
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  outline: none;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #21262d;
+}
+
+.drawer-title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drawer-title h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.drawer-close {
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  border-radius: 4px;
+}
+
+.drawer-close:hover {
+  background: #21262d;
+  color: #e1e4e8;
+}
+
+.drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.drawer-section {
+  margin-bottom: 24px;
+}
+
+.drawer-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8b949e;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 8px 12px;
+  margin: 0;
+}
+
+.detail-grid dt {
+  color: #8b949e;
+  font-size: 12px;
+}
+
+.detail-grid dd {
+  margin: 0;
+  font-size: 12px;
+}
+
+.detail-grid .mono {
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 11px;
+}
+
+.warning-text {
+  margin: 12px 0 0 0;
+  padding: 8px 12px;
+  background: rgba(210, 153, 34, 0.15);
+  border-radius: 6px;
+  color: #d29922;
+  font-size: 12px;
+}
+
+.audit-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.audit-event {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #21262d;
+}
+
+.audit-event:last-child {
+  border-bottom: none;
+}
+
+.event-icon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.event-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.event-type {
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.event-time {
+  font-size: 11px;
+  color: #6e7681;
+  flex-shrink: 0;
+}
+
+.event-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.event-actor {
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.event-detail-text {
+  font-size: 11px;
+  color: #6e7681;
+}
+
+.drawer-footer {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid #21262d;
+}
+
+.drawer-footer button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btn-secondary {
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: #e1e4e8;
+}
+
+.btn-secondary:hover {
+  background: #30363d;
+}
+
+.btn-primary {
+  background: #238636;
+  border: 1px solid #238636;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #2ea043;
+}
+
+.btn-danger {
+  background: rgba(248, 81, 73, 0.15);
+  border: 1px solid #f85149;
+  color: #f85149;
+}
+
+.btn-danger:hover {
+  background: rgba(248, 81, 73, 0.25);
+}
+
+@media (max-width: 500px) {
+  .audit-drawer {
+    width: 100vw;
+  }
+  
+  .drawer-footer {
+    flex-wrap: wrap;
+  }
+  
+  .drawer-footer button {
+    flex: 1;
+  }
+}
+
+===== src/components/AuditDrawer.jsx =====
+import React, { useEffect, useRef } from 'react'
+import { format } from 'date-fns'
+import { StatusPill } from './StatusPill'
+import { ScopeBadges } from './ScopeBadges'
+import './AuditDrawer.css'
+
+export function AuditDrawer({ keyData, onClose }) {
+  const drawerRef = useRef(null)
+
+  useEffect(() => {
+    function handleEscape(e) {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleEscape)
+    drawerRef.current?.focus()
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [onClose])
+
+  if (!keyData) return null
+
+  const eventIcons = {
+    created: '🔑',
+    used: '→',
+    rotated: '🔄',
+    'scope-modified': '✏️'
+  }
+
+  return (
+    <>
+      <div className="drawer-overlay" onClick={onClose} />
+      <aside
+        className="audit-drawer"
+        ref={drawerRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-label={`Audit details for ${keyData.name}`}
+      >
+        <header className="drawer-header">
+          <div className="drawer-title">
+            <h2>{keyData.name}</h2>
+            <StatusPill status={keyData.status} />
+          </div>
+          <button className="drawer-close" onClick={onClose} aria-label="Close drawer">
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/>
+            </svg>
+          </button>
+        </header>
+
+        <div className="drawer-content">
+          <section className="drawer-section">
+            <h3>Key Details</h3>
+            <dl className="detail-grid">
+              <dt>Key ID</dt>
+              <dd className="mono">{keyData.id}</dd>
+              <dt>Prefix</dt>
+              <dd className="mono">{keyData.keyPrefix}</dd>
+              <dt>Owner</dt>
+              <dd>{keyData.owner}</dd>
+              <dt>Created</dt>
+              <dd>{format(new Date(keyData.created), 'PPpp')}</dd>
+              <dt>Last Used</dt>
+              <dd>{format(new Date(keyData.lastUsed), 'PPpp')}</dd>
+              <dt>Expires</dt>
+              <dd>{format(new Date(keyData.expires), 'PPpp')}</dd>
+              {keyData.lastRotated && (
+                <>
+                  <dt>Last Rotated</dt>
+                  <dd>{format(new Date(keyData.lastRotated), 'PPpp')}</dd>
+                </>
+              )}
+            </dl>
+          </section>
+
+          <section className="drawer-section">
+            <h3>Scopes</h3>
+            <ScopeBadges scopes={keyData.scopes} overScoped={keyData.overScoped} />
+            {keyData.overScoped && (
+              <p className="warning-text">
+                ⚠️ This key has excessive permissions. Consider reducing scope.
+              </p>
+            )}
+          </section>
+
+          <section className="drawer-section">
+            <h3>Audit Trail</h3>
+            <div className="audit-timeline">
+              {keyData.auditEvents.map((event, i) => (
+                <div key={i} className="audit-event">
+                  <span className="event-icon">{eventIcons[event.type] || '•'}</span>
+                  <div className="event-content">
+                    <div className="event-header">
+                      <span className="event-type">{event.type}</span>
+                      <span className="event-time">{format(new Date(event.timestamp), 'MMM d, HH:mm')}</span>
+                    </div>
+                    <div className="event-details">
+                      <span className="event-actor">{event.actor}</span>
+                      {event.details && <span className="event-detail-text">{event.details}</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <footer className="drawer-footer">
+          <button className="btn-secondary" onClick={onClose}>Close</button>
+          <button className="btn-primary">Rotate Key</button>
+          <button className="btn-danger">Revoke Key</button>
+        </footer>
+      </aside>
+    </>
+  )
+}
+
+===== src/components/BulkActionBar.css =====
+.bulk-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #161b22;
+  border-top: 1px solid #30363d;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 50;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.bulk-count {
+  font-weight: 600;
+  color: #58a6ff;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+.bulk-actions button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e1e4e8;
+  font-size: 13px;
+}
+
+.bulk-actions button:hover {
+  background: #30363d;
+}
+
+.bulk-actions button.danger {
+  background: rgba(248, 81, 73, 0.15);
+  border-color: #f85149;
+  color: #f85149;
+}
+
+.bulk-actions button.danger:hover {
+  background: rgba(248, 81, 73, 0.25);
+}
+
+.bulk-clear {
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  font-size: 13px;
+}
+
+.bulk-clear:hover {
+  color: #e1e4e8;
+}
+
+@media (max-width: 600px) {
+  .bulk-action-bar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .bulk-actions {
+    order: 3;
+    width: 100%;
+  }
+  .bulk-actions button {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+===== src/components/BulkActionBar.jsx =====
+import React from 'react'
+import './BulkActionBar.css'
+
+export function BulkActionBar({ count, onAction, onClear }) {
+  return (
+    <div className="bulk-action-bar" role="toolbar" aria-label="Bulk actions">
+      <span className="bulk-count">{count} selected</span>
+      <div className="bulk-actions">
+        <button onClick={() => onAction('rotate')}>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+          </svg>
+          Rotate all
+        </button>
+        <button className="danger" onClick={() => onAction('revoke')}>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75ZM4.496 6.675l.66 6.6a.25.25 0 0 0 .249.225h5.19a.25.25 0 0 0 .249-.225l.66-6.6a.75.75 0 0 1 1.492.149l-.66 6.6A1.748 1.748 0 0 1 10.595 15h-5.19a1.75 1.75 0 0 1-1.741-1.575l-.66-6.6a.75.75 0 1 1 1.492-.15ZM6.5 1.75V3h3V1.75a.25.25 0 0 0-.25-.25h-2.5a.25.25 0 0 0-.25.25Z"/>
+          </svg>
+          Revoke all
+        </button>
+      </div>
+      <button className="bulk-clear" onClick={onClear}>
+        Clear selection
+      </button>
+    </div>
+  )
+}
+
+===== src/components/FilterBar.css =====
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #161b22;
+  border-bottom: 1px solid #21262d;
+  flex-wrap: wrap;
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8b949e;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px 8px 34px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e1e4e8;
+}
+
+.search-input::placeholder {
+  color: #6e7681;
+}
+
+.search-input:focus {
+  border-color: #58a6ff;
+  outline: none;
+}
+
+.filter-segments {
+  display: flex;
+  background: #0d1117;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  overflow: hidden;
+}
+
+.filter-segment {
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.filter-segment:not(:last-child) {
+  border-right: 1px solid #30363d;
+}
+
+.filter-segment:hover {
+  background: #21262d;
+  color: #e1e4e8;
+}
+
+.filter-segment.active {
+  background: #21262d;
+  color: #e1e4e8;
+}
+
+@media (max-width: 600px) {
+  .filter-segments {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .filter-segment {
+    flex: 1;
+    white-space: nowrap;
+  }
+}
+
+===== src/components/FilterBar.jsx =====
+import React from 'react'
+import './FilterBar.css'
+
+const filters = [
+  { id: 'all', label: 'All' },
+  { id: 'active', label: 'Active' },
+  { id: 'stale', label: 'Stale' },
+  { id: 'expiring', label: 'Expiring' },
+  { id: 'over-scoped', label: 'Over-scoped' }
+]
+
+export function FilterBar({ search, onSearchChange, filter, onFilterChange }) {
+  return (
+    <div className="filter-bar">
+      <div className="search-wrapper">
+        <svg className="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/>
+        </svg>
+        <input
+          type="search"
+          placeholder="Search keys, owners, scopes..."
+          value={search}
+          onChange={e => onSearchChange(e.target.value)}
+          className="search-input"
+          aria-label="Search API keys"
+        />
+      </div>
+      <div className="filter-segments" role="group" aria-label="Filter keys">
+        {filters.map(f => (
+          <button
+            key={f.id}
+            className={`filter-segment ${filter === f.id ? 'active' : ''}`}
+            onClick={() => onFilterChange(f.id)}
+            aria-pressed={filter === f.id}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+===== src/components/KeysTable.css =====
+.keys-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.keys-table th,
+.keys-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #21262d;
+}
+
+.keys-table th {
+  background: #161b22;
+  color: #8b949e;
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.keys-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.keys-table th.sortable:hover {
+  color: #e1e4e8;
+}
+
+.th-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sort-indicator {
+  font-size: 10px;
+}
+
+.keys-table tbody tr {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.keys-table tbody tr:hover {
+  background: #161b22;
+}
+
+.keys-table tbody tr.selected {
+  background: #1f2937;
+}
+
+.keys-table tbody tr.row-danger {
+  background: rgba(248, 81, 73, 0.1);
+}
+
+.col-checkbox {
+  width: 40px;
+}
+
+.col-checkbox input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.col-name { min-width: 160px; }
+.col-owner { min-width: 140px; }
+.col-scopes { min-width: 180px; }
+.col-lastUsed { min-width: 100px; }
+.col-created { min-width: 100px; }
+.col-expires { min-width: 100px; }
+.col-status { min-width: 100px; }
+.col-actions { width: 60px; }
+
+.name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.key-name {
+  font-weight: 500;
+  color: #e1e4e8;
+}
+
+.key-prefix {
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 10px;
+  color: #6e7681;
+}
+
+.actions-wrapper {
+  position: relative;
+}
+
+.action-trigger {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #8b949e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-trigger:hover {
+  background: #21262d;
+  border-color: #30363d;
+  color: #e1e4e8;
+}
+
+.action-popover {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  min-width: 180px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.action-popover button {
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: #e1e4e8;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.action-popover button:hover {
+  background: #21262d;
+}
+
+.action-popover button.danger {
+  color: #f85149;
+}
+
+.action-popover hr {
+  margin: 4px 0;
+  border: none;
+  border-top: 1px solid #21262d;
+}
+
+.keys-cards {
+  display: none;
+  padding: 12px;
+  gap: 12px;
+}
+
+.key-card {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.key-card:hover {
+  border-color: #30363d;
+}
+
+.key-card.selected {
+  border-color: #58a6ff;
+  background: #1f2937;
+}
+
+.key-card.card-danger {
+  border-color: #f85149;
+  background: rgba(248, 81, 73, 0.1);
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.card-header input[type="checkbox"] {
+  margin-top: 2px;
+}
+
+.card-title {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.card-label {
+  color: #8b949e;
+  font-size: 11px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  color: #8b949e;
+}
+
+@media (max-width: 900px) {
+  .keys-table {
+    display: none;
+  }
+  .keys-cards {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+===== src/components/KeysTable.jsx =====
+import React, { useState, useRef, useEffect } from 'react'
+import { format, formatDistanceToNow } from 'date-fns'
+import { StatusPill } from './StatusPill'
+import { ScopeBadges } from './ScopeBadges'
+import './KeysTable.css'
+
+const columns = [
+  { key: 'name', label: 'Name', sortable: true },
+  { key: 'owner', label: 'Owner', sortable: true },
+  { key: 'scopes', label: 'Scopes', sortable: true },
+  { key: 'lastUsed', label: 'Last Used', sortable: true },
+  { key: 'created', label: 'Created', sortable: true },
+  { key: 'expires', label: 'Expires', sortable: true },
+  { key: 'status', label: 'Status', sortable: true }
+]
+
+export function KeysTable({ keys, sortConfig, onSort, selectedIds, onSelect, onSelectAll, onRowClick, onRowAction }) {
+  const [openPopover, setOpenPopover] = useState(null)
+  const popoverRef = useRef(null)
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (popoverRef.current && !popoverRef.current.contains(e.target)) {
+        setOpenPopover(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleAction = (e, keyId, action) => {
+    e.stopPropagation()
+    onRowAction(keyId, action)
+    setOpenPopover(null)
+  }
+
+  const allSelected = keys.length > 0 && selectedIds.size === keys.length
+
+  return (
+    <>
+      <table className="keys-table" role="grid">
+        <thead>
+          <tr>
+            <th className="col-checkbox">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={onSelectAll}
+                aria-label="Select all keys"
+              />
+            </th>
+            {columns.map(col => (
+              <th
+                key={col.key}
+                className={`col-${col.key} ${col.sortable ? 'sortable' : ''}`}
+                onClick={() => col.sortable && onSort(col.key)}
+                aria-sort={sortConfig.key === col.key ? (sortConfig.direction === 'asc' ? 'ascending' : 'descending') : undefined}
+              >
+                <span className="th-content">
+                  {col.label}
+                  {sortConfig.key === col.key && (
+                    <span className="sort-indicator">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                  )}
+                </span>
+              </th>
+            ))}
+            <th className="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {keys.map(key => (
+            <tr
+              key={key.id}
+              className={`${selectedIds.has(key.id) ? 'selected' : ''} ${key.status === 'leaked-suspected' ? 'row-danger' : ''}`}
+              onClick={() => onRowClick(key.id)}
+            >
+              <td className="col-checkbox" onClick={e => e.stopPropagation()}>
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(key.id)}
+                  onChange={() => onSelect(key.id)}
+                  aria-label={`Select ${key.name}`}
+                />
+              </td>
+              <td className="col-name">
+                <div className="name-cell">
+                  <span className="key-name">{key.name}</span>
+                  <span className="key-prefix">{key.keyPrefix}</span>
+                </div>
+              </td>
+              <td className="col-owner">{key.owner}</td>
+              <td className="col-scopes">
+                <ScopeBadges scopes={key.scopes} overScoped={key.overScoped} />
+              </td>
+              <td className="col-lastUsed" title={format(new Date(key.lastUsed), 'PPpp')}>
+                {formatDistanceToNow(new Date(key.lastUsed), { addSuffix: true })}
+              </td>
+              <td className="col-created" title={format(new Date(key.created), 'PPpp')}>
+                {format(new Date(key.created), 'MMM d, yyyy')}
+              </td>
+              <td className="col-expires" title={format(new Date(key.expires), 'PPpp')}>
+                {format(new Date(key.expires), 'MMM d, yyyy')}
+              </td>
+              <td className="col-status">
+                <StatusPill status={key.status} />
+              </td>
+              <td className="col-actions" onClick={e => e.stopPropagation()}>
+                <div className="actions-wrapper">
+                  <button
+                    className="action-trigger"
+                    onClick={() => setOpenPopover(openPopover === key.id ? null : key.id)}
+                    aria-label="Row actions"
+                    aria-expanded={openPopover === key.id}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M8 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm13 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
+                    </svg>
+                  </button>
+                  {openPopover === key.id && (
+                    <div className="action-popover" ref={popoverRef} role="menu">
+                      <button role="menuitem" onClick={e => handleAction(e, key.id, 'rotate')}>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                        </svg>
+                        Rotate key
+                      </button>
+                      <button role="menuitem" onClick={e => handleAction(e, key.id, 'edit-scopes')}>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z"/>
+                        </svg>
+                        Edit scopes
+                      </button>
+                      <button role="menuitem" onClick={() => { onRowClick(key.id); setOpenPopover(null) }}>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287ZM8 5.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/>
+                        </svg>
+                        View audit trail
+                      </button>
+                      <hr />
+                      <button role="menuitem" className="danger" onClick={e => handleAction(e, key.id, 'revoke')}>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75ZM4.496 6.675l.66 6.6a.25.25 0 0 0 .249.225h5.19a.25.25 0 0 0 .249-.225l.66-6.6a.75.75 0 0 1 1.492.149l-.66 6.6A1.748 1.748 0 0 1 10.595 15h-5.19a1.75 1.75 0 0 1-1.741-1.575l-.66-6.6a.75.75 0 1 1 1.492-.15ZM6.5 1.75V3h3V1.75a.25.25 0 0 0-.25-.25h-2.5a.25.25 0 0 0-.25.25Z"/>
+                        </svg>
+                        Revoke key
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="keys-cards">
+        {keys.map(key => (
+          <div
+            key={key.id}
+            className={`key-card ${selectedIds.has(key.id) ? 'selected' : ''} ${key.status === 'leaked-suspected' ? 'card-danger' : ''}`}
+            onClick={() => onRowClick(key.id)}
+          >
+            <div className="card-header">
+              <input
+                type="checkbox"
+                checked={selectedIds.has(key.id)}
+                onChange={() => onSelect(key.id)}
+                onClick={e => e.stopPropagation()}
+                aria-label={`Select ${key.name}`}
+              />
+              <div className="card-title">
+                <span className="key-name">{key.name}</span>
+                <span className="key-prefix">{key.keyPrefix}</span>
+              </div>
+              <StatusPill status={key.status} />
+            </div>
+            <div className="card-body">
+              <div className="card-row">
+                <span className="card-label">Owner</span>
+                <span>{key.owner}</span>
+              </div>
+              <div className="card-row">
+                <span className="card-label">Scopes</span>
+                <ScopeBadges scopes={key.scopes} overScoped={key.overScoped} />
+              </div>
+              <div className="card-row">
+                <span className="card-label">Last used</span>
+                <span>{formatDistanceToNow(new Date(key.lastUsed), { addSuffix: true })}</span>
+              </div>
+              <div className="card-row">
+                <span className="card-label">Expires</span>
+                <span>{format(new Date(key.expires), 'MMM d, yyyy')}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {keys.length === 0 && (
+        <div className="empty-state">
+          <p>No API keys match your filters</p>
+        </div>
+      )}
+    </>
+  )
+}
+
+===== src/components/ScopeBadges.css =====
+.scope-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.scope-badge {
+  display: inline-flex;
+  padding: 2px 6px;
+  background: #21262d;
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: 'SF Mono', Monaco, monospace;
+  color: #8b949e;
+}
+
+.scope-badge.scope-danger {
+  background: rgba(210, 153, 34, 0.2);
+  color: #d29922;
+}
+
+.scope-badge.scope-more {
+  background: transparent;
+  color: #6e7681;
+}
+
+.over-scoped-indicator {
+  color: #d29922;
+  font-size: 12px;
+  cursor: help;
+}
+
+===== src/components/ScopeBadges.jsx =====
+import React from 'react'
+import './ScopeBadges.css'
+
+export function ScopeBadges({ scopes, overScoped }) {
+  const displayScopes = scopes.slice(0, 2)
+  const remaining = scopes.length - 2
+
+  return (
+    <div className={`scope-badges ${overScoped ? 'over-scoped' : ''}`}>
+      {displayScopes.map((scope, i) => (
+        <span key={i} className={`scope-badge ${scope.includes('admin') || scope.includes('*') ? 'scope-danger' : ''}`}>
+          {scope}
+        </span>
+      ))}
+      {remaining > 0 && (
+        <span className="scope-badge scope-more" title={scopes.slice(2).join(', ')}>
+          +{remaining}
+        </span>
+      )}
+      {overScoped && (
+        <span className="over-scoped-indicator" title="This key has excessive permissions">
+          ⚠
+        </span>
+      )}
+    </div>
+  )
+}
+
+===== src/components/StatusPill.css =====
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-healthy {
+  background: rgba(63, 185, 80, 0.15);
+  color: #3fb950;
+}
+
+.status-stale {
+  background: rgba(139, 148, 158, 0.15);
+  color: #8b949e;
+}
+
+.status-expiring {
+  background: rgba(210, 153, 34, 0.15);
+  color: #d29922;
+}
+
+.status-leaked {
+  background: rgba(248, 81, 73, 0.25);
+  color: #f85149;
+  animation: pulse 2s infinite;
+}
+
+.status-revoked {
+  background: rgba(110, 118, 129, 0.15);
+  color: #6e7681;
+  text-decoration: line-through;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+===== src/components/StatusPill.jsx =====
+import React from 'react'
+import './StatusPill.css'
+
+const statusConfig = {
+  healthy: { label: 'Healthy', className: 'status-healthy' },
+  stale: { label: 'Stale', className: 'status-stale' },
+  expiring: { label: 'Expiring', className: 'status-expiring' },
+  'leaked-suspected': { label: 'Leaked?', className: 'status-leaked' },
+  revoked: { label: 'Revoked', className: 'status-revoked' }
+}
+
+export function StatusPill({ status }) {
+  const config = statusConfig[status] || { label: status, className: '' }
+  return (
+    <span className={`status-pill ${config.className}`}>
+      {config.label}
+    </span>
+  )
+}
+
+===== src/components/SummaryHeader.css =====
+.summary-header {
+  display: flex;
+  gap: 1px;
+  background: #21262d;
+  border-bottom: 1px solid #21262d;
+}
+
+.summary-stat {
+  flex: 1;
+  padding: 12px 16px;
+  background: #161b22;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-healthy { color: #3fb950; }
+.stat-warning { color: #d29922; }
+.stat-danger { color: #f85149; }
+
+@media (max-width: 600px) {
+  .summary-header {
+    flex-wrap: wrap;
+  }
+  .summary-stat {
+    flex: 1 1 50%;
+  }
+}
+
+===== src/components/SummaryHeader.jsx =====
+import React from 'react'
+import './SummaryHeader.css'
+
+export function SummaryHeader({ stats }) {
+  return (
+    <div className="summary-header">
+      <div className="summary-stat">
+        <span className="stat-value">{stats.total}</span>
+        <span className="stat-label">Total Keys</span>
+      </div>
+      <div className="summary-stat">
+        <span className="stat-value stat-healthy">{stats.active}</span>
+        <span className="stat-label">Active</span>
+      </div>
+      <div className="summary-stat">
+        <span className="stat-value stat-warning">{stats.overScoped}</span>
+        <span className="stat-label">Over-scoped</span>
+      </div>
+      <div className="summary-stat">
+        <span className="stat-value stat-danger">{stats.expiringThisWeek}</span>
+        <span className="stat-label">Expiring this week</span>
+      </div>
+    </div>
+  )
+}
+
+===== src/data/mockKeys.js =====
+const owners = [
+  'alice@company.com', 'bob@company.com', 'charlie@company.com',
+  'diana@company.com', 'eve@company.com', 'frank@company.com',
+  'grace@company.com', 'henry@company.com', 'iris@company.com',
+  'jack@company.com'
+]
+
+const scopeSets = [
+  ['read:users'],
+  ['read:users', 'write:users'],
+  ['read:*'],
+  ['admin:*'],
+  ['read:billing', 'write:billing'],
+  ['read:analytics'],
+  ['read:users', 'read:billing', 'read:analytics'],
+  ['write:deployments'],
+  ['admin:users', 'admin:billing', 'admin:deployments'],
+  ['read:users', 'write:users', 'read:billing', 'write:billing', 'admin:*']
+]
+
+const statuses = ['healthy', 'healthy', 'healthy', 'stale', 'expiring', 'leaked-suspected', 'revoked']
+
+const eventTypes = ['created', 'used', 'rotated', 'scope-modified']
+
+function randomDate(start, end) {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
+}
+
+function generateAuditEvents(created) {
+  const events = [
+    {
+      type: 'created',
+      timestamp: created,
+      actor: owners[Math.floor(Math.random() * owners.length)],
+      details: 'Key created via API'
+    }
+  ]
+  
+  const numEvents = 2 + Math.floor(Math.random() * 5)
+  const now = new Date()
+  
+  for (let i = 0; i < numEvents; i++) {
+    const eventDate = randomDate(new Date(created), now)
+    const type = eventTypes[Math.floor(Math.random() * eventTypes.length)]
+    events.push({
+      type,
+      timestamp: eventDate.toISOString(),
+      actor: type === 'used' ? 'system' : owners[Math.floor(Math.random() * owners.length)],
+      details: type === 'used' ? `IP: 192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` :
+               type === 'rotated' ? 'Manual rotation' :
+               type === 'scope-modified' ? 'Scopes updated' : null
+    })
+  }
+  
+  return events.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+}
+
+export function generateMockKeys(count) {
+  const keys = []
+  const now = new Date()
+  
+  for (let i = 0; i < count; i++) {
+    const created = randomDate(new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000), now)
+    const status = statuses[Math.floor(Math.random() * statuses.length)]
+    const scopes = scopeSets[Math.floor(Math.random() * scopeSets.length)]
+    const overScoped = scopes.some(s => s.includes('admin') || s.includes('*'))
+    
+    let lastUsed
+    if (status === 'stale') {
+      lastUsed = randomDate(new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000), new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000))
+    } else if (status === 'revoked') {
+      lastUsed = randomDate(new Date(created), new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000))
+    } else {
+      lastUsed = randomDate(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), now)
+    }
+    
+    let expires
+    if (status === 'expiring') {
+      expires = randomDate(now, new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000))
+    } else if (status === 'revoked') {
+      expires = randomDate(new Date(created), now)
+    } else {
+      expires = randomDate(new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000))
+    }
+    
+    const keyNames = [
+      'Production API', 'Staging API', 'CI/CD Pipeline', 'Analytics Service',
+      'Billing Integration', 'User Sync', 'Backup Service', 'Monitoring',
+      'Deploy Bot', 'Test Runner', 'Data Export', 'Webhook Handler',
+      'Mobile App', 'Web Dashboard', 'Internal Tools', 'Partner API'
+    ]
+    
+    keys.push({
+      id: `key_${i.toString().padStart(3, '0')}_${Math.random().toString(36).substr(2, 8)}`,
+      name: `${keyNames[i % keyNames.length]} ${Math.floor(i / keyNames.length) + 1}`,
+      keyPrefix: `sk_${status === 'healthy' ? 'live' : 'test'}_${Math.random().toString(36).substr(2, 8)}...`,
+      owner: owners[i % owners.length],
+      scopes,
+      overScoped,
+      created: created.toISOString(),
+      lastUsed: lastUsed.toISOString(),
+      expires: expires.toISOString(),
+      lastRotated: Math.random() > 0.5 ? randomDate(new Date(created), now).toISOString() : null,
+      status,
+      auditEvents: generateAuditEvents(created.toISOString())
+    })
+  }
+  
+  return keys
+}
+
+===== src/index.css =====
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  background: #0f1117;
+  color: #e1e4e8;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+input {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid #58a6ff;
+  outline-offset: 1px;
+}
+
+===== src/main.jsx =====
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+
+===== src/styles.css =====
+
+
+===== vite.config.js =====
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()]
+})
