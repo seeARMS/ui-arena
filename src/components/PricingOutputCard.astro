@@ -2,6 +2,7 @@
 const { output, index = 0 } = Astro.props;
 const rowClass = `r${(index % 8) + 1}`;
 const hasPreview = output.previewUrl && output.previewUrl !== "#";
+const hasRawPreview = output.rawPreviewUrl && output.rawPreviewUrl !== "#";
 const hasScreenshot = output.screenshotUrl && output.screenshotUrl !== "#";
 const hasSource = output.sourceUrl && output.sourceUrl !== "#";
 
@@ -70,9 +71,9 @@ const medalClass = !isComplete
 
   <div class="preview-cell">
     <div class="lb-preview">
-      {hasPreview ? (
+      {hasRawPreview ? (
         <iframe
-          src={output.previewUrl}
+          src={output.rawPreviewUrl}
           title={`${output.model} generated interface preview`}
           sandbox="allow-scripts"
           loading="lazy"

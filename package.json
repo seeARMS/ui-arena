@@ -1,8 +1,8 @@
 {
-  "name": "uiarena-web",
+  "name": "tastebench-web",
   "version": "0.0.0",
   "private": true,
-  "description": "Astro site for UI Arena.",
+  "description": "Astro site for TasteBench — an open benchmark for AI product taste.",
   "type": "module",
   "scripts": {
     "arena:run": "node scripts/arena/run-models.mjs",

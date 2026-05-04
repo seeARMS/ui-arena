@@ -1,11 +1,11 @@
-export const defaultSiteUrl = "https://uiarena.armstr.ng";
-export const siteName = "UI Arena";
+export const defaultSiteUrl = "https://tastebench.armstr.ng";
+export const siteName = "TasteBench";
 export const authorName = "Colin Armstrong";
 export const xHandle = "@colinarms";
-export const title = "UI Arena — An open benchmark for AI-generated interfaces";
+export const title = "TasteBench — An open benchmark for AI product taste";
 export const description =
-  "Same prompt, five frontier models. UI Arena ships each model's generated HTML with Lighthouse and axe scores, side by side.";
+  "Same product brief, every frontier model. TasteBench ships the working build, the source, and the scores side by side — from a landing page to a React dashboard.";
 export const ogImagePath = "/og/home.png";
 export const ogImageAlt =
-  "UI Arena leaderboard showing AI-generated product interfaces ranked by Lighthouse and axe scores.";
-export const ogHeadline = "Same brief.\nFive models.\nOne leaderboard.";
+  "TasteBench leaderboard ranking AI-generated product builds by Lighthouse and axe scores.";
+export const ogHeadline = "Same brief.\nEvery model.\nRanked.";

@@ -4,7 +4,7 @@ import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://uiarena.armstr.ng',
+  site: 'https://tastebench.armstr.ng',
   integrations: [],
   fonts: [
     {

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>TasteBench</title>
+  <rect width="64" height="64" fill="#f7f7f5"/>
+  <rect x="9" y="9" width="46" height="46" fill="#111111"/>
+  <rect x="14" y="14" width="17" height="17" fill="#d0e3ff"/>
+  <rect x="33" y="14" width="17" height="17" fill="#ffe1cf"/>
+  <rect x="14" y="33" width="17" height="17" fill="#d6f5d4"/>
+  <rect x="33" y="33" width="17" height="17" fill="#efd8ff"/>
+</svg>

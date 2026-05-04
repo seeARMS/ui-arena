@@ -1,10 +1,10 @@
-# UI Arena
+# TasteBench
 
-Examples of how different AI models generate different product interfaces.
+An open benchmark for AI product taste.
 
-UI Arena runs the same interface prompt through multiple models, renders the outputs as live static pages, and publishes the screenshots, source, and run metadata side by side.
+TasteBench gives the same product brief to every frontier model — landing pages today, React dashboards and full apps next — then publishes the working build, the source, and the scores. Side by side. Same prompt. Every model. No vibes.
 
-Browse generated pricing pages, dashboards, onboarding flows, AI chat interfaces, settings pages, and more.
+The site groups briefs by product surface (landing pages, pricing, dashboards, auth, onboarding, settings, admin tables, mobile screens, workflows, chat). Each brief runs through the lineup, gets rendered into a sandboxed iframe, scored with Lighthouse and axe, and dropped onto a leaderboard.
 
 ## Development
 
@@ -13,15 +13,15 @@ npm install
 npm run dev
 ```
 
-## Production Build
+## Production build
 
 ```bash
 npm run build
 ```
 
-## Running Arena Jobs
+## Running benchmark jobs
 
-The site is static. Model runs are generated ahead of time, written to disk, and then indexed into the Astro build.
+The site is static. Model runs are generated ahead of time, written to disk, and indexed into the Astro build.
 
 ```bash
 cp .env.example .env
@@ -30,8 +30,8 @@ export OPENROUTER_API_KEY=...
 # Required once before screenshot capture and local evaluators.
 npm run arena:install-browsers
 
-# Run every enabled model for the first pricing-page interface.
-# This writes previews, screenshots, and evaluator results by default.
+# Run every enabled model for the first brief.
+# Writes previews, screenshots, and evaluator results by default.
 npm run arena:run -- --interface pricing-ai-coding-assistant
 
 # Run one model.
@@ -63,9 +63,9 @@ Each run writes:
 - `public/screenshots/<interface>/<run>__desktop.png` and `__mobile.png`.
 - `public/evaluations/<interface>/<run>/...` for Lighthouse reports and axe JSON.
 
-The gallery embeds generated previews in sandboxed iframes and links to screenshots and the rendered source-viewer route. Generated HTML is treated as untrusted, so the runner injects a restrictive CSP into preview documents and the gallery iframe does not grant same-origin access.
+The leaderboard embeds generated previews in sandboxed iframes and links to screenshots and the canonical run page. Generated HTML is treated as untrusted, so the runner injects a restrictive CSP into preview documents and the gallery iframe does not grant same-origin access.
 
-Evaluators are declared in `arena/evaluators/manifest.json` and implemented as modules in `scripts/arena/evaluators`. Add a manifest entry plus a module exporting `runEvaluation()` to plug in another evaluator later. The first evaluators are Lighthouse for performance/accessibility scores and axe-core for concrete accessibility violations.
+Evaluators are declared in `arena/evaluators/manifest.json` and implemented as modules in `scripts/arena/evaluators`. Add a manifest entry plus a module exporting `runEvaluation()` to plug in another evaluator. The first evaluators are Lighthouse for performance/accessibility scores and axe-core for concrete accessibility violations.
 
 Lighthouse uses Chrome discovery through `chrome-launcher`. Set `LIGHTHOUSE_CHROME_PATH` or `CHROME_PATH` if it cannot find a local Chrome/Chromium install.
 
@@ -73,7 +73,7 @@ Lighthouse uses Chrome discovery through `chrome-launcher`. Set `LIGHTHOUSE_CHRO
 
 - Astro app configured for Cloudflare via `@astrojs/cloudflare`.
 - Tailwind is wired through `@tailwindcss/vite`.
-- Interface prompt manifests live in `arena/interfaces`.
+- Brief manifests live in `arena/interfaces`.
 - Model manifests live in `arena/models`.
 - Evaluator manifests live in `arena/evaluators`.
-- Gallery data is adapted in `src/data/interfaces.js` from `src/data/generated-results.js`.
+- Brief metadata, surface taxonomy, and gallery data are adapted in `src/data/interfaces.js` from `src/data/generated-results.js`.

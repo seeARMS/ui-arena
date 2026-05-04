@@ -24,30 +24,29 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
     <section class="hero">
       <div class="container hero-inner stagger-fade-group">
         <div>
-          <p class="eyebrow">Open benchmark · UI generation</p>
-          <h1>How well do frontier models design <em>UI?</em></h1>
+          <p class="eyebrow">Open benchmark · Product taste</p>
+          <h1>Benchmarking AI <em>taste.</em></h1>
           <p class="lede">
-            UI Arena gives the same product-interface brief to GPT-5, Claude Sonnet 4.5, Gemini 3.1, Grok 4.3, and Flash —
-            then publishes the live HTML, screenshots, and Lighthouse + axe scores. Same prompt. Five outputs. No vibes.
+            TasteBench gives the same product brief to every frontier model — landing pages today, React dashboards and full apps next — then ships the working build, the source, and the scores. Side by side. Same prompt. Every model. No vibes.
           </p>
           <div class="hero-actions">
             <a class="button button-primary" href="/interfaces/pricing-ai-coding-assistant/">
               Open the pricing leaderboard →
             </a>
             <a class="button button-secondary" href="/interfaces/">
-              Browse {interfacePrompts.length} interfaces
+              Browse {interfacePrompts.length} briefs
             </a>
           </div>
         </div>
         <aside class="hero-aside">
-          <div class="snapshot" aria-label="Arena snapshot">
+          <div class="snapshot" aria-label="Bench snapshot">
             <div class="snapshot-head">
-              <span>Arena snapshot</span>
+              <span>Bench snapshot</span>
               <span class="live"><i></i> Live</span>
             </div>
             <dl>
               <div>
-                <dt>Interfaces</dt>
+                <dt>Briefs</dt>
                 <dd>{interfacePrompts.length}<small>concrete prompts</small></dd>
               </div>
               <div>
@@ -59,8 +58,8 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
                 <dd>{lastUpdate}<small>auto-indexed</small></dd>
               </div>
               <div>
-                <dt>Artifacts</dt>
-                <dd>4<small>HTML · PNG · src · eval</small></dd>
+                <dt>Stacks</dt>
+                <dd>HTML<small>React · Vue next</small></dd>
               </div>
             </dl>
           </div>
@@ -73,15 +72,15 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
         <div class="metric-strip">
           <div>
             <strong>{interfacePrompts.length}</strong>
-            <span>Interface prompts</span>
+            <span>Product briefs</span>
           </div>
           <div>
             <strong>{pricingOutputs.length}</strong>
             <span>Frontier models</span>
           </div>
           <div>
-            <strong>HTML</strong>
-            <span>Live, sandboxed previews</span>
+            <strong>Live builds</strong>
+            <span>Sandboxed previews</span>
           </div>
           <div>
             <strong>Lighthouse + axe</strong>
@@ -97,16 +96,16 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
           <div>
             <p class="eyebrow">Method</p>
             <h2>How a run works.</h2>
-            <p>One prompt, every model, scored on the same machine. The point isn't to crown a winner — it's to make the differences legible.</p>
+            <p>One brief, every model, scored on the same machine. The point isn't to crown a winner — it's to make taste legible.</p>
           </div>
-          <a class="text-link" href="https://github.com/colinarms/uiarena" rel="noopener noreferrer">Read the source ↗</a>
+          <a class="text-link" href="https://github.com/colinarms/tastebench" rel="noopener noreferrer">Read the source ↗</a>
         </div>
 
         <div class="pipeline-list">
           <div>
-            <div class="num">01 · Prompt</div>
-            <strong>One concrete brief.</strong>
-            <p>A product surface like a SaaS pricing page or an admin table — written tightly enough that "good" is verifiable.</p>
+            <div class="num">01 · Brief</div>
+            <strong>One concrete product.</strong>
+            <p>A pricing page, a creator dashboard, an onboarding flow — specified tightly enough that "good" is verifiable, but open enough for every model to pick its own approach.</p>
           </div>
           <div>
             <div class="num">02 · Run</div>
@@ -131,7 +130,7 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
       <div class="container">
         <div class="section-header">
           <div>
-            <p class="eyebrow">Featured run</p>
+            <p class="eyebrow">Featured brief</p>
             <h2>SaaS pricing page · AI coding assistant.</h2>
             <p>Three plans, a team upgrade path, usage limits, FAQs, responsive behavior. {pricingOutputs.length} models took a swing.</p>
           </div>
@@ -161,6 +160,7 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
             const tone = (item) => !item ? "pending" : item.tone === "good" ? "good" : item.tone === "warn" ? "warn" : item.tone === "bad" ? "bad" : "neutral";
             const medal = !isComplete ? "" : index === 0 ? "gold" : index === 1 ? "silver" : index === 2 ? "bronze" : "";
             const hasPreview = output.previewUrl && output.previewUrl !== "#";
+            const hasRawPreview = output.rawPreviewUrl && output.rawPreviewUrl !== "#";
             const hasSource = output.sourceUrl && output.sourceUrl !== "#";
             return (
               <div class={`lb-row ${rowClass} ${isPending ? "is-pending" : ""}`}>
@@ -196,9 +196,9 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
                 </div>
                 <div class="preview-cell">
                   <div class="lb-preview">
-                    {hasPreview ? (
+                    {hasRawPreview ? (
                       <iframe
-                        src={output.previewUrl}
+                        src={output.rawPreviewUrl}
                         title={`${output.model} pricing page preview`}
                         sandbox="allow-scripts"
                         loading="lazy"
@@ -242,15 +242,15 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
       </div>
     </section>
 
-    <section class="section" id="interfaces">
+    <section class="section" id="briefs">
       <div class="container">
         <div class="section-header">
           <div>
-            <p class="eyebrow">Gallery</p>
-            <h2>{interfacePrompts.length} interfaces. Pick a fight.</h2>
-            <p>Each prompt is a real product surface. Click into one to compare what every model shipped.</p>
+            <p class="eyebrow">Briefs</p>
+            <h2>{interfacePrompts.length} product briefs. Pick a fight.</h2>
+            <p>Each brief is a concrete product surface — landing pages, dashboards, settings, onboarding. Click in to see how every model built it.</p>
           </div>
-          <a class="text-link" href="/interfaces/">View all interfaces →</a>
+          <a class="text-link" href="/interfaces/">View all briefs →</a>
         </div>
 
         <div class="interface-grid">
@@ -276,13 +276,13 @@ const lastUpdate = new Date().toLocaleDateString("en", { month: "short", day: "n
           <div>
             <p class="eyebrow">Why this exists</p>
             <h2 style="font-size: clamp(28px, 3.6vw, 38px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; margin-bottom: 16px;">
-              Model demos cherry-pick. UI Arena doesn't.
+              Model demos cherry-pick. TasteBench doesn't.
             </h2>
             <p style="color: var(--ink-soft); font-size: 16px; line-height: 1.6; margin-bottom: 12px;">
-              Every model lab ships its best example. UI Arena fixes the brief, runs the same prompt across the lineup, and publishes everything — including the runs that look bad.
+              Every model lab ships its best example. TasteBench fixes the brief, runs the same prompt across the lineup, and publishes everything — including the builds that look bad.
             </p>
             <p style="color: var(--ink-soft); font-size: 16px; line-height: 1.6;">
-              The point isn't a verdict. It's the patterns: which model writes accessible HTML by default, which one over-engineers the gradient, which one ships 240 lines that beat Sonnet's 412.
+              The point isn't a verdict. It's the patterns: which model writes accessible markup by default, which one over-engineers the gradient, which one ships 240 lines that beat Sonnet's 412.
             </p>
           </div>
           <div class="prompt-box" style="margin-top: 12px;">

@@ -1,11 +1,11 @@
 {
-  "name": "UI Arena",
-  "short_name": "UI Arena",
-  "description": "A gallery of AI-generated product interface examples.",
+  "name": "TasteBench",
+  "short_name": "TasteBench",
+  "description": "An open benchmark for AI product taste — same brief, every model, ranked.",
   "icons": [
-    { "src": "ui-arena.svg", "sizes": "any", "type": "image/svg+xml" }
+    { "src": "tastebench.svg", "sizes": "any", "type": "image/svg+xml" }
   ],
-  "theme_color": "#f3efe6",
-  "background_color": "#f3efe6",
+  "theme_color": "#f7f7f5",
+  "background_color": "#f7f7f5",
   "display": "standalone"
 }

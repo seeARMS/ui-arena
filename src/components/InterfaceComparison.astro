@@ -26,7 +26,7 @@ const lastRun = outputs
   <section class="page-head">
     <div class="container">
       <div class="crumb">
-        <a href="/interfaces/">Interfaces</a>
+        <a href="/interfaces/">Briefs</a>
         <span>/</span>
         <span>{interfacePrompt.number}</span>
       </div>
@@ -35,16 +35,15 @@ const lastRun = outputs
       <div class="page-head-grid">
         <div>
           <p class="lede">
-            {outputs.length} models received the same brief. Below: a leaderboard of their generated
-            HTML, ranked by aggregate of Lighthouse performance and accessibility.
+            {outputs.length} models received the same brief. Below: a leaderboard of their builds, ranked by aggregate of Lighthouse performance and accessibility.
           </p>
           <div class="badges">
             <span class="badge">▣ {interfacePrompt.eyebrow}</span>
             <span class="badge">⚙ {outputs.length} models</span>
-            <span class="badge">▤ {completedCount} generated</span>
-            {pendingCount > 0 && <span class="badge">○ {pendingCount} pending</span>}
+            <span class="badge">▤ {completedCount} ranked</span>
+            {pendingCount > 0 && <span class="badge">○ {pendingCount} queued</span>}
             {failedCount > 0 && <span class="badge">✕ {failedCount} failed</span>}
-            <span class="badge">⚡ Static HTML</span>
+            {interfacePrompt.stack && <span class="badge">⌗ {interfacePrompt.stack}</span>}
           </div>
         </div>
         <div class="prompt-box">

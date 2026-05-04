@@ -4,24 +4,24 @@ const { active = "home" } = Astro.props;
 
 <header class="site-header">
   <div class="container header-inner">
-    <a class="brand" href="/" aria-label="UI Arena home">
+    <a class="brand" href="/" aria-label="TasteBench home">
       <span class="brand-mark" aria-hidden="true">
         <span></span>
         <span></span>
         <span></span>
         <span></span>
       </span>
-      <span>UI Arena</span>
+      <span>TasteBench</span>
     </a>
     <div class="nav-search" aria-hidden="true">
       <span>⌕</span>
-      <span>Find an interface or model…</span>
+      <span>Find a brief or a model…</span>
       <kbd>⌘K</kbd>
     </div>
     <nav class="site-nav" aria-label="Primary navigation">
-      <a href="/interfaces/" aria-current={active === "interfaces" ? "page" : undefined}>Interfaces</a>
+      <a href="/interfaces/" aria-current={active === "interfaces" ? "page" : undefined}>Briefs</a>
       <a href="/#how-it-works">Method</a>
-      <a href="https://github.com/colinarms/uiarena" rel="noopener noreferrer">GitHub</a>
+      <a href="https://github.com/colinarms/tastebench" rel="noopener noreferrer">GitHub</a>
     </nav>
   </div>
 </header>
