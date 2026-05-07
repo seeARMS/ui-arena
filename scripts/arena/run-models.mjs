@@ -236,6 +236,10 @@ function normalizePackageJson(content) {
   dependencies.react ??= "^18.3.1";
   dependencies["react-dom"] ??= "^18.3.1";
 
+  devDependencies["@vitejs/plugin-react"] ??= "^5.1.1";
+  devDependencies.tailwindcss ??= "^3.4.17";
+  devDependencies.postcss ??= "^8.4.49";
+  devDependencies.autoprefixer ??= "^10.4.20";
   if (!dependencies.vite && !devDependencies.vite) {
     devDependencies.vite = "^7.3.2";
   }
@@ -259,6 +263,34 @@ function normalizePackageJson(content) {
     null,
     2,
   )}\n`;
+}
+
+function defaultPostcssConfig() {
+  return `module.exports = {
+  plugins: {
+    tailwindcss: { config: "./tailwind.config.cjs" },
+    autoprefixer: {},
+  },
+};
+`;
+}
+
+function defaultTailwindConfig() {
+  return `module.exports = {
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx,html}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+`;
+}
+
+function defaultArenaCss() {
+  return `@tailwind base;
+@tailwind components;
+@tailwind utilities;
+`;
 }
 
 function findAppEntry(filesByPath) {
@@ -294,6 +326,7 @@ function ensureProjectIndexHtml(content, interfacePrompt, result) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy" content="${REACT_APP_CSP}" />
+    <link rel="stylesheet" href="/src/arena.css" />
     <title>${interfacePrompt.title} - ${result.modelDisplayName}</title>
   </head>
   <body>
@@ -307,7 +340,21 @@ function ensureProjectIndexHtml(content, interfacePrompt, result) {
     return fallback;
   }
 
-  return injectReactAppCsp(content);
+  return ensureProjectStylesheet(injectReactAppCsp(content));
+}
+
+function ensureProjectStylesheet(html) {
+  const stylesheet = '<link rel="stylesheet" href="/src/arena.css" />';
+
+  if (/href=(["'])\/src\/arena\.css\1/i.test(html)) {
+    return html;
+  }
+
+  if (/<\/head>/i.test(html)) {
+    return html.replace(/<\/head>/i, `    ${stylesheet}\n  </head>`);
+  }
+
+  return html.replace(/<html[^>]*>/i, (match) => `${match}\n<head>\n    ${stylesheet}\n</head>`);
 }
 
 function injectReactAppCsp(html) {
@@ -410,6 +457,9 @@ createRoot(document.getElementById("root")).render(
     );
   }
 
+  byPath.set("src/arena.css", defaultArenaCss());
+  byPath.set("tailwind.config.cjs", defaultTailwindConfig());
+  byPath.set("postcss.config.cjs", defaultPostcssConfig());
   byPath.set("package.json", normalizePackageJson(byPath.get("package.json")));
   byPath.set("index.html", ensureProjectIndexHtml(byPath.get("index.html"), interfacePrompt, result));
 
