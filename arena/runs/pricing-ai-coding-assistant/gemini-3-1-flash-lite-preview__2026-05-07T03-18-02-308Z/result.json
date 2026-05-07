@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "runId": "gemini-3-1-flash-lite-preview__2026-05-07T03-18-02-308Z",
+  "interfaceId": "pricing-ai-coding-assistant",
+  "interfaceTitle": "Pricing page for an AI coding assistant",
+  "modelId": "gemini-3-1-flash-lite-preview",
+  "modelDisplayName": "Gemini 3.1 Flash Lite Preview",
+  "family": "Google",
+  "gateway": "openrouter",
+  "gatewayModel": "google/gemini-3.1-flash-lite-preview",
+  "gatewayGenerationId": null,
+  "providerName": null,
+  "status": "error",
+  "createdAt": "2026-05-07T03:18:02.308Z",
+  "completedAt": "2026-05-07T03:20:43.974Z",
+  "request": {
+    "dryRun": false,
+    "artifactType": "react-project",
+    "promptSha256": "14800838b4dd455aa1dafb0d94ee14d27ef1dc96ba75e9306a31926c62e4cc2f",
+    "params": {
+      "temperature": 0.2,
+      "max_tokens": 8000
+    }
+  },
+  "execution": {
+    "startedAt": "2026-05-07T03:18:02.308Z",
+    "completedAt": "2026-05-07T03:20:43.974Z",
+    "durationMs": 10501,
+    "modelStartedAt": null,
+    "modelCompletedAt": null,
+    "modelDurationMs": null,
+    "generationTimeMs": null,
+    "latencyMs": null
+  },
+  "usage": null,
+  "artifacts": {
+    "localResultPath": "arena/runs/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-18-02-308Z/result.json",
+    "localRunPath": "arena/runs/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-18-02-308Z"
+  },
+  "error": {
+    "phase": "model",
+    "message": "fetch failed",
+    "stack": "TypeError: fetch failed"
+  }
+}

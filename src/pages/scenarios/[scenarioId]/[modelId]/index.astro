@@ -4,7 +4,7 @@ import Header from "../../../../components/Header.astro";
 import Footer from "../../../../components/Footer.astro";
 import { generatedResults } from "../../../../data/generated-results.js";
 import { generatedSourceFiles, generatedSources } from "../../../../data/generated-sources.js";
-import { scenarioById } from "../../../../data/interfaces.js";
+import { scenarioById, tasteForResult } from "../../../../data/interfaces.js";
 
 export async function getStaticPaths() {
   const latestByScenarioModel = new Map();
@@ -116,6 +116,15 @@ const sizeKb = Math.max(1, Math.round((source.length / 1024) * 10) / 10);
 
 const lighthouse = result.evaluations?.lighthouse;
 const axe = result.evaluations?.axe;
+const designHygiene = result.evaluations?.["design-hygiene"];
+const taste = tasteForResult(result);
+const tasteTone = typeof taste?.score === "number"
+  ? taste.score >= 66
+    ? "good"
+    : taste.score >= 45
+      ? "warn"
+      : "bad"
+  : "neutral";
 
 const perfValue = lighthouse?.scores?.performance?.value;
 const a11yValue = lighthouse?.scores?.accessibility?.value;
@@ -147,6 +156,9 @@ const lhJson = lhArtifacts.json;
 const axeJson = axeArtifacts.json;
 
 const axeIssues = (axe?.issues ?? []).slice(0, 6);
+const designHygieneMetrics = designHygiene?.metrics ?? {};
+const designHygieneSummary = designHygiene?.summary ?? {};
+const designHygieneScore = designHygiene?.scores?.discipline?.value;
 ---
 
 <BaseLayout
@@ -292,6 +304,25 @@ const axeIssues = (axe?.issues ?? []).slice(0, 6);
             </dl>
           </div>
 
+          {taste && (
+            <div class="dossier-block">
+              <h2 class="dossier-h">Taste</h2>
+              <div class="dossier-scores">
+                <div class={`dossier-score tone-${tasteTone}`}>
+                  <span class="label">Pairwise</span>
+                  <span class="value">{typeof taste.score === "number" ? taste.score.toFixed(1) : "—"}</span>
+                  <span class="bar"><i style={`width: ${typeof taste.score === "number" ? taste.score : 0}%`}></i></span>
+                </div>
+              </div>
+              <dl class="dossier-table small-table">
+                <div><dt>Votes</dt><dd>{taste.votes}</dd></div>
+                <div><dt>Record</dt><dd>{taste.wins}-{taste.losses}-{taste.ties}</dd></div>
+                <div><dt>CI</dt><dd>{typeof taste.ciLow === "number" && typeof taste.ciHigh === "number" ? `${taste.ciLow.toFixed(1)}–${taste.ciHigh.toFixed(1)}` : "Pending"}</dd></div>
+                <div><dt>Status</dt><dd>{taste.provisional ? "Provisional" : "Ranked"}</dd></div>
+              </dl>
+            </div>
+          )}
+
           {lighthouse && (
             <div class="dossier-block">
               <h2 class="dossier-h">Lighthouse</h2>
@@ -320,6 +351,32 @@ const axeIssues = (axe?.issues ?? []).slice(0, 6);
                   <span>Open Lighthouse report</span>
                   <span class="arrow">↗</span>
                 </a>
+              )}
+            </div>
+          )}
+
+          {designHygiene && (
+            <div class="dossier-block">
+              <h2 class="dossier-h">Design hygiene</h2>
+              <div class="dossier-scores">
+                <div class={`dossier-score tone-${scoreTone(designHygieneScore)}`}>
+                  <span class="label">Discipline</span>
+                  <span class="value">{typeof designHygieneScore === "number" ? designHygieneScore : "—"}</span>
+                  <span class="bar"><i style={`width: ${typeof designHygieneScore === "number" ? designHygieneScore : 0}%`}></i></span>
+                </div>
+              </div>
+              <dl class="dossier-table small-table">
+                <div><dt>Fonts</dt><dd>{designHygieneMetrics.fontFamilyCount ?? "—"}</dd></div>
+                <div><dt>Type sizes</dt><dd>{designHygieneMetrics.fontSizeCount ?? "—"}</dd></div>
+                <div><dt>Palette</dt><dd>{designHygieneMetrics.paletteColorCount ?? "—"}</dd></div>
+                <div><dt>Spacing grid</dt><dd>{typeof designHygieneMetrics.spacingGridFit === "number" ? `${Math.round(designHygieneMetrics.spacingGridFit * 100)}%` : "—"}</dd></div>
+                <div><dt>Radii</dt><dd>{designHygieneMetrics.radiusCount ?? "—"}</dd></div>
+                <div><dt>Shadows</dt><dd>{designHygieneMetrics.shadowCount ?? "—"}</dd></div>
+              </dl>
+              {Array.isArray(designHygieneSummary.topFontSizes) && designHygieneSummary.topFontSizes.length > 0 && (
+                <p class="dossier-note">
+                  Type scale: {designHygieneSummary.topFontSizes.slice(0, 8).join(", ")}px
+                </p>
               )}
             </div>
           )}

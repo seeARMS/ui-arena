@@ -1,4 +1,5 @@
 import { generatedModelSlots, generatedResults } from "./generated-results.js";
+import { generatedTaste } from "./generated-taste.js";
 
 export const surfaces = [
   {
@@ -470,6 +471,25 @@ export function resultPathFor(result) {
   return result ? `/scenarios/${result.interfaceId}/${result.modelId}/` : "#";
 }
 
+export function tasteForResult(result) {
+  if (!result || result.status !== "complete") {
+    return null;
+  }
+
+  const scenarioTaste = generatedTaste?.scenarios?.[result.interfaceId];
+  const modelTaste = scenarioTaste?.models?.[result.modelId];
+
+  if (!modelTaste || modelTaste.runId !== result.runId) {
+    return null;
+  }
+
+  return modelTaste;
+}
+
+function modelTasteFor(modelId) {
+  return generatedTaste?.models?.[modelId] ?? null;
+}
+
 function formatDate(value) {
   if (!value) {
     return "not run yet";
@@ -646,6 +666,7 @@ export function outputsForInterface(interfaceId) {
     const isComplete = result?.status === "complete";
     const isError = result?.status === "error";
     const evaluation = evaluationsFor(result);
+    const taste = tasteForResult(result);
 
     return {
       modelId: slot.id,
@@ -672,6 +693,14 @@ export function outputsForInterface(interfaceId) {
       stats: statsFor(result),
       evaluations: evaluation.items,
       evaluationReportUrl: evaluation.reportUrl ?? "#",
+      tasteScore: taste?.score ?? null,
+      tasteCiLow: taste?.ciLow ?? null,
+      tasteCiHigh: taste?.ciHigh ?? null,
+      tasteVotes: taste?.votes ?? 0,
+      tasteWins: taste?.wins ?? 0,
+      tasteLosses: taste?.losses ?? 0,
+      tasteTies: taste?.ties ?? 0,
+      tasteProvisional: taste?.provisional ?? true,
     };
   });
 }
@@ -720,10 +749,11 @@ export const modelAggregates = modelSlots.map((slot) => {
   const avgTime = avgOrNull(durations);
   const totalCost = sumOrZero(costs);
   const avgCompletionTokens = avgOrNull(completionTokens);
+  const taste = modelTasteFor(slot.id);
 
-  // Aggregate score: 70% accessibility weight, 30% perf, minus axe penalty.
-  // (Taste leans on accessibility — bad contrast is bad taste.)
-  const aggregate =
+  // Hygiene score: 70% accessibility weight, 30% perf, minus axe penalty.
+  // This stays separate from taste; it captures implementation hygiene, not aesthetic judgment.
+  const hygieneScore =
     avgPerf !== null && avgA11y !== null
       ? avgPerf * 0.3 + avgA11y * 0.7 - (avgAxe ?? 0) * 1.5 - (avgSerious ?? 0) * 3
       : null;
@@ -745,13 +775,27 @@ export const modelAggregates = modelSlots.map((slot) => {
     avgTime,
     totalCost,
     avgCompletionTokens,
-    aggregate,
+    hygieneScore,
+    aggregate: hygieneScore,
+    tasteScore: taste?.score ?? null,
+    tasteCiLow: taste?.ciLow ?? null,
+    tasteCiHigh: taste?.ciHigh ?? null,
+    tasteScenarios: taste?.scenarios ?? 0,
+    tasteVotes: taste?.votes ?? 0,
+    tasteComparisons: taste?.comparisons ?? 0,
+    tasteWins: taste?.wins ?? 0,
+    tasteLosses: taste?.losses ?? 0,
+    tasteTies: taste?.ties ?? 0,
+    tasteProvisional: taste?.provisional ?? true,
   };
 });
 
 export const benchTotals = {
   totalRuns: modelAggregates.reduce((a, b) => a + b.runs, 0),
   totalCost: modelAggregates.reduce((a, b) => a + b.totalCost, 0),
+  tasteVotes: Object.values(generatedTaste?.scenarios ?? {}).reduce((sum, scenario) => sum + (scenario.votes ?? 0), 0),
+  tasteScenarios: Object.values(generatedTaste?.scenarios ?? {}).filter((scenario) => scenario.status === "scored").length,
+  tasteGeneratedAt: generatedTaste?.generatedAt ?? null,
   briefsLive: interfacePrompts.length,
   modelsActive: modelAggregates.filter((m) => m.runs > 0).length,
   modelsTotal: modelAggregates.length,

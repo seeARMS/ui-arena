@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "id": "lighthouse",
+  "displayName": "Lighthouse",
+  "description": "Runs Lighthouse against the generated preview and records performance and accessibility scores.",
+  "categories": [
+    "performance",
+    "accessibility"
+  ],
+  "status": "complete",
+  "version": "13.2.0",
+  "startedAt": "2026-05-07T03:20:25.365Z",
+  "completedAt": "2026-05-07T03:20:32.567Z",
+  "durationMs": 7202,
+  "scores": {
+    "performance": {
+      "title": "Performance",
+      "score": 0.83,
+      "value": 83
+    },
+    "accessibility": {
+      "title": "Accessibility",
+      "score": 0.76,
+      "value": 76
+    }
+  },
+  "metrics": {
+    "firstContentfulPaint": {
+      "id": "first-contentful-paint",
+      "title": "First Contentful Paint",
+      "displayValue": "1.8 s",
+      "numericValue": 1816.1199,
+      "score": 0.38
+    },
+    "largestContentfulPaint": {
+      "id": "largest-contentful-paint",
+      "title": "Largest Contentful Paint",
+      "displayValue": "1.8 s",
+      "numericValue": 1816.1199,
+      "score": 0.69
+    },
+    "speedIndex": {
+      "id": "speed-index",
+      "title": "Speed Index",
+      "displayValue": "1.8 s",
+      "numericValue": 1816.1199,
+      "score": 0.7
+    },
+    "totalBlockingTime": {
+      "id": "total-blocking-time",
+      "title": "Total Blocking Time",
+      "displayValue": "0 ms",
+      "numericValue": 0,
+      "score": 1
+    },
+    "cumulativeLayoutShift": {
+      "id": "cumulative-layout-shift",
+      "title": "Cumulative Layout Shift",
+      "displayValue": "0",
+      "numericValue": 0,
+      "score": 1
+    }
+  },
+  "summary": {
+    "requestedUrl": "http://127.0.0.1:62178/previews/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/",
+    "finalUrl": "http://127.0.0.1:62178/previews/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/",
+    "fetchTime": "2026-05-07T03:20:28.246Z",
+    "accessibilityIssueCount": 3
+  },
+  "issues": [
+    {
+      "id": "button-name",
+      "title": "Buttons do not have an accessible name",
+      "score": 0,
+      "displayValue": null,
+      "description": "When a button doesn't have an accessible name, screen readers announce it as \"button\", making it unusable for users who rely on screen readers. [Learn how to make buttons more accessible](https://dequeuniversity.com/rules/axe/4.11/button-name)."
+    },
+    {
+      "id": "color-contrast",
+      "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+      "score": 0,
+      "displayValue": null,
+      "description": "Low-contrast text is difficult or impossible for many users to read. [Learn how to provide sufficient color contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast)."
+    },
+    {
+      "id": "heading-order",
+      "title": "Heading elements are not in a sequentially-descending order",
+      "score": 0,
+      "displayValue": null,
+      "description": "Properly ordered headings that do not skip levels convey the semantic structure of the page, making it easier to navigate and understand when using assistive technologies. [Learn more about heading order](https://dequeuniversity.com/rules/axe/4.11/heading-order)."
+    }
+  ],
+  "artifacts": {
+    "report": "/evaluations/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/lighthouse/report.html",
+    "json": "/evaluations/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/lighthouse/lhr.json"
+  }
+}

@@ -1,4 +1,4 @@
-export const generatedAt = "2026-05-04T03:04:47.942Z";
+export const generatedAt = "2026-05-07T03:21:16.690Z";
 export const generatedModelSlots = [
   {
     "id": "gpt-5-5",
@@ -66,6 +66,495 @@ export const generatedModelSlots = [
   }
 ];
 export const generatedResults = [
+  {
+    "schemaVersion": 1,
+    "runId": "gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z",
+    "interfaceId": "pricing-ai-coding-assistant",
+    "modelId": "gemini-3-1-flash-lite-preview",
+    "modelDisplayName": "Gemini 3.1 Flash Lite Preview",
+    "family": "Google",
+    "gateway": "openrouter",
+    "gatewayModel": "google/gemini-3.1-flash-lite-preview",
+    "gatewayGenerationId": "gen-1778124062-fe1HXN2TUsJ1uZCOpuEr",
+    "providerName": "Google AI Studio",
+    "status": "complete",
+    "createdAt": "2026-05-07T03:21:02.136Z",
+    "completedAt": "2026-05-07T03:21:16.690Z",
+    "execution": {
+      "startedAt": "2026-05-07T03:21:02.136Z",
+      "completedAt": "2026-05-07T03:21:16.690Z",
+      "durationMs": 14553,
+      "modelStartedAt": "2026-05-07T03:21:02.137Z",
+      "modelCompletedAt": "2026-05-07T03:21:08.417Z",
+      "modelDurationMs": 6280,
+      "generationTimeMs": 5945,
+      "latencyMs": 438
+    },
+    "usage": {
+      "source": "openrouter:generation",
+      "promptTokens": 673,
+      "completionTokens": 1799,
+      "totalTokens": 2655,
+      "nativePromptTokens": 550,
+      "nativeCompletionTokens": 2105,
+      "reasoningTokens": 0,
+      "cachedPromptTokens": 0,
+      "cacheDiscount": null,
+      "totalCost": 0.003295,
+      "upstreamInferenceCost": 0.003295,
+      "currency": "USD",
+      "rawResponseUsage": {
+        "prompt_tokens": 550,
+        "completion_tokens": 2105,
+        "total_tokens": 2655,
+        "cost": 0.003295,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.003295,
+          "upstream_inference_prompt_cost": 0.0001375,
+          "upstream_inference_completions_cost": 0.0031575
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "evaluations": {
+      "design-hygiene": {
+        "id": "design-hygiene",
+        "displayName": "Design Hygiene",
+        "status": "complete",
+        "version": "1.0.0",
+        "completedAt": "2026-05-07T03:31:34.170Z",
+        "durationMs": 1050,
+        "scores": {
+          "discipline": {
+            "label": "Design hygiene",
+            "score": 1,
+            "value": 100,
+            "displayValue": "100"
+          }
+        },
+        "metrics": {
+          "fontFamilyCount": 2,
+          "fontSizeCount": 7,
+          "paletteColorCount": 10,
+          "spacingGridFit": 1,
+          "radiusCount": 2,
+          "shadowCount": 1,
+          "visibleElementCount": 104
+        },
+        "summary": {
+          "viewport": {
+            "width": 1440,
+            "height": 1100
+          },
+          "visibleElementCount": 104,
+          "textElementCount": 67,
+          "fontFamilyCount": 2,
+          "fontSizeCount": 7,
+          "paletteColorCount": 10,
+          "spacingSampleCount": 98,
+          "spacingGridFit": 1,
+          "radiusCount": 2,
+          "shadowCount": 1,
+          "topFontFamilies": [
+            "-apple-system",
+            "ui-monospace"
+          ],
+          "topFontSizes": [
+            12,
+            14,
+            16,
+            18,
+            20,
+            24,
+            36
+          ],
+          "disciplineScore": 100
+        },
+        "issues": [],
+        "artifacts": {},
+        "error": null
+      }
+    },
+    "repairs": [],
+    "artifacts": {
+      "preview": "/previews/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z/",
+      "source": "/sources/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z/source.txt",
+      "sourceJson": "/sources/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z/files.json",
+      "sourceFormat": "react-project",
+      "sourceFiles": [
+        "index.html",
+        "package.json",
+        "postcss.config.cjs",
+        "postcss.config.js",
+        "src/App.jsx",
+        "src/arena.css",
+        "src/index.css",
+        "src/main.jsx",
+        "src/styles.css",
+        "tailwind.config.cjs",
+        "tailwind.config.js"
+      ],
+      "desktopScreenshot": "/screenshots/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z__desktop.png",
+      "mobileScreenshot": "/screenshots/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z__mobile.png"
+    },
+    "error": null
+  },
+  {
+    "schemaVersion": 1,
+    "runId": "gemini-3-1-flash-lite-preview__2026-05-07T03-18-02-308Z",
+    "interfaceId": "pricing-ai-coding-assistant",
+    "modelId": "gemini-3-1-flash-lite-preview",
+    "modelDisplayName": "Gemini 3.1 Flash Lite Preview",
+    "family": "Google",
+    "gateway": "openrouter",
+    "gatewayModel": "google/gemini-3.1-flash-lite-preview",
+    "gatewayGenerationId": null,
+    "providerName": null,
+    "status": "error",
+    "createdAt": "2026-05-07T03:18:02.308Z",
+    "completedAt": "2026-05-07T03:20:43.974Z",
+    "execution": {
+      "startedAt": "2026-05-07T03:18:02.308Z",
+      "completedAt": "2026-05-07T03:20:43.974Z",
+      "durationMs": 10501,
+      "modelStartedAt": null,
+      "modelCompletedAt": null,
+      "modelDurationMs": null,
+      "generationTimeMs": null,
+      "latencyMs": null
+    },
+    "usage": null,
+    "evaluations": null,
+    "repairs": null,
+    "artifacts": {
+      "preview": null,
+      "source": null,
+      "sourceJson": null,
+      "sourceFormat": null,
+      "sourceFiles": null,
+      "desktopScreenshot": null,
+      "mobileScreenshot": null
+    },
+    "error": {
+      "phase": "model",
+      "message": "fetch failed"
+    }
+  },
+  {
+    "schemaVersion": 1,
+    "runId": "gemini-3-flash-preview__2026-05-07T03-18-02-308Z",
+    "interfaceId": "pricing-ai-coding-assistant",
+    "modelId": "gemini-3-flash-preview",
+    "modelDisplayName": "Gemini 3 Flash Preview",
+    "family": "Google",
+    "gateway": "openrouter",
+    "gatewayModel": "google/gemini-3-flash-preview",
+    "gatewayGenerationId": "gen-1778123882-P3jRhyAvnf7tVbIK3k6n",
+    "providerName": "Google",
+    "status": "complete",
+    "createdAt": "2026-05-07T03:18:02.308Z",
+    "completedAt": "2026-05-07T03:18:37.451Z",
+    "execution": {
+      "startedAt": "2026-05-07T03:18:02.308Z",
+      "completedAt": "2026-05-07T03:18:37.451Z",
+      "durationMs": 35143,
+      "modelStartedAt": "2026-05-07T03:18:02.309Z",
+      "modelCompletedAt": "2026-05-07T03:18:26.821Z",
+      "modelDurationMs": 24512,
+      "generationTimeMs": 24231,
+      "latencyMs": 944
+    },
+    "usage": {
+      "source": "openrouter:generation",
+      "promptTokens": 673,
+      "completionTokens": 4793,
+      "totalTokens": 5859,
+      "nativePromptTokens": 548,
+      "nativeCompletionTokens": 5311,
+      "reasoningTokens": 0,
+      "cachedPromptTokens": 0,
+      "cacheDiscount": null,
+      "totalCost": 0.016207,
+      "upstreamInferenceCost": 0.016207,
+      "currency": "USD",
+      "rawResponseUsage": {
+        "prompt_tokens": 548,
+        "completion_tokens": 5311,
+        "total_tokens": 5859,
+        "cost": 0.016207,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.016207,
+          "upstream_inference_prompt_cost": 0.000274,
+          "upstream_inference_completions_cost": 0.015933
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "evaluations": {
+      "lighthouse": {
+        "id": "lighthouse",
+        "displayName": "Lighthouse",
+        "status": "complete",
+        "version": "13.2.0",
+        "completedAt": "2026-05-07T03:20:32.567Z",
+        "durationMs": 7202,
+        "scores": {
+          "performance": {
+            "title": "Performance",
+            "score": 0.83,
+            "value": 83
+          },
+          "accessibility": {
+            "title": "Accessibility",
+            "score": 0.76,
+            "value": 76
+          }
+        },
+        "metrics": {
+          "firstContentfulPaint": {
+            "id": "first-contentful-paint",
+            "title": "First Contentful Paint",
+            "displayValue": "1.8 s",
+            "numericValue": 1816.1199,
+            "score": 0.38
+          },
+          "largestContentfulPaint": {
+            "id": "largest-contentful-paint",
+            "title": "Largest Contentful Paint",
+            "displayValue": "1.8 s",
+            "numericValue": 1816.1199,
+            "score": 0.69
+          },
+          "speedIndex": {
+            "id": "speed-index",
+            "title": "Speed Index",
+            "displayValue": "1.8 s",
+            "numericValue": 1816.1199,
+            "score": 0.7
+          },
+          "totalBlockingTime": {
+            "id": "total-blocking-time",
+            "title": "Total Blocking Time",
+            "displayValue": "0 ms",
+            "numericValue": 0,
+            "score": 1
+          },
+          "cumulativeLayoutShift": {
+            "id": "cumulative-layout-shift",
+            "title": "Cumulative Layout Shift",
+            "displayValue": "0",
+            "numericValue": 0,
+            "score": 1
+          }
+        },
+        "summary": {
+          "requestedUrl": "http://127.0.0.1:62178/previews/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/",
+          "finalUrl": "http://127.0.0.1:62178/previews/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/",
+          "fetchTime": "2026-05-07T03:20:28.246Z",
+          "accessibilityIssueCount": 3
+        },
+        "issues": [
+          {
+            "id": "button-name",
+            "title": "Buttons do not have an accessible name",
+            "score": 0,
+            "displayValue": null,
+            "description": "When a button doesn't have an accessible name, screen readers announce it as \"button\", making it unusable for users who rely on screen readers. [Learn how to make buttons more accessible](https://dequeuniversity.com/rules/axe/4.11/button-name)."
+          },
+          {
+            "id": "color-contrast",
+            "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+            "score": 0,
+            "displayValue": null,
+            "description": "Low-contrast text is difficult or impossible for many users to read. [Learn how to provide sufficient color contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast)."
+          },
+          {
+            "id": "heading-order",
+            "title": "Heading elements are not in a sequentially-descending order",
+            "score": 0,
+            "displayValue": null,
+            "description": "Properly ordered headings that do not skip levels convey the semantic structure of the page, making it easier to navigate and understand when using assistive technologies. [Learn more about heading order](https://dequeuniversity.com/rules/axe/4.11/heading-order)."
+          }
+        ],
+        "artifacts": {
+          "report": "/evaluations/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/lighthouse/report.html",
+          "json": "/evaluations/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/lighthouse/lhr.json"
+        },
+        "error": null
+      },
+      "axe": {
+        "id": "axe",
+        "displayName": "Axe",
+        "status": "complete",
+        "version": "4.11.4",
+        "completedAt": "2026-05-07T03:20:33.473Z",
+        "durationMs": 903,
+        "scores": null,
+        "metrics": null,
+        "summary": {
+          "violationCount": 3,
+          "passCount": 25,
+          "incompleteCount": 1,
+          "inapplicableCount": 64,
+          "seriousOrCriticalCount": 2,
+          "impactCounts": {
+            "critical": 1,
+            "serious": 1,
+            "moderate": 1,
+            "minor": 0,
+            "unknown": 0
+          }
+        },
+        "issues": [
+          {
+            "id": "button-name",
+            "impact": "critical",
+            "help": "Buttons must have discernible text",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/button-name?application=playwright",
+            "description": "Ensure buttons have discernible text",
+            "nodeCount": 1,
+            "targets": [
+              ".w-12"
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "nodeCount": 16,
+            "targets": [
+              ".gap-4.justify-center.items-center > .font-medium.text-slate-500",
+              ".rounded-2xl.p-8.duration-300:nth-child(1) > .space-y-4.flex-grow > .tracking-wider.uppercase.text-xs",
+              ".ring-2 > .space-y-4.flex-grow > .tracking-wider.uppercase.text-xs",
+              ".rounded-2xl.p-8.duration-300:nth-child(3) > .space-y-4.flex-grow > .tracking-wider.uppercase.text-xs"
+            ]
+          },
+          {
+            "id": "heading-order",
+            "impact": "moderate",
+            "help": "Heading levels should only increase by one",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/heading-order?application=playwright",
+            "description": "Ensure the order of headings is semantically correct",
+            "nodeCount": 2,
+            "targets": [
+              ".rounded-2xl.p-8.duration-300:nth-child(1) > .mb-8:nth-child(1) > h3",
+              ".p-6.glass-card.rounded-xl:nth-child(1) > .mb-3.justify-between"
+            ]
+          }
+        ],
+        "artifacts": {
+          "json": "/evaluations/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/axe/axe.json"
+        },
+        "error": null
+      },
+      "design-hygiene": {
+        "id": "design-hygiene",
+        "displayName": "Design Hygiene",
+        "status": "complete",
+        "version": "1.0.0",
+        "completedAt": "2026-05-07T03:31:34.174Z",
+        "durationMs": 1054,
+        "scores": {
+          "discipline": {
+            "label": "Design hygiene",
+            "score": 0.9820895522388059,
+            "value": 98.2,
+            "displayValue": "98"
+          }
+        },
+        "metrics": {
+          "fontFamilyCount": 1,
+          "fontSizeCount": 10,
+          "paletteColorCount": 12,
+          "spacingGridFit": 0.94,
+          "radiusCount": 5,
+          "shadowCount": 2,
+          "visibleElementCount": 252
+        },
+        "summary": {
+          "viewport": {
+            "width": 1440,
+            "height": 1100
+          },
+          "visibleElementCount": 252,
+          "textElementCount": 170,
+          "fontFamilyCount": 1,
+          "fontSizeCount": 10,
+          "paletteColorCount": 12,
+          "spacingSampleCount": 335,
+          "spacingGridFit": 0.94,
+          "radiusCount": 5,
+          "shadowCount": 2,
+          "topFontFamilies": [
+            "inter"
+          ],
+          "topFontSizes": [
+            10,
+            12,
+            14,
+            16,
+            18,
+            20,
+            24,
+            30,
+            36,
+            60
+          ],
+          "disciplineScore": 98.2
+        },
+        "issues": [],
+        "artifacts": {},
+        "error": null
+      }
+    },
+    "repairs": [],
+    "artifacts": {
+      "preview": "/previews/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/",
+      "source": "/sources/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/source.txt",
+      "sourceJson": "/sources/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/files.json",
+      "sourceFormat": "react-project",
+      "sourceFiles": [
+        "index.html",
+        "package.json",
+        "postcss.config.cjs",
+        "src/App.jsx",
+        "src/arena.css",
+        "src/index.css",
+        "src/main.jsx",
+        "src/styles.css",
+        "tailwind.config.cjs",
+        "tailwind.config.js",
+        "vite.config.js"
+      ],
+      "desktopScreenshot": "/screenshots/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z__desktop.png",
+      "mobileScreenshot": "/screenshots/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z__mobile.png"
+    },
+    "error": null
+  },
   {
     "schemaVersion": 1,
     "runId": "gemini-3-flash-preview__2026-05-04T03-04-04-338Z",

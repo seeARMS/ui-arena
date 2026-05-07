@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "runId": "gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z",
+  "interfaceId": "pricing-ai-coding-assistant",
+  "interfaceTitle": "Pricing page for an AI coding assistant",
+  "modelId": "gemini-3-1-flash-lite-preview",
+  "modelDisplayName": "Gemini 3.1 Flash Lite Preview",
+  "family": "Google",
+  "gateway": "openrouter",
+  "gatewayModel": "google/gemini-3.1-flash-lite-preview",
+  "gatewayGenerationId": "gen-1778124062-fe1HXN2TUsJ1uZCOpuEr",
+  "providerName": "Google AI Studio",
+  "status": "complete",
+  "createdAt": "2026-05-07T03:21:02.136Z",
+  "completedAt": "2026-05-07T03:21:16.690Z",
+  "request": {
+    "dryRun": false,
+    "artifactType": "react-project",
+    "promptSha256": "14800838b4dd455aa1dafb0d94ee14d27ef1dc96ba75e9306a31926c62e4cc2f",
+    "params": {
+      "temperature": 0.2,
+      "max_tokens": 8000
+    }
+  },
+  "execution": {
+    "startedAt": "2026-05-07T03:21:02.136Z",
+    "completedAt": "2026-05-07T03:21:16.690Z",
+    "durationMs": 14553,
+    "modelStartedAt": "2026-05-07T03:21:02.137Z",
+    "modelCompletedAt": "2026-05-07T03:21:08.417Z",
+    "modelDurationMs": 6280,
+    "generationTimeMs": 5945,
+    "latencyMs": 438
+  },
+  "usage": {
+    "source": "openrouter:generation",
+    "promptTokens": 673,
+    "completionTokens": 1799,
+    "totalTokens": 2655,
+    "nativePromptTokens": 550,
+    "nativeCompletionTokens": 2105,
+    "reasoningTokens": 0,
+    "cachedPromptTokens": 0,
+    "cacheDiscount": null,
+    "totalCost": 0.003295,
+    "upstreamInferenceCost": 0.003295,
+    "currency": "USD",
+    "rawResponseUsage": {
+      "prompt_tokens": 550,
+      "completion_tokens": 2105,
+      "total_tokens": 2655,
+      "cost": 0.003295,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.003295,
+        "upstream_inference_prompt_cost": 0.0001375,
+        "upstream_inference_completions_cost": 0.0031575
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "artifacts": {
+    "preview": "/previews/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z/",
+    "source": "/sources/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z/source.txt",
+    "sourceJson": "/sources/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z/files.json",
+    "localResultPath": "arena/runs/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z/result.json",
+    "localRunPath": "arena/runs/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z",
+    "localSourcePath": "arena/runs/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z/source",
+    "localPreviewPath": "public/previews/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z",
+    "sourceFormat": "react-project",
+    "sourceFiles": [
+      "index.html",
+      "package.json",
+      "postcss.config.cjs",
+      "postcss.config.js",
+      "src/App.jsx",
+      "src/arena.css",
+      "src/index.css",
+      "src/main.jsx",
+      "src/styles.css",
+      "tailwind.config.cjs",
+      "tailwind.config.js"
+    ],
+    "desktopScreenshot": "/screenshots/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z__desktop.png",
+    "mobileScreenshot": "/screenshots/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z__mobile.png"
+  },
+  "finishReason": "stop",
+  "repairs": [],
+  "screenshots": {
+    "desktop": {
+      "width": 1440,
+      "height": 1100,
+      "path": "/screenshots/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z__desktop.png",
+      "capturedAt": "2026-05-07T03:21:24.437Z"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "path": "/screenshots/pricing-ai-coding-assistant/gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z__mobile.png",
+      "capturedAt": "2026-05-07T03:21:25.042Z"
+    }
+  },
+  "evaluations": {
+    "design-hygiene": {
+      "id": "design-hygiene",
+      "displayName": "Design Hygiene",
+      "status": "complete",
+      "version": "1.0.0",
+      "completedAt": "2026-05-07T03:31:34.170Z",
+      "durationMs": 1050,
+      "scores": {
+        "discipline": {
+          "label": "Design hygiene",
+          "score": 1,
+          "value": 100,
+          "displayValue": "100"
+        }
+      },
+      "metrics": {
+        "fontFamilyCount": 2,
+        "fontSizeCount": 7,
+        "paletteColorCount": 10,
+        "spacingGridFit": 1,
+        "radiusCount": 2,
+        "shadowCount": 1,
+        "visibleElementCount": 104
+      },
+      "summary": {
+        "viewport": {
+          "width": 1440,
+          "height": 1100
+        },
+        "visibleElementCount": 104,
+        "textElementCount": 67,
+        "fontFamilyCount": 2,
+        "fontSizeCount": 7,
+        "paletteColorCount": 10,
+        "spacingSampleCount": 98,
+        "spacingGridFit": 1,
+        "radiusCount": 2,
+        "shadowCount": 1,
+        "topFontFamilies": [
+          "-apple-system",
+          "ui-monospace"
+        ],
+        "topFontSizes": [
+          12,
+          14,
+          16,
+          18,
+          20,
+          24,
+          36
+        ],
+        "disciplineScore": 100
+      },
+      "issues": [],
+      "artifacts": {},
+      "error": null
+    }
+  }
+}

@@ -16,6 +16,14 @@
       "module": "axe.mjs",
       "enabled": true,
       "categories": ["accessibility"]
+    },
+    {
+      "id": "design-hygiene",
+      "displayName": "Design Hygiene",
+      "description": "Extracts transparent UI discipline metrics from computed styles: typography, palette, spacing, radius, and shadow consistency.",
+      "module": "design-hygiene.mjs",
+      "enabled": true,
+      "categories": ["design-hygiene"]
     }
   ]
 }

@@ -10,6 +10,7 @@ const pendingCount = outputs.length - completedCount - failedCount;
 const sorted = [...outputs].sort((a, b) => {
   const score = (o) => {
     if (o.pending || o.stateLabel === "Failed") return -1;
+    if (typeof o.tasteScore === "number") return 10000 + o.tasteScore;
     const perf = o.evaluations.find((e) => e.label === "Performance");
     const a11y = o.evaluations.find((e) => e.label === "Accessibility");
     return (perf?.percent ?? 0) + (a11y?.percent ?? 0);
@@ -35,7 +36,7 @@ const lastRun = outputs
       <div class="page-head-grid">
         <div>
           <p class="lede">
-            {outputs.length} models received the same scenario. Below: a leaderboard of their builds, ranked by aggregate of Lighthouse performance and accessibility.
+            {outputs.length} models received the same scenario. Below: a leaderboard of their builds, ranked by pairwise Taste when available, with Lighthouse and axe kept as hygiene signals.
           </p>
           <div class="badges">
             <span class="badge">▣ {interfacePrompt.eyebrow}</span>
@@ -89,7 +90,8 @@ const lastRun = outputs
         <div class="group">
           <span class="controls-label">Sort by</span>
           <select class="sort-select" aria-label="Sort outputs">
-            <option>Aggregate</option>
+            <option>Taste</option>
+            <option>Hygiene</option>
             <option>Performance</option>
             <option>Accessibility</option>
             <option>Speed</option>

@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "id": "axe",
+  "displayName": "Axe",
+  "description": "Runs axe-core accessibility checks through Playwright and records violations by impact.",
+  "categories": [
+    "accessibility"
+  ],
+  "status": "complete",
+  "version": "4.11.4",
+  "startedAt": "2026-05-07T03:20:32.570Z",
+  "completedAt": "2026-05-07T03:20:33.473Z",
+  "durationMs": 903,
+  "scores": null,
+  "metrics": null,
+  "summary": {
+    "violationCount": 3,
+    "passCount": 25,
+    "incompleteCount": 1,
+    "inapplicableCount": 64,
+    "seriousOrCriticalCount": 2,
+    "impactCounts": {
+      "critical": 1,
+      "serious": 1,
+      "moderate": 1,
+      "minor": 0,
+      "unknown": 0
+    }
+  },
+  "issues": [
+    {
+      "id": "button-name",
+      "impact": "critical",
+      "help": "Buttons must have discernible text",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/button-name?application=playwright",
+      "description": "Ensure buttons have discernible text",
+      "nodeCount": 1,
+      "targets": [
+        ".w-12"
+      ]
+    },
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "nodeCount": 16,
+      "targets": [
+        ".gap-4.justify-center.items-center > .font-medium.text-slate-500",
+        ".rounded-2xl.p-8.duration-300:nth-child(1) > .space-y-4.flex-grow > .tracking-wider.uppercase.text-xs",
+        ".ring-2 > .space-y-4.flex-grow > .tracking-wider.uppercase.text-xs",
+        ".rounded-2xl.p-8.duration-300:nth-child(3) > .space-y-4.flex-grow > .tracking-wider.uppercase.text-xs"
+      ]
+    },
+    {
+      "id": "heading-order",
+      "impact": "moderate",
+      "help": "Heading levels should only increase by one",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/heading-order?application=playwright",
+      "description": "Ensure the order of headings is semantically correct",
+      "nodeCount": 2,
+      "targets": [
+        ".rounded-2xl.p-8.duration-300:nth-child(1) > .mb-8:nth-child(1) > h3",
+        ".p-6.glass-card.rounded-xl:nth-child(1) > .mb-3.justify-between"
+      ]
+    }
+  ],
+  "artifacts": {
+    "json": "/evaluations/pricing-ai-coding-assistant/gemini-3-flash-preview__2026-05-07T03-18-02-308Z/axe/axe.json"
+  }
+}

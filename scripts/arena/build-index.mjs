@@ -3,13 +3,17 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import {
+  generatedTastePath,
   generatedResultsPath,
   generatedSourcesPath,
   loadOpenRouterModels,
   loadResultManifests,
   publicResultsIndexPath,
+  publicTasteIndexPath,
   rootDir,
+  tasteDir,
   toRepoPath,
+  readJson,
   writeJson,
   writeText,
 } from "./shared.mjs";
@@ -92,8 +96,24 @@ async function sourceFilesForResult(result, source) {
   return source ? [{ path: "index.html", content: source }] : null;
 }
 
+async function loadTasteIndex() {
+  return readJson(join(tasteDir, "taste.json")).catch(() => ({
+    schemaVersion: 1,
+    rubricVersion: "taste-v1",
+    generatedAt: null,
+    bootstrapSamples: 0,
+    scenarios: {},
+    models: {},
+    votes: [],
+  }));
+}
+
 async function main() {
-  const [models, results] = await Promise.all([loadOpenRouterModels(), loadResultManifests()]);
+  const [models, results, tasteIndex] = await Promise.all([
+    loadOpenRouterModels(),
+    loadResultManifests(),
+    loadTasteIndex(),
+  ]);
   const compactResults = results.map(compactResult);
   const generatedAt = compactResults[0]?.completedAt ?? null;
   const compactModels = models.map(compactModel);
@@ -124,18 +144,23 @@ async function main() {
     null,
     2,
   )};\n`;
+  const tasteModuleSource = `export const generatedTaste = ${JSON.stringify(tasteIndex, null, 2)};\n`;
 
   await writeText(generatedResultsPath, moduleSource);
   await writeText(generatedSourcesPath, sourcesModuleSource);
+  await writeText(generatedTastePath, tasteModuleSource);
   await writeJson(publicResultsIndexPath, {
     generatedAt,
     models: compactModels,
     results: compactResults,
   });
+  await writeJson(publicTasteIndexPath, tasteIndex);
 
   console.log(`Indexed ${compactResults.length} run(s) into ${toRepoPath(generatedResultsPath)}`);
   console.log(`Wrote source module to ${toRepoPath(generatedSourcesPath)}`);
+  console.log(`Wrote taste module to ${toRepoPath(generatedTastePath)}`);
   console.log(`Wrote public result index to ${toRepoPath(publicResultsIndexPath)}`);
+  console.log(`Wrote public taste index to ${toRepoPath(publicTasteIndexPath)}`);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

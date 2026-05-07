@@ -10,6 +10,13 @@ const isComplete = !isPending && !isFailed;
 const perfScore = output.evaluations.find((e) => e.label === "Performance");
 const a11yScore = output.evaluations.find((e) => e.label === "Accessibility");
 const axeScore = output.evaluations.find((e) => e.label === "Axe");
+const tasteScore = typeof output.tasteScore === "number"
+  ? {
+      label: "Taste",
+      value: output.tasteScore.toFixed(1),
+      tone: output.tasteScore >= 66 ? "good" : output.tasteScore >= 45 ? "warn" : "bad",
+    }
+  : null;
 
 function toneClass(item) {
   if (!item) return "pending";
@@ -55,6 +62,10 @@ const linkProps = isComplete
 
   <div>
     <dl class="scores-cell">
+      <div class={`score ${toneClass(tasteScore)}`}>
+        <dt>Taste</dt>
+        <dd>{tasteScore ? tasteScore.value : "—"}</dd>
+      </div>
       <div class={`score ${toneClass(perfScore)}`}>
         <dt>Perf</dt>
         <dd>{perfScore ? perfScore.value : "—"}</dd>

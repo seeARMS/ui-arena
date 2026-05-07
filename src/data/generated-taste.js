@@ -1,0 +1,88 @@
+export const generatedTaste = {
+  "schemaVersion": 1,
+  "rubricVersion": "taste-v1",
+  "generatedAt": "2026-05-07T03:22:57.792Z",
+  "bootstrapSamples": 100,
+  "scenarios": {
+    "pricing-ai-coding-assistant": {
+      "interfaceId": "pricing-ai-coding-assistant",
+      "status": "scored",
+      "votes": 1,
+      "comparisons": 1,
+      "models": {
+        "gemini-3-1-flash-lite-preview": {
+          "modelId": "gemini-3-1-flash-lite-preview",
+          "runId": "gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z",
+          "score": 14,
+          "ciLow": 14,
+          "ciHigh": 14,
+          "beta": -0.909,
+          "wins": 0,
+          "losses": 1,
+          "ties": 0,
+          "votes": 1,
+          "comparisons": 1,
+          "provisional": true
+        },
+        "gemini-3-flash-preview": {
+          "modelId": "gemini-3-flash-preview",
+          "runId": "gemini-3-flash-preview__2026-05-07T03-18-02-308Z",
+          "score": 86,
+          "ciLow": 86,
+          "ciHigh": 86,
+          "beta": 0.909,
+          "wins": 1,
+          "losses": 0,
+          "ties": 0,
+          "votes": 1,
+          "comparisons": 1,
+          "provisional": true
+        }
+      }
+    }
+  },
+  "models": {
+    "gemini-3-1-flash-lite-preview": {
+      "modelId": "gemini-3-1-flash-lite-preview",
+      "score": 14,
+      "ciLow": 14,
+      "ciHigh": 14,
+      "scenarios": 1,
+      "votes": 1,
+      "comparisons": 1,
+      "wins": 0,
+      "losses": 1,
+      "ties": 0,
+      "provisional": true
+    },
+    "gemini-3-flash-preview": {
+      "modelId": "gemini-3-flash-preview",
+      "score": 86,
+      "ciLow": 86,
+      "ciHigh": 86,
+      "scenarios": 1,
+      "votes": 1,
+      "comparisons": 1,
+      "wins": 1,
+      "losses": 0,
+      "ties": 0,
+      "provisional": true
+    }
+  },
+  "votes": [
+    {
+      "comparisonId": "2b706e98c3a0b6e0",
+      "interfaceId": "pricing-ai-coding-assistant",
+      "judge": "google/gemini-3.1-flash-lite-preview",
+      "modelA": "gemini-3-1-flash-lite-preview",
+      "runA": "gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z",
+      "modelB": "gemini-3-flash-preview",
+      "runB": "gemini-3-flash-preview__2026-05-07T03-18-02-308Z",
+      "winner": "B",
+      "winnerModelId": "gemini-3-flash-preview",
+      "confidence": 0.9,
+      "rationale": "Design B demonstrates superior product maturity by including a feature comparison matrix and specific usage metrics, which are essential for technical buyers, whereas Design A feels like a generic landing page template.",
+      "completedAt": "2026-05-07T03:22:57.759Z"
+    }
+  ]
+};

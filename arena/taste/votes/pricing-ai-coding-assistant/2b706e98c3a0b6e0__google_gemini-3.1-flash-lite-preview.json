@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "rubricVersion": "taste-v1",
+  "status": "complete",
+  "comparisonId": "2b706e98c3a0b6e0",
+  "interfaceId": "pricing-ai-coding-assistant",
+  "judge": "google/gemini-3.1-flash-lite-preview",
+  "startedAt": "2026-05-07T03:22:53.415Z",
+  "completedAt": "2026-05-07T03:22:57.759Z",
+  "durationMs": 4344,
+  "viewports": [
+    "desktop",
+    "mobile"
+  ],
+  "models": {
+    "a": {
+      "modelId": "gemini-3-1-flash-lite-preview",
+      "runId": "gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z",
+      "displayName": "Gemini 3.1 Flash Lite Preview",
+      "screenshotHashes": [
+        {
+          "viewport": "desktop",
+          "sha256": "52af85c8b7a277d43470fe0d6323a0a22d7e214fd5bf33e9aedb41fc35bce469"
+        },
+        {
+          "viewport": "mobile",
+          "sha256": "5a5de174c6c8078ec67b49a3b8d23e6cf206a55d6acf45157c728c9e364771e2"
+        }
+      ]
+    },
+    "b": {
+      "modelId": "gemini-3-flash-preview",
+      "runId": "gemini-3-flash-preview__2026-05-07T03-18-02-308Z",
+      "displayName": "Gemini 3 Flash Preview",
+      "screenshotHashes": [
+        {
+          "viewport": "desktop",
+          "sha256": "7055180850ea7b37c323d847c11ebf581eac4b8742fe47b3317ad4a2a3bfe3ad"
+        },
+        {
+          "viewport": "mobile",
+          "sha256": "491b20bc1e6cf71439b141f95fddd4cfea0d798cdc88d4d82f33006cf59e446a"
+        }
+      ]
+    }
+  },
+  "sides": {
+    "A": {
+      "modelId": "gemini-3-1-flash-lite-preview",
+      "runId": "gemini-3-1-flash-lite-preview__2026-05-07T03-21-02-136Z"
+    },
+    "B": {
+      "modelId": "gemini-3-flash-preview",
+      "runId": "gemini-3-flash-preview__2026-05-07T03-18-02-308Z"
+    }
+  },
+  "winner": "B",
+  "winnerModelId": "gemini-3-flash-preview",
+  "confidence": 0.9,
+  "rationale": "Design B demonstrates superior product maturity by including a feature comparison matrix and specific usage metrics, which are essential for technical buyers, whereas Design A feels like a generic landing page template.",
+  "dimensions": {
+    "briefFit": "B",
+    "hierarchy": "B",
+    "typography": "B",
+    "spacing": "B",
+    "color": "B",
+    "polish": "B",
+    "usability": "B"
+  },
+  "usage": {
+    "prompt_tokens": 4683,
+    "completion_tokens": 82,
+    "total_tokens": 4765,
+    "cost": 0.00129375,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.00129375,
+      "upstream_inference_prompt_cost": 0.00117075,
+      "upstream_inference_completions_cost": 0.000123
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "finishReason": "stop"
+}

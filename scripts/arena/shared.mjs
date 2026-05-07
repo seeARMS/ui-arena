@@ -8,7 +8,10 @@ export const arenaDir = join(rootDir, "arena");
 export const publicDir = join(rootDir, "public");
 export const generatedResultsPath = join(rootDir, "src", "data", "generated-results.js");
 export const generatedSourcesPath = join(rootDir, "src", "data", "generated-sources.js");
+export const generatedTastePath = join(rootDir, "src", "data", "generated-taste.js");
 export const publicResultsIndexPath = join(publicDir, "results", "index.json");
+export const publicTasteIndexPath = join(publicDir, "results", "taste.json");
+export const tasteDir = join(arenaDir, "taste");
 
 export async function readJson(path) {
   return JSON.parse(await readFile(path, "utf8"));

@@ -558,8 +558,8 @@ a.lb-row.is-clickable:focus-visible {
 
 .scores-cell {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
   width: 100%;
 }
 
@@ -1230,7 +1230,7 @@ a.lb-row.is-clickable:focus-visible {
 
 .gl-row {
   display: grid;
-  grid-template-columns: 64px 1.6fr 96px 84px 84px 84px 110px 110px 110px;
+  grid-template-columns: 64px 1.45fr 96px 96px 78px 78px 72px 104px 96px 96px;
   align-items: stretch;
 }
 
@@ -1372,7 +1372,12 @@ a.lb-row.is-clickable:focus-visible {
   background: var(--bg);
 }
 
+.gl-row.is-untasted {
+  background: color-mix(in srgb, var(--bg) 72%, var(--paper));
+}
+
 .gl-row.is-unbenched .gl-num strong,
+.gl-row.is-untasted .gl-aggregate strong,
 .gl-row.is-unbenched .model-name span {
   color: var(--ink-mute);
 }
@@ -1386,20 +1391,20 @@ a.lb-row.is-clickable:focus-visible {
 
 @media (max-width: 1100px) {
   .gl-row {
-    grid-template-columns: 56px 1.4fr 88px 76px 76px 76px 96px;
+    grid-template-columns: 56px 1.4fr 88px 84px 76px 76px 72px;
   }
-  .gl-row .gl-cell:nth-child(8),
-  .gl-row .gl-cell:nth-child(9) {
+  .gl-row .gl-cell:nth-child(9),
+  .gl-row .gl-cell:nth-child(10) {
     display: none;
   }
 }
 
 @media (max-width: 880px) {
   .gl-row {
-    grid-template-columns: 48px 1.2fr 80px 72px 72px;
+    grid-template-columns: 48px 1.2fr 80px 76px 72px;
   }
-  .gl-row .gl-cell:nth-child(6),
-  .gl-row .gl-cell:nth-child(7) {
+  .gl-row .gl-cell:nth-child(7),
+  .gl-row .gl-cell:nth-child(8) {
     display: none;
   }
   .lb-controls {
@@ -1412,7 +1417,8 @@ a.lb-row.is-clickable:focus-visible {
     grid-template-columns: 40px 1fr 72px;
   }
   .gl-row .gl-cell:nth-child(4),
-  .gl-row .gl-cell:nth-child(5) {
+  .gl-row .gl-cell:nth-child(5),
+  .gl-row .gl-cell:nth-child(6) {
     display: none;
   }
 }
@@ -2137,6 +2143,13 @@ a.lb-row.is-clickable:focus-visible {
 
 .dossier-table.small-table dd {
   font-size: 12px;
+}
+
+.dossier-note {
+  padding: 8px 14px 12px;
+  border-top: 1px dashed var(--line);
+  font: 500 11px/1.45 "JetBrains Mono", monospace;
+  color: var(--ink-mute);
 }
 
 .dossier-scores {

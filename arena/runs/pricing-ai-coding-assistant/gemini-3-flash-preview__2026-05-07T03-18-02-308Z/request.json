@@ -1,0 +1,15 @@
+{
+  "model": "google/gemini-3-flash-preview",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are participating in UI Arena, a gallery of AI-generated product interface examples.\nBuild a complete React project for the requested interface. Return only project files using the file block format below. Do not return markdown or explanations.\nFor each file, write exactly: <<<FILE: path/to/file>>>, then the file content, then <<<END FILE>>>. Include any project files you want: package.json, index.html, Vite config, src files, public assets, styles, components, and mock data.\nThe runner will write the project to a directory, fill in missing Vite/React boilerplate when needed, install dependencies from package.json, run the build, and use the generated static output.\nPrefer a Vite-compatible React SPA with mock data. If you omit package.json, index.html, or src/main.jsx, the runner will create sensible defaults.\nDo not use external fonts, images, scripts, stylesheets, CDNs, analytics, or network requests; every runtime asset must be bundled into the project.\nKeep the project concise. Generate repeated mock rows programmatically instead of serializing huge arrays."
+    },
+    {
+      "role": "user",
+      "content": "Interface prompt: Pricing page for an AI coding assistant\nCategory: pricing-page\n\nDesign and implement a pricing page for an AI coding assistant.\n\nThe product helps developers plan changes, edit code, run tests, and review pull requests with an AI agent. Pricing has to let an individual decide today, give an engineering team a reason to upgrade, and route enterprises to sales.\n\nBuild:\n\n- Three paid plans with realistic prices and concrete usage limits (per-month tokens, parallel agents, indexed repos, context window).\n- A team upgrade path that's specific (shared budgets, audit log, SSO, role-based permissions).\n- Trust signals about source-code privacy, model providers, retention, and SOC 2.\n- An FAQ that answers real buying objections — not filler.\n- Strong visual hierarchy: the recommended plan should be obvious without hiding tradeoffs.\n- Responsive behavior for mobile, tablet, and desktop.\n\nStack: React app. Build it as a small project directory using mock data. The runner will install dependencies, compile the app, and repair build errors if needed.\n\nAvoid generic SaaS template energy. Make this feel specific to an AI coding assistant and the engineers who buy it.\nImplementation requirements:\n- Build a production-quality product interface, not a marketing explanation.\n- Use semantic HTML and accessible controls.\n- Make it responsive from mobile to desktop.\n- Include realistic copy, states, and content needed for the interface.\n- Build it as a React app project using mock data."
+    }
+  ],
+  "temperature": 0.2,
+  "max_tokens": 16000
+}

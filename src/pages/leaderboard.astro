@@ -19,6 +19,16 @@ function formatAggregate(value) {
   return value.toFixed(1);
 }
 
+function formatTaste(value) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  return value.toFixed(1);
+}
+
+function formatCi(low, high) {
+  if (typeof low !== "number" || typeof high !== "number") return "CI pending";
+  return `${low.toFixed(1)}–${high.toFixed(1)}`;
+}
+
 function formatDuration(ms) {
   if (typeof ms !== "number" || Number.isNaN(ms)) return "—";
   if (ms < 1000) return `${Math.round(ms)}ms`;
@@ -46,17 +56,19 @@ function axeTone(value) {
 }
 
 const sorted = [...modelAggregates].sort((a, b) => {
-  const av = a.aggregate ?? -Infinity;
-  const bv = b.aggregate ?? -Infinity;
+  const av = a.tasteScore ?? -Infinity;
+  const bv = b.tasteScore ?? -Infinity;
   return bv - av;
 });
 
 const rows = sorted.map((model, index) => {
-  const isRanked = model.runs > 0;
+  const hasTaste = typeof model.tasteScore === "number";
+  const isGenerated = model.runs > 0;
   return {
     ...model,
     sortKeys: {
-      aggregate: model.aggregate ?? -Infinity,
+      taste: model.tasteScore ?? -Infinity,
+      hygiene: model.hygieneScore ?? -Infinity,
       perf: model.avgPerf ?? -Infinity,
       a11y: model.avgA11y ?? -Infinity,
       axe: model.avgAxe ?? Infinity,
@@ -65,17 +77,18 @@ const rows = sorted.map((model, index) => {
       cost: model.totalCost,
       runs: model.runs,
     },
-    isRanked,
+    hasTaste,
+    isGenerated,
     initialRank: index + 1,
   };
 });
 
-const rankedCount = rows.filter((r) => r.isRanked).length;
+const rankedCount = rows.filter((r) => r.hasTaste).length;
 ---
 
 <BaseLayout
   title="Leaderboard — TasteBench"
-  description={`Global TasteBench leaderboard ranking ${rows.length} frontier models across every product surface. Sort by aggregate, performance, accessibility, axe violations, speed, or cost.`}
+  description={`Global TasteBench leaderboard ranking ${rows.length} frontier models by pairwise taste, with performance, accessibility, axe violations, speed, and cost shown separately.`}
   canonicalPath="/leaderboard/"
 >
   <Header active="leaderboard" />
@@ -92,26 +105,27 @@ const rankedCount = rows.filter((r) => r.isRanked).length;
         <div class="page-head-grid">
           <div>
             <p class="lede">
-              Every frontier model ranked across every scenario on the bench. The aggregate score is 70% accessibility, 30% performance, with a penalty for axe violations — taste leans on accessibility.
+              Every frontier model ranked by blinded pairwise visual judgment when available. Lighthouse and axe remain separate hygiene signals, so taste is not just performance or accessibility in disguise.
             </p>
             <div class="badges">
               <span class="badge">⚙ {rows.length} models</span>
               <span class="badge">▣ {benchTotals.briefsLive} scenarios</span>
               <span class="badge">▤ {benchTotals.totalRuns} runs</span>
-              <span class="badge">● {rankedCount} ranked · {rows.length - rankedCount} unbenched</span>
+              <span class="badge">● {rankedCount} tasted · {rows.length - rankedCount} pending</span>
+              <span class="badge">◐ {benchTotals.tasteVotes} taste votes</span>
               <span class="badge">$ {formatCost(benchTotals.totalCost)}</span>
             </div>
           </div>
           <div class="lb-method">
             <header>
-              <span>Score · v1</span>
+              <span>Taste · v1</span>
               <a href="/#how-it-works">Method ↗</a>
             </header>
             <ul>
-              <li><span class="k">Perf weight</span><span class="v">0.30</span></li>
-              <li><span class="k">A11y weight</span><span class="v">0.70</span></li>
-              <li><span class="k">Axe penalty</span><span class="v">−1.5 / violation</span></li>
-              <li><span class="k">Serious penalty</span><span class="v">−3.0 / each</span></li>
+              <li><span class="k">Judge shape</span><span class="v">Blinded pairwise</span></li>
+              <li><span class="k">Aggregator</span><span class="v">Bradley-Terry</span></li>
+              <li><span class="k">Scenario weight</span><span class="v">Equal mean</span></li>
+              <li><span class="k">Hygiene</span><span class="v">Shown separately</span></li>
             </ul>
           </div>
         </div>
@@ -133,7 +147,8 @@ const rankedCount = rows.filter((r) => r.isRanked).length;
           <div class="group">
             <span class="controls-label">Sort by</span>
             <select class="sort-select" data-sort-select aria-label="Sort by">
-              <option value="aggregate">Aggregate score</option>
+              <option value="taste">Taste</option>
+              <option value="hygiene">Hygiene</option>
               <option value="perf">Performance</option>
               <option value="a11y">Accessibility</option>
               <option value="axe">Axe (fewest)</option>
@@ -148,9 +163,10 @@ const rankedCount = rows.filter((r) => r.isRanked).length;
 
         <div class="global-leaderboard" data-board>
           <div class="gl-row gl-head" aria-hidden="true">
-            <button type="button" class="gl-cell gl-rank" data-sort="aggregate">#</button>
-            <button type="button" class="gl-cell gl-model" data-sort="aggregate"><span>Model</span></button>
-            <button type="button" class="gl-cell gl-num" data-sort="aggregate"><span>Score</span></button>
+            <button type="button" class="gl-cell gl-rank" data-sort="taste">#</button>
+            <button type="button" class="gl-cell gl-model" data-sort="taste"><span>Model</span></button>
+            <button type="button" class="gl-cell gl-num" data-sort="taste"><span>Taste</span></button>
+            <button type="button" class="gl-cell gl-num" data-sort="hygiene"><span>Hygiene</span></button>
             <button type="button" class="gl-cell gl-num" data-sort="perf"><span>Perf</span></button>
             <button type="button" class="gl-cell gl-num" data-sort="a11y"><span>A11y</span></button>
             <button type="button" class="gl-cell gl-num" data-sort="axe"><span>Axe</span></button>
@@ -160,8 +176,8 @@ const rankedCount = rows.filter((r) => r.isRanked).length;
           </div>
 
           {rows.map((row, index) => {
-            const isComplete = row.isRanked;
-            const medal = !isComplete
+            const isComplete = row.isGenerated;
+            const medal = !row.hasTaste
               ? ""
               : index === 0
                 ? "gold"
@@ -171,7 +187,8 @@ const rankedCount = rows.filter((r) => r.isRanked).length;
                     ? "bronze"
                     : "";
             const dataAttrs = {
-              "data-sort-aggregate": row.sortKeys.aggregate,
+              "data-sort-taste": row.sortKeys.taste,
+              "data-sort-hygiene": row.sortKeys.hygiene,
               "data-sort-perf": row.sortKeys.perf,
               "data-sort-a11y": row.sortKeys.a11y,
               "data-sort-axe": row.sortKeys.axe,
@@ -180,11 +197,12 @@ const rankedCount = rows.filter((r) => r.isRanked).length;
               "data-sort-cost": row.sortKeys.cost,
               "data-sort-runs": row.sortKeys.runs,
               "data-ranked": String(isComplete),
+              "data-has-taste": String(row.hasTaste),
             };
             return (
-              <div class={`gl-row ${isComplete ? "" : "is-unbenched"}`} {...dataAttrs}>
+              <div class={`gl-row ${isComplete ? "" : "is-unbenched"} ${row.hasTaste ? "" : "is-untasted"}`} {...dataAttrs}>
                 <div class="gl-cell gl-rank">
-                  {isComplete ? (
+                  {row.hasTaste ? (
                     <span class={`rank-medal ${medal}`}>{index + 1}</span>
                   ) : (
                     <span class="rank">—</span>
@@ -198,8 +216,12 @@ const rankedCount = rows.filter((r) => r.isRanked).length;
                   </div>
                 </div>
                 <div class="gl-cell gl-num gl-aggregate">
-                  <strong>{formatAggregate(row.aggregate)}</strong>
-                  <span>aggregate</span>
+                  <strong>{formatTaste(row.tasteScore)}</strong>
+                  <span>{row.tasteProvisional ? "provisional" : formatCi(row.tasteCiLow, row.tasteCiHigh)}</span>
+                </div>
+                <div class="gl-cell gl-num">
+                  <strong>{formatAggregate(row.hygieneScore)}</strong>
+                  <span>hygiene</span>
                 </div>
                 <div class={`gl-cell gl-num tone-${scoreTone(row.avgPerf)}`}>
                   <strong>{formatScore(row.avgPerf)}</strong>
@@ -231,7 +253,7 @@ const rankedCount = rows.filter((r) => r.isRanked).length;
         </div>
 
         <p class="lb-foot">
-          Coverage shows scenarios ranked / scenarios live. As more runs land, ranks shift. Models with no runs sort last regardless of direction.
+          Taste coverage is scenario-level pairwise judging. Models without taste votes sort last; Hygiene remains the old Lighthouse/axe blend for transparency.
         </p>
       </div>
     </section>
@@ -247,13 +269,13 @@ const rankedCount = rows.filter((r) => r.isRanked).length;
   const headerButtons = Array.from(document.querySelectorAll(".gl-head [data-sort]"));
 
   if (board && select && dirToggle) {
-    let sortKey = "aggregate";
+    let sortKey = "taste";
     let dir = "desc";
 
     function sortRows() {
       const rows = Array.from(board.querySelectorAll(".gl-row:not(.gl-head)"));
-      const ranked = rows.filter((r) => r.dataset.ranked === "true");
-      const unbenched = rows.filter((r) => r.dataset.ranked !== "true");
+      const ranked = rows.filter((r) => sortKey === "taste" ? r.dataset.hasTaste === "true" : r.dataset.ranked === "true");
+      const unbenched = rows.filter((r) => !ranked.includes(r));
       const sorted = ranked.sort((a, b) => {
         const av = parseFloat(a.dataset[`sort${sortKey.charAt(0).toUpperCase()}${sortKey.slice(1)}`]);
         const bv = parseFloat(b.dataset[`sort${sortKey.charAt(0).toUpperCase()}${sortKey.slice(1)}`]);
@@ -270,6 +292,11 @@ const rankedCount = rows.filter((r) => r.isRanked).length;
         medal.className = `rank-medal ${idx === 0 ? "gold" : idx === 1 ? "silver" : idx === 2 ? "bronze" : ""}`;
         medal.textContent = String(idx + 1);
         rankCell.appendChild(medal);
+      });
+      unbenched.forEach((row) => {
+        const rankCell = row.querySelector(".gl-rank");
+        if (!rankCell) return;
+        rankCell.innerHTML = '<span class="rank">—</span>';
       });
       // re-attach in order
       const fragment = document.createDocumentFragment();

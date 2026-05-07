@@ -40,6 +40,10 @@ npm run arena:run -- --interface pricing-ai-coding-assistant --models gpt-5-5
 # Re-run evaluators for existing completed runs without calling models again.
 npm run arena:evaluate -- --interface pricing-ai-coding-assistant
 
+# Judge taste for completed runs. Defaults to the 3-judge ensemble; use --cheap
+# for a single inexpensive judge while testing the pipeline.
+npm run arena:taste -- --interface api-keys-admin-table --cheap
+
 # Exercise the full artifact pipeline without calling OpenRouter.
 npm run arena:dry-run -- --interface pricing-ai-coding-assistant --models gpt-5-5
 
@@ -66,6 +70,8 @@ Each run writes:
 The leaderboard embeds generated previews in sandboxed iframes and links to screenshots and the canonical scenario/model page. Generated HTML is treated as untrusted, so the runner injects a restrictive CSP into preview documents and the gallery iframe does not grant same-origin access.
 
 Evaluators are declared in `arena/evaluators/manifest.json` and implemented as modules in `scripts/arena/evaluators`. Add a manifest entry plus a module exporting `runEvaluation()` to plug in another evaluator. The first evaluators are Lighthouse for performance/accessibility scores and axe-core for concrete accessibility violations.
+
+Taste judging is intentionally separate from evaluators because it compares two runs at a time. `npm run arena:taste` reads the latest screenshots for each model in a scenario, sends blinded pairwise comparisons to vision judges, stores vote JSON in `arena/taste/votes`, fits Bradley-Terry scores per scenario, and writes `arena/taste/taste.json`, `src/data/generated-taste.js`, and `public/results/taste.json`. Lighthouse and axe remain visible as hygiene signals instead of being folded into taste.
 
 Lighthouse uses Chrome discovery through `chrome-launcher`. Set `LIGHTHOUSE_CHROME_PATH` or `CHROME_PATH` if it cannot find a local Chrome/Chromium install.
 

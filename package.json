@@ -10,6 +10,7 @@
     "arena:index": "node scripts/arena/build-index.mjs",
     "arena:screenshot": "node scripts/arena/capture-screenshots.mjs",
     "arena:evaluate": "node scripts/arena/evaluate-results.mjs",
+    "arena:taste": "node scripts/arena/judge-taste.mjs",
     "arena:refresh-usage": "node scripts/arena/refresh-openrouter-usage.mjs",
     "arena:install-browsers": "playwright install chromium",
     "generate-og": "node scripts/generate-og.mjs",

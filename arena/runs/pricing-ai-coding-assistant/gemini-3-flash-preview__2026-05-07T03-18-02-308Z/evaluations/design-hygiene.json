@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "id": "design-hygiene",
+  "displayName": "Design Hygiene",
+  "description": "Extracts transparent UI discipline metrics from computed styles: typography, palette, spacing, radius, and shadow consistency.",
+  "categories": [
+    "design-hygiene"
+  ],
+  "status": "complete",
+  "version": "1.0.0",
+  "startedAt": "2026-05-07T03:31:33.119Z",
+  "completedAt": "2026-05-07T03:31:34.174Z",
+  "durationMs": 1054,
+  "scores": {
+    "discipline": {
+      "label": "Design hygiene",
+      "score": 0.9820895522388059,
+      "value": 98.2,
+      "displayValue": "98"
+    }
+  },
+  "metrics": {
+    "fontFamilyCount": 1,
+    "fontSizeCount": 10,
+    "paletteColorCount": 12,
+    "spacingGridFit": 0.94,
+    "radiusCount": 5,
+    "shadowCount": 2,
+    "visibleElementCount": 252
+  },
+  "summary": {
+    "viewport": {
+      "width": 1440,
+      "height": 1100
+    },
+    "visibleElementCount": 252,
+    "textElementCount": 170,
+    "fontFamilyCount": 1,
+    "fontSizeCount": 10,
+    "paletteColorCount": 12,
+    "spacingSampleCount": 335,
+    "spacingGridFit": 0.94,
+    "radiusCount": 5,
+    "shadowCount": 2,
+    "topFontFamilies": [
+      "inter"
+    ],
+    "topFontSizes": [
+      10,
+      12,
+      14,
+      16,
+      18,
+      20,
+      24,
+      30,
+      36,
+      60
+    ],
+    "disciplineScore": 98.2
+  },
+  "issues": [],
+  "artifacts": {}
+}
